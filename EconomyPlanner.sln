@@ -1,0 +1,51 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32929.385
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{E8318E8D-7884-41ED-A5FE-47B673F03E77}"
+	ProjectSection(SolutionItems) = preProject
+		Tools\How to migrate.md = Tools\How to migrate.md
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EconomyPlanner.Abstractions", "EconomyPlanner.Abstractions\EconomyPlanner.Abstractions.csproj", "{C7EB1E1B-5CA7-4648-8B66-C52A8D76FC5D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EconomyPlanner.API", "EconomyPlanner.API\EconomyPlanner.API.csproj", "{49E384EC-9BF5-40FF-AF40-873F7C098EDC}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EconomyPlanner.Repository", "EconomyPlanner.Repository\EconomyPlanner.Repository.csproj", "{6FA9598B-124A-469A-B32A-F052BCEDE49D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EconomyPlannerMigrationDummy", "Tools\EconomyPlannerMigrationDummy\EconomyPlannerMigrationDummy.csproj", "{B7B05755-D412-4A5E-9E74-CAC09828531B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C7EB1E1B-5CA7-4648-8B66-C52A8D76FC5D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C7EB1E1B-5CA7-4648-8B66-C52A8D76FC5D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C7EB1E1B-5CA7-4648-8B66-C52A8D76FC5D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C7EB1E1B-5CA7-4648-8B66-C52A8D76FC5D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{49E384EC-9BF5-40FF-AF40-873F7C098EDC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{49E384EC-9BF5-40FF-AF40-873F7C098EDC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{49E384EC-9BF5-40FF-AF40-873F7C098EDC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{49E384EC-9BF5-40FF-AF40-873F7C098EDC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6FA9598B-124A-469A-B32A-F052BCEDE49D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6FA9598B-124A-469A-B32A-F052BCEDE49D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6FA9598B-124A-469A-B32A-F052BCEDE49D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6FA9598B-124A-469A-B32A-F052BCEDE49D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B7B05755-D412-4A5E-9E74-CAC09828531B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B7B05755-D412-4A5E-9E74-CAC09828531B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B7B05755-D412-4A5E-9E74-CAC09828531B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B7B05755-D412-4A5E-9E74-CAC09828531B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{B7B05755-D412-4A5E-9E74-CAC09828531B} = {E8318E8D-7884-41ED-A5FE-47B673F03E77}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8689DE1D-54B1-4500-B0A7-F0D522A5449B}
+	EndGlobalSection
+EndGlobal
