@@ -1,10 +1,10 @@
 ﻿using EconomyPlanner.Repository.Enums;
 
-namespace EconomyPlanner.Repository.Entities;
+namespace EconomyPlanner.Abstractions.Models;
 
-public class Expense
+public class ExpenseModel
 {
-    public Expense(string name, decimal amount, ExpenseType expenseType, bool recurring, decimal? recurringAmount)
+    public ExpenseModel(string name, decimal amount, ExpenseType expenseType, bool recurring, decimal? recurringAmount)
     {
         Name = name;
         Amount = amount;
@@ -12,8 +12,6 @@ public class Expense
         Recurring = recurring;
         RecurringAmount = recurringAmount;
     }
-
-    public int Id { get; set; }
     public string Name { get; set; }
     public decimal Amount { get; set; }
     public ExpenseType ExpenseType { get; set; }
