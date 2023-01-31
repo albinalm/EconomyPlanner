@@ -22,3 +22,5 @@ The project is based on four layers; A bottom repository, an abstraction layer a
 Security layers are still WIP but the general thought is to keep it simple and use a GUID for each household that you use to authenticate with. Since this application will be used mostly domestic between family and friends security isn't a huge concern at the moment.
 
 In the future I might add user accounts which need to be linked to certain household to strengthen integrity and security.
+
+![Preview of tech stack](Documentation/EconomyPlannerStack.png?raw=true "Tech stack")
