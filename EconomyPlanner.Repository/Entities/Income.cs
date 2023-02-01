@@ -1,23 +1,15 @@
-﻿using EconomyPlanner.Repository.Enums;
+﻿using EconomyPlanner.Repository.Entities.Bases;
+using EconomyPlanner.Repository.Enums;
 
 namespace EconomyPlanner.Repository.Entities;
 
-public class Income
+public class Income : TransactionBase
 {
-    public Income(string name, decimal amount, IncomeType incomeType,  bool recurring, decimal? recurringAmount)
-    {
-        Name = name;
-        Amount = amount;
-        IncomeType = incomeType;
-        Recurring = recurring;
-        RecurringAmount = recurringAmount;
-    }
-
-    public int Id { get; set; }
-    public string Name { get; set; }
-    public decimal Amount { get; set; }
     public IncomeType IncomeType { get; set; }
-    public bool Recurring { get; set; }
-    public decimal? RecurringAmount { get; set; }
-    public bool IsDeleted { get; set; }
+    public RecurringIncome RecurringIncome { get; set; }
+    public Income(string name, decimal amount, IncomeType incomeType, RecurringIncome recurringIncome) : base(name, amount)
+    {
+        IncomeType = incomeType;
+        RecurringIncome = recurringIncome;
+    }
 }
