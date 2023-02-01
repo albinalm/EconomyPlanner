@@ -22,9 +22,9 @@ public class DatabaseContext : DbContext
                            .FirstOrDefault(ep => ep.Id == economyPlanId);
     }
 
-    public Household? GetHouseholdFromId(int householdId)
+    public Household? GetHouseholdFromGuid(string guid)
     {
-        return Households.Include(h => h.EconomyPlans).FirstOrDefault(h => h.Id == householdId);
+        return Households.Include(h => h.EconomyPlans).FirstOrDefault(h => h.Guid == guid);
     }
 
     public Expense? GetExpenseFromId(int expenseId) => Expenses.Find(expenseId);

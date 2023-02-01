@@ -8,8 +8,24 @@ builder.Services.AddControllers();
 builder.Services.RegisterRepository(builder.Configuration);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
+// builder.Services.AddCors(options =>
+// {
+//     options.AddDefaultPolicy(corsPolicyBuilder => 
+//                                  corsPolicyBuilder.WithOrigins("https://localhost:44338")
+//                                         .AllowAnyMethod()
+//                                         .AllowAnyHeader());
+// }); 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: "AllowBlazorOrigin",
+                      corsPolicyBuilder =>
+                      {
+                          corsPolicyBuilder.WithOrigins("http://localhost:5179", "http://localhost:5114");
+                      });
+});
 var app = builder.Build();
+
+app.UseCors("AllowBlazorOrigin");
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -18,8 +34,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-
 app.UseHttpsRedirection();
+
 
 app.UseAuthorization();
 

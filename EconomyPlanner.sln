@@ -18,6 +18,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EconomyPlannerMigrationDumm
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FrontendDummy", "Tools\FrontendDummy\FrontendDummy.csproj", "{EBDE6F01-A9D4-4D83-AE72-3FA3DC893343}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EconomyPlanner.Web", "EconomyPlanner.Web\EconomyPlanner.Web.csproj", "{2AA36190-F615-403F-AB56-80B8F4F3133C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -44,6 +46,10 @@ Global
 		{EBDE6F01-A9D4-4D83-AE72-3FA3DC893343}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EBDE6F01-A9D4-4D83-AE72-3FA3DC893343}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EBDE6F01-A9D4-4D83-AE72-3FA3DC893343}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2AA36190-F615-403F-AB56-80B8F4F3133C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2AA36190-F615-403F-AB56-80B8F4F3133C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2AA36190-F615-403F-AB56-80B8F4F3133C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2AA36190-F615-403F-AB56-80B8F4F3133C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

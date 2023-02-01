@@ -18,9 +18,10 @@ public static class ConfigurationExtensions
         
         services.AddDbContext<DatabaseContext>(options => options.UseSqlServer(connectionString, b => b.MigrationsAssembly("EconomyPlannerMigrationDummy")));
 
-        services.AddTransient<IEconomyPlannerService, EconomyPlanService>();
-        services.AddTransient<IExpenseService, ExpenseService>();
-        services.AddTransient<IIncomeService, IncomeService>();
+        services.AddScoped<IEconomyPlannerService, EconomyPlanService>();
+        services.AddScoped<IExpenseService, ExpenseService>();
+        services.AddScoped<IIncomeService, IncomeService>();
+        services.AddScoped<IHouseholdService, HouseholdService>();
         
         services.AddAutoMapper(typeof(MappingProfile));
     }
