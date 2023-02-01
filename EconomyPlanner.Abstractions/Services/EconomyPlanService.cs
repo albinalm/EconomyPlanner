@@ -21,7 +21,33 @@ public class EconomyPlanService : IEconomyPlannerService
     {
         var economyPlan = EconomyPlan.Create(name);
         _dbContext.Add(economyPlan);
+        
+        AddRecurringExpensesToEconomyPlan(economyPlan);
+        AddRecurringIncomesToEconomyPlan(economyPlan);
+        
         _dbContext.SaveChanges();
+    }
+
+    private void AddRecurringExpensesToEconomyPlan(EconomyPlan economyPlan)
+    {
+        foreach (var recurringExpense in _dbContext.RecurringExpenses)
+        {
+            var expense = _mapper.Map<Expense>(recurringExpense);
+            expense.RecurringExpense = recurringExpense;
+                
+            economyPlan.Expenses.Add(expense);
+        }
+    }
+    
+    private void AddRecurringIncomesToEconomyPlan(EconomyPlan economyPlan)
+    {
+        foreach (var recurringIncome in _dbContext.RecurringIncomes)
+        {
+            var income = _mapper.Map<Income>(recurringIncome);
+            income.RecurringIncome = recurringIncome;
+            
+            economyPlan.Incomes.Add(income);
+        }
     }
     
     // public void AddExpense(int economyPlanId, int expenseId)

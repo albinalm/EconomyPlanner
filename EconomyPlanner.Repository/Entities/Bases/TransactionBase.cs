@@ -4,9 +4,9 @@ namespace EconomyPlanner.Repository.Entities.Bases;
 
 public class TransactionBase : EntityBase
 {
-    protected decimal Amount { get; set; }
+    public decimal Amount { get; set; }
 
-    protected TransactionBase(string name, decimal amount) : base(name)
+    public TransactionBase(string name, decimal amount) : base(name)
     {
         Amount = amount;
     }
