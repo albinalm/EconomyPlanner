@@ -1,43 +1,24 @@
 ﻿@inject Blazored.LocalStorage.ILocalStorageService LocalStorage
-@inject HttpClient Http
 @inject NavigationManager NavManager
+
 @page "/"
+@using EconomyPlanner.Web.Services.Interfaces
 <PageTitle>Index</PageTitle>
 
 <h1>EconomyPlanner</h1>
-<br/>
-<p>Please login by entering your guid below:</p>
-<input type="text" id="txt_guid" name="txt_guid" @bind="TxtGuidText">
-<button @onclick="HandleSubmit">Submit</button>
 
-<p>Was login successful? @LoginSuccessful</p>
 <SurveyPrompt Title="How is Blazor working for you?"/>
 
 @code{
-
-    public string TxtGuidText { get; set; } = "";
-    public bool LoginSuccessful { get; set; } = false;
-    public async Task HandleSubmit()
-    {
-        await LocalStorage.SetItemAsync("EconomyPlanner.UserGuid", TxtGuidText);
-        
-        if(await ValidateGuid(TxtGuidText))
-            NavManager.NavigateTo("/Counter");
-    }
-
+    
+    [Inject]
+    private IHouseholdService HouseholdService { get; set; }
+    
     protected override async Task OnInitializedAsync()
     {
-        var cookieContent = await LocalStorage.GetItemAsync<string>("EconomyPlanner.UserGuid");
-
-        if (cookieContent != null)
-        {
-            // if(await ValidateGuid(cookieContent))
-            //     NavManager.NavigateTo("/Counter");
-        }
+        if(!await HouseholdService.HasSavedLogin())
+            NavManager.NavigateTo("/login");
     }
 
-    private async Task<bool> ValidateGuid(string guid)
-    {
-       return await Http.GetFromJsonAsync<bool>($"http://localhost:5179/api/Household/GetHouseholdFromGuid?guid={guid}");
-    }
+ 
 }

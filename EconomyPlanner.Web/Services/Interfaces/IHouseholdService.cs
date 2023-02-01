@@ -2,5 +2,8 @@ namespace EconomyPlanner.Web.Services.Interfaces;
 
 public interface IHouseholdService
 {
-    Task<bool> ValidateGuid(string guid);
+   Task<bool> AttemptLogin(string guid);
+   Task Logout();
+   Task<bool> HasSavedLogin();
+   Task<string?> GetSavedLogin();
 }

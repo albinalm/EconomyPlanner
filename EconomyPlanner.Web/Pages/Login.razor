@@ -1,0 +1,44 @@
+@inject Blazored.LocalStorage.ILocalStorageService LocalStorage
+@inject HttpClient Http
+@inject NavigationManager NavManager
+@page "/login"
+@using EconomyPlanner.Web.Services.Interfaces
+
+<PageTitle>Counter</PageTitle>
+
+<h1>Login to EconomyPlanner</h1>
+<br/>
+<p>Please login by entering your guid below:</p>
+<input type="text" id="txt_guid" name="txt_guid" @bind="TxtGuidText">
+<button @onclick="SetGuid">Submit</button>
+
+@code{
+
+    [Inject]
+    private IHouseholdService HouseholdService { get; set; }
+
+    public string TxtGuidText { get; set; } = "";
+
+    public async Task SetGuid()
+    {
+        if(await HouseholdService.AttemptLogin(TxtGuidText))
+            NavManager.NavigateTo("/");
+        
+        Console.WriteLine("Login failed :(");
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (await HouseholdService.HasSavedLogin())
+        {
+            var login = await HouseholdService.GetSavedLogin();
+            if (!string.IsNullOrEmpty(login))
+            {
+                if(await HouseholdService.AttemptLogin(login))
+                    NavManager.NavigateTo("/");
+            }
+        }
+            
+    }
+
+}
