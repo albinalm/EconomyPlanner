@@ -6,6 +6,7 @@ namespace EconomyPlanner.Abstractions.Interfaces;
 
 public interface IIncomeService
 {
-    void CreateIncome(IncomeModel incomeModel);
-    void UpdateIncome(Income income);
+    void CreateIncome(int economyPlanId, string name, decimal amount, int incomeTypeId, bool isRecurring, decimal? recurringAmount);
+    void UpdateIncome(IncomeModel incomeModel);
+    IncomeModel? GetIncomeModel(int incomeId);
 }

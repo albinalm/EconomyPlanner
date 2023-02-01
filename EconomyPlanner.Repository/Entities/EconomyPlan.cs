@@ -9,6 +9,8 @@ public class EconomyPlan
         Name = name;
         StartDate = startDate;
         EndDate = endDate;
+        Expenses = new HashSet<Expense>();
+        Incomes = new HashSet<Income>();
     }
 
     public int Id { get; set; }
@@ -17,4 +19,5 @@ public class EconomyPlan
     public ICollection<Income> Incomes { get; set; }
     public string StartDate { get; set; }
     public string EndDate { get; set; }
+  //  public string UserGuid { get; set; }
 }

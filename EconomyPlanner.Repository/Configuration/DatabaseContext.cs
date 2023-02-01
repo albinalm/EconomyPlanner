@@ -11,4 +11,14 @@ public class DatabaseContext : DbContext
     public DatabaseContext(DbContextOptions options) : base(options)
     {
     }
+
+    public EconomyPlan? GetEconomyPlanFromId(int economyPlanId)
+    {
+        return EconomyPlans.Include(ep => ep.Expenses)
+                           .Include(ep => ep.Incomes)
+                           .FirstOrDefault(ep => ep.Id == economyPlanId);
+    }
+
+    public Expense? GetExpenseFromId(int expenseId) => Expenses.Find(expenseId);
+    public Income? GetIncomeFromId(int incomeId) => Incomes.Find(incomeId);
 }

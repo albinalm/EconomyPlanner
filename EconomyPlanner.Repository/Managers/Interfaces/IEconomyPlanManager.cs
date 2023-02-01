@@ -4,5 +4,5 @@ namespace EconomyPlanner.Repository.Managers.Interfaces;
 
 public interface IEconomyPlanManager
 {
-    EconomyPlan Create(string name, ICollection<Expense>? expenses, ICollection<Income>? incomes);
+    EconomyPlan Create(string name);
 }

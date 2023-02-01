@@ -5,10 +5,10 @@ namespace EconomyPlanner.Abstractions.Interfaces;
 
 public interface IEconomyPlannerService
 {
-    void CreateEconomyPlan(EconomyPlanModel economyPlanModel);
-    void AddExpense(EconomyPlan economyPlan, Expense expense);
-    void DeleteExpense(EconomyPlan economyPlan, Expense expense);
-    void AddIncome(EconomyPlan economyPlan, Income income);
-    void DeleteIncome(EconomyPlan economyPlan, Income income);
+    void CreateEconomyPlan(string name);
+    void AddExpense(int economyPlanId, int expenseId);
+    void RemoveExpense(int economyPlanId, int expenseId);
+    void AddIncome(int economyPlanId, int incomeId);
+    void RemoveIncome(int economyPlanId, int incomeId);
     EconomyPlan? GetEconomyPlanByDate(DateTime startPeriod);
 }

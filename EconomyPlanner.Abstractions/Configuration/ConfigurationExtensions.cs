@@ -1,6 +1,8 @@
 ﻿using EconomyPlanner.Abstractions.Interfaces;
+using EconomyPlanner.Abstractions.Models;
 using EconomyPlanner.Abstractions.Services;
 using EconomyPlanner.Repository.Configuration;
+using EconomyPlanner.Repository.Entities;
 using EconomyPlanner.Repository.Managers;
 using EconomyPlanner.Repository.Managers.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -20,14 +22,14 @@ public static class ConfigurationExtensions
         
         services.AddDbContext<DatabaseContext>(options => options.UseSqlServer(connectionString, b => b.MigrationsAssembly("EconomyPlannerMigrationDummy")));
        
-        services.AddScoped<IIncomeManager, IncomeManager>();
-        services.AddScoped<IExpenseManager, ExpenseManager>();
-        services.AddScoped<IEconomyPlanManager, EconomyPlanManager>();
+        services.AddTransient<IIncomeManager, IncomeManager>();
+        services.AddTransient<IExpenseManager, ExpenseManager>();
+        services.AddTransient<IEconomyPlanManager, EconomyPlanManager>();
         
-        services.AddScoped<IExpenseService, ExpenseService>();
-        services.AddScoped<IIncomeService, IncomeService>();
-        services.AddScoped<IEconomyPlannerService, EconomyPlannerService>();
+        services.AddTransient<IEconomyPlannerService, EconomyPlanService>();
+        services.AddTransient<IExpenseService, ExpenseService>();
+        services.AddTransient<IIncomeService, IncomeService>();
         
-
+        services.AddAutoMapper(typeof(MappingProfile));
     }
 }

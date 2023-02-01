@@ -1,5 +1,6 @@
 ﻿using EconomyPlanner.Abstractions.Interfaces;
 using EconomyPlanner.Abstractions.Models;
+using EconomyPlanner.API.Bodies;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EconomyPlanner.API.Controllers;
@@ -16,12 +17,44 @@ public class IncomeController : ControllerBase
         _incomeService = incomeService;
     }
 
-    [HttpPost(Name = "AddIncome")]
-    public IActionResult AddIncome(IncomeModel incomeModel)
+    [HttpPost(Name = "CreateIncome")]
+    public IActionResult CreateIncome(CreateIncomeBody incomeBody)
     {
         try
         {
-            _incomeService.CreateIncome(incomeModel);
+            _incomeService.CreateIncome(incomeBody.EconomyPlanId, incomeBody.Name, incomeBody.Amount, incomeBody.IncomeTypeId, incomeBody.IsRecurring, incomeBody.RecurringAmount);
+            return Ok(incomeBody);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ex.Message);
+        }
+    }
+    
+    [HttpPost(Name = "UpdateIncome")]
+    public IActionResult UpdateIncome(IncomeModel incomeModel)
+    {
+        try
+        {
+            _incomeService.UpdateIncome(incomeModel);
+            return Ok(incomeModel);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ex.Message);
+        }
+    }
+    
+    [HttpGet(Name = "GetIncome")]
+    public IActionResult GetIncome(int incomeId)
+    {
+        try
+        {
+            var incomeModel = _incomeService.GetIncomeModel(incomeId);
+            
+            if (incomeModel is null)
+                return NotFound();
+            
             return Ok(incomeModel);
         }
         catch (Exception ex)

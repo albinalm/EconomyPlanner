@@ -6,7 +6,7 @@ namespace EconomyPlanner.Repository.Managers;
 
 public class EconomyPlanManager : IEconomyPlanManager
 {
-    public EconomyPlan Create(string name, ICollection<Expense>? expenses, ICollection<Income>? incomes)
+    public EconomyPlan Create(string name)
     {
         var year = DateTime.Now.Year;
         var month = DateTime.Now.Month;
@@ -20,11 +20,7 @@ public class EconomyPlanManager : IEconomyPlanManager
 
         return new EconomyPlan(name,
                                startDate,
-                               endDate)
-               {
-                   Expenses = expenses ?? Collection.Empty<Expense>(),
-                   Incomes = incomes ?? Collection.Empty<Income>()
-               };
-        
+                               endDate);
+
     }
 }

@@ -4,14 +4,7 @@ namespace EconomyPlanner.Abstractions.Models;
 
 public class ExpenseModel
 {
-    public ExpenseModel(string name, decimal amount, ExpenseType expenseType, bool recurring, decimal? recurringAmount)
-    {
-        Name = name;
-        Amount = amount;
-        ExpenseType = expenseType;
-        Recurring = recurring;
-        RecurringAmount = recurringAmount;
-    }
+    public int Id { get; set; }
     public string Name { get; set; }
     public decimal Amount { get; set; }
     public ExpenseType ExpenseType { get; set; }

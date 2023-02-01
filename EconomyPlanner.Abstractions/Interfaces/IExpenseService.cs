@@ -6,6 +6,7 @@ namespace EconomyPlanner.Abstractions.Interfaces;
 
 public interface IExpenseService
 {
-    void CreateExpense(ExpenseModel expenseModel);
-    void UpdateExpense(Expense expense);
+    void CreateExpense(int economyPlanId, string name, decimal amount, int expenseTypeId, bool isRecurring, decimal? recurringAmount);
+    void UpdateExpense(ExpenseModel expenseModel);
+    ExpenseModel? GetExpenseModel(int expenseId);
 }
