@@ -23,4 +23,4 @@ Security layers are still WIP but the general thought is to keep it simple and u
 
 In the future I might add user accounts which need to be linked to certain household to strengthen integrity and security.
 
-![Preview of tech stack](Documentation/StackPreview.png?raw=true "Tech stack")
+![Preview of tech stack](Documentation/stack.png?raw=true "Tech stack")
