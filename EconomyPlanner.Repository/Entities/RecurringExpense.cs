@@ -11,4 +11,9 @@ public class RecurringExpense : TransactionBase
     {
         ExpenseType = expenseType;
     }
+    
+    public static RecurringExpense Create(string name, decimal amount, ExpenseType expenseType)
+    {
+        return new RecurringExpense(name, amount, expenseType);
+    }
 }

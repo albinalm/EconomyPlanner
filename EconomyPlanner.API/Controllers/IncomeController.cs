@@ -22,7 +22,7 @@ public class IncomeController : ControllerBase
     {
         try
         {
-            _incomeService.CreateIncome(incomeBody.EconomyPlanId, incomeBody.Name, incomeBody.Amount, incomeBody.IncomeTypeId, incomeBody.IsRecurring, incomeBody.RecurringAmount);
+            _incomeService.CreateIncome(incomeBody.EconomyPlanId, incomeBody.Name, incomeBody.Amount, incomeBody.IncomeTypeId, incomeBody.IsRecurring);
             return Ok(incomeBody);
         }
         catch (Exception ex)
@@ -36,7 +36,7 @@ public class IncomeController : ControllerBase
     {
         try
         {
-            _incomeService.UpdateIncome(incomeModel);
+            _incomeService.UpdateIncomeFromModel(incomeModel);
             return Ok(incomeModel);
         }
         catch (Exception ex)

@@ -11,4 +11,9 @@ public class RecurringIncome : TransactionBase
     {
         IncomeType = incomeType;
     }
+    
+    public static RecurringIncome Create(string name, decimal amount, IncomeType incomeType)
+    {
+        return new RecurringIncome(name, amount, incomeType);
+    }
 }

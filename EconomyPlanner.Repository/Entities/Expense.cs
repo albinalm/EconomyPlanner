@@ -12,4 +12,10 @@ public class Expense : TransactionBase
         ExpenseType = expenseType;
         RecurringExpense = recurringExpense;
     }
+    public static Expense Create(string name, decimal amount, ExpenseType expenseType, RecurringExpense? recurringExpense)
+    {
+        return new Expense(name, amount, expenseType, recurringExpense);
+    }
+    
+    public void SetRecurringExpense(RecurringExpense? recurringExpense) => RecurringExpense = recurringExpense;
 }

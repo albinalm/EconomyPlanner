@@ -1,23 +1,37 @@
-﻿namespace EconomyPlanner.Repository.Entities;
+﻿using EconomyPlanner.Repository.Entities.Bases;
 
-public class EconomyPlan
+namespace EconomyPlanner.Repository.Entities;
+
+public class EconomyPlan : EntityBase
 {
-#pragma warning disable CS8618 //Disabled due to Entity framework cannot use navigation properties in constructor. Parameters are enforced in manager
-    public EconomyPlan(string name, string startDate, string endDate)
-#pragma warning restore CS8618
+    public ICollection<Expense> Expenses { get; set; }
+    public ICollection<Income> Incomes { get; set; }
+    public string StartDate { get; set; }
+    public string EndDate { get; set; }
+    
+    public EconomyPlan(string name, string startDate, string endDate) : base(name)
     {
-        Name = name;
         StartDate = startDate;
         EndDate = endDate;
         Expenses = new HashSet<Expense>();
         Incomes = new HashSet<Income>();
     }
+    
+    public static EconomyPlan Create(string name)
+    {
+        var year = DateTime.Now.Year;
+        var month = DateTime.Now.Month;
 
-    public int Id { get; set; }
-    public string Name { get; set; } 
-    public ICollection<Expense> Expenses { get; set; }
-    public ICollection<Income> Incomes { get; set; }
-    public string StartDate { get; set; }
-    public string EndDate { get; set; }
-  //  public string UserGuid { get; set; }
+        var startDate = $"{year:yyyy}-" +
+                        $"{month:MM}-01";
+        
+        var endDate = $"{year:yyyy}-" +
+                      $"{month:MM}-" +
+                      $"{DateTime.DaysInMonth(year, month)}";
+
+        return new EconomyPlan(name,
+                               startDate,
+                               endDate);
+
+    }
 }

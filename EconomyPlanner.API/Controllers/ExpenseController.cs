@@ -22,7 +22,7 @@ public class ExpenseController : ControllerBase
     {
         try
         {
-            _expenseService.CreateExpense(expenseBody.EconomyPlanId, expenseBody.Name, expenseBody.Amount, expenseBody.ExpenseTypeId, expenseBody.IsRecurring, expenseBody.RecurringAmount);
+            _expenseService.CreateExpense(expenseBody.EconomyPlanId, expenseBody.Name, expenseBody.Amount, expenseBody.ExpenseTypeId, expenseBody.IsRecurring);
             return Ok(expenseBody);
         }
         catch (Exception ex)
@@ -36,7 +36,7 @@ public class ExpenseController : ControllerBase
     {
         try
         {
-            _expenseService.UpdateExpense(expenseModel);
+            _expenseService.UpdateExpenseFromModel(expenseModel);
             return Ok(expenseModel);
         }
         catch (Exception ex)

@@ -4,39 +4,45 @@ using EconomyPlanner.Abstractions.Models;
 using EconomyPlanner.Repository.Configuration;
 using EconomyPlanner.Repository.Entities;
 using EconomyPlanner.Repository.Enums;
-using EconomyPlanner.Repository.Managers.Interfaces;
 
 namespace EconomyPlanner.Abstractions.Services;
 
 public class IncomeService : IIncomeService
 {
     private readonly DatabaseContext _dbContext;
-    private readonly IIncomeManager _incomeManager;
     private readonly IMapper _mapper;
 
-    public IncomeService(DatabaseContext dbContext, IIncomeManager incomeManager, IMapper mapper)
+    public IncomeService(DatabaseContext dbContext, IMapper mapper)
     {
         _dbContext = dbContext;
-        _incomeManager = incomeManager;
         _mapper = mapper;
     }
 
-    public void CreateIncome(int economyPlanId, string name, decimal amount, int incomeTypeId, bool isRecurring, decimal? recurringAmount)
+    public void CreateIncome(int economyPlanId, string name, decimal amount, int incomeTypeId, bool isRecurring)
     {
         var economyPlan = _dbContext.GetEconomyPlanFromId(economyPlanId);
 
             if (economyPlan is null)
                 return;
-
-            var income = _incomeManager.Create(name, amount, (IncomeType)incomeTypeId, isRecurring, recurringAmount);
-        
+            
+            var income = Income.Create(name, amount, (IncomeType)incomeTypeId, null);
+            
+            if (isRecurring)
+            {
+                var recurringIncome = RecurringIncome.Create(name, amount, (IncomeType)incomeTypeId);
+                
+                _dbContext.Add(recurringIncome);
+                
+                income.SetRecurringIncome(recurringIncome);
+            }
+            
             _dbContext.Incomes.Add(income);
             economyPlan.Incomes.Add(income);
             _dbContext.EconomyPlans.Update(economyPlan);
             _dbContext.SaveChanges();
     }
     
-    public void UpdateIncome(IncomeModel incomeModel)
+    public void UpdateIncomeFromModel(IncomeModel incomeModel)
     {
         var income = _dbContext.GetIncomeFromId(incomeModel.Id);
         

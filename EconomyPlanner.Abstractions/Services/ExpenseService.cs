@@ -4,31 +4,37 @@ using EconomyPlanner.Abstractions.Models;
 using EconomyPlanner.Repository.Configuration;
 using EconomyPlanner.Repository.Entities;
 using EconomyPlanner.Repository.Enums;
-using EconomyPlanner.Repository.Managers.Interfaces;
 
 namespace EconomyPlanner.Abstractions.Services;
 
 public class ExpenseService : IExpenseService
 {
     private readonly DatabaseContext _dbContext;
-    private readonly IExpenseManager _expenseManager;
     private readonly IMapper _mapper;
 
-    public ExpenseService(DatabaseContext dbContext, IExpenseManager expenseManager, IMapper mapper)
+    public ExpenseService(DatabaseContext dbContext, IMapper mapper)
     {
         _dbContext = dbContext;
-        _expenseManager = expenseManager;
         _mapper = mapper;
     }
 
-    public void CreateExpense(int economyPlanId, string name, decimal amount, int expenseTypeId, bool isRecurring, decimal? recurringAmount)
+    public void CreateExpense(int economyPlanId, string name, decimal amount, int expenseTypeId, bool isRecurring)
     {
         var economyPlan = _dbContext.GetEconomyPlanFromId(economyPlanId);
 
         if (economyPlan is null)
             return;
 
-        var expense = _expenseManager.Create(name, amount, (ExpenseType)expenseTypeId, isRecurring, recurringAmount);
+        var expense = Expense.Create(name, amount, (ExpenseType)expenseTypeId, null);
+
+        if (isRecurring)
+        {
+            var recurringExpense = RecurringExpense.Create(name, amount, (ExpenseType)expenseTypeId);
+                
+            _dbContext.Add(recurringExpense);
+                
+            expense.SetRecurringExpense(recurringExpense);
+        }
 
         _dbContext.Expenses.Add(expense);
         economyPlan.Expenses.Add(expense);
@@ -36,7 +42,7 @@ public class ExpenseService : IExpenseService
         _dbContext.SaveChanges();
     }
 
-    public void UpdateExpense(ExpenseModel expenseModel)
+    public void UpdateExpenseFromModel(ExpenseModel expenseModel)
     {
         var expense = _dbContext.GetExpenseFromId(expenseModel.Id);
         

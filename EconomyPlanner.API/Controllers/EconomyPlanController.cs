@@ -30,40 +30,40 @@ public class EconomyPlannerController : ControllerBase
         }
     }
     
-    [HttpPost(Name = "AddExpense")]
-    public IActionResult AddExpense(int economyPlanId, int expenseId)
-    {
-        try
-        {
-            _economyPlannerService.AddExpense(economyPlanId, expenseId);
-            return Ok();
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, ex.Message);
-        }
-    }
-    
-    [HttpPost(Name = "AddIncome")]
-    public IActionResult AddIncome(int economyPlanId, int incomeId)
-    {
-        try
-        {
-            _economyPlannerService.AddIncome(economyPlanId, incomeId);
-            return Ok();
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, ex.Message);
-        }
-    }
+    // [HttpPost(Name = "AddExpense")]
+    // public IActionResult AddExpense(int economyPlanId, int expenseId)
+    // {
+    //     try
+    //     {
+    //         _economyPlannerService.AddExpense(economyPlanId, expenseId);
+    //         return Ok();
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         return StatusCode(500, ex.Message);
+    //     }
+    // }
+    //
+    // [HttpPost(Name = "AddIncome")]
+    // public IActionResult AddIncome(int economyPlanId, int incomeId)
+    // {
+    //     try
+    //     {
+    //         _economyPlannerService.AddIncome(economyPlanId, incomeId);
+    //         return Ok();
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         return StatusCode(500, ex.Message);
+    //     }
+    // }
     
     [HttpPost(Name = "RemoveExpense")]
-    public IActionResult RemoveExpense(int economyPlanId, int expenseId)
+    public IActionResult RemoveExpense(int economyPlanId, int expenseId, bool removeRecurring)
     {
         try
         {
-            _economyPlannerService.RemoveExpense(economyPlanId, expenseId);
+            _economyPlannerService.RemoveExpense(economyPlanId, expenseId, removeRecurring);
             return Ok();
         }
         catch (Exception ex)
@@ -73,11 +73,11 @@ public class EconomyPlannerController : ControllerBase
     }
     
     [HttpPost(Name = "RemoveIncome")]
-    public IActionResult RemoveIncome(int economyPlanId, int incomeId)
+    public IActionResult RemoveIncome(int economyPlanId, int incomeId, bool removeRecurring)
     {
         try
         {
-            _economyPlannerService.RemoveIncome(economyPlanId, incomeId);
+            _economyPlannerService.RemoveIncome(economyPlanId, incomeId, removeRecurring);
             return Ok();
         }
         catch (Exception ex)
