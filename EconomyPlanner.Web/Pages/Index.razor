@@ -1,24 +1,35 @@
 ﻿@inject Blazored.LocalStorage.ILocalStorageService LocalStorage
 @inject NavigationManager NavManager
-
 @page "/"
 @using EconomyPlanner.Web.Services.Interfaces
+
 <PageTitle>Index</PageTitle>
 
-<h1>EconomyPlanner</h1>
-
+<h1>Your overview</h1>
+<h2>+ 1200:-</h2>
+<div class="alert alert-secondary mt-4">
+    <span class="bi-amd" aria-hidden="true"></span>
+    <span class="text-nowrap">
+        Shopping 500:-
+    </span>
+    <br/>
+    <span class="oi oi-arrow-right me-2" aria-hidden="true"></span>
+    <span class="text-nowrap">
+        Household 300:-
+    </span>
+</div>
 <SurveyPrompt Title="How is Blazor working for you?"/>
 
 @code{
-    
+
     [Inject]
     private IHouseholdService HouseholdService { get; set; }
-    
+
     protected override async Task OnInitializedAsync()
     {
-        if(!await HouseholdService.HasSavedLogin())
+        if (!await HouseholdService.HasSavedLogin())
             NavManager.NavigateTo("/login");
     }
 
- 
+
 }
