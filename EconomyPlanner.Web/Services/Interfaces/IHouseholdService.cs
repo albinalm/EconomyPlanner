@@ -1,4 +1,4 @@
-using EconomyPlanner.Abstractions.Models;
+using HouseholdModel = EconomyPlanner.Web.Models.HouseholdModel;
 
 namespace EconomyPlanner.Web.Services.Interfaces;
 

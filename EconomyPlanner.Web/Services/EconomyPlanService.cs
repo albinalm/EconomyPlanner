@@ -1,6 +1,6 @@
 ﻿using System.Net.Http.Json;
-using EconomyPlanner.Abstractions.Models;
 using EconomyPlanner.Web.Services.Interfaces;
+using EconomyPlanModel = EconomyPlanner.Web.Models.EconomyPlanModel;
 
 
 namespace EconomyPlanner.Web.Services;

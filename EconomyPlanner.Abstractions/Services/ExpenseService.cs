@@ -3,7 +3,6 @@ using EconomyPlanner.Abstractions.Interfaces;
 using EconomyPlanner.Abstractions.Models;
 using EconomyPlanner.Repository.Configuration;
 using EconomyPlanner.Repository.Entities;
-using EconomyPlanner.Repository.Enums;
 
 namespace EconomyPlanner.Abstractions.Services;
 
@@ -18,18 +17,18 @@ public class ExpenseService : IExpenseService
         _mapper = mapper;
     }
 
-    public void CreateExpense(int economyPlanId, string name, decimal amount, int expenseTypeId, bool isRecurring)
+    public void CreateExpense(int economyPlanId, string name, decimal amount, string expenseType, bool isRecurring)
     {
         var economyPlan = _dbContext.GetEconomyPlanFromId(economyPlanId);
 
         if (economyPlan is null)
             return;
 
-        var expense = Expense.Create(name, amount, (ExpenseType)expenseTypeId, null);
+        var expense = Expense.Create(name, amount, expenseType, null);
 
         if (isRecurring)
         {
-            var recurringExpense = RecurringExpense.Create(name, amount, (ExpenseType)expenseTypeId);
+            var recurringExpense = RecurringExpense.Create(name, amount, expenseType);
                 
             _dbContext.Add(recurringExpense);
                 

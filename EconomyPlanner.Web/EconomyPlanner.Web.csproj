@@ -8,6 +8,7 @@
 
     <ItemGroup>
         <PackageReference Include="Blazored.LocalStorage" Version="4.3.0" />
+        <PackageReference Include="Blazored.Modal" Version="7.1.0" />
         <PackageReference Include="BuildWebCompiler" Version="1.12.405" />
         <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="7.0.0-rc.2.22476.2" />
         <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="7.0.0-rc.2.22476.2" PrivateAssets="all" />
@@ -15,7 +16,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\EconomyPlanner.Abstractions\EconomyPlanner.Abstractions.csproj" />
+      <Folder Include="wwwroot\js" />
     </ItemGroup>
 
 </Project>

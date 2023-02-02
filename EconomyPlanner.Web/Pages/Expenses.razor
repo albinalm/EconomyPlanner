@@ -1,13 +1,18 @@
 ﻿@page "/expenses"
-@using EconomyPlanner.Abstractions.Models
 @using EconomyPlanner.Web.Services.Interfaces
+@using EconomyPlanModel = EconomyPlanner.Web.Models.EconomyPlanModel
+@using ExpenseModel = EconomyPlanner.Web.Models.ExpenseModel
 
 <PageTitle>Expenses</PageTitle>
 
-<h1>Expenses</h1>
+<h1>Current expenses</h1>
+<br/>
 
+<div>
+    <b>Selected economy plan:</b>
+</div>
 <Dropdown TItem="EconomyPlanModel" OnSelected="@OnSelected">
-    <InitialTip>This is a dropdown list</InitialTip>
+    <InitialTip>@InitialEconomyPlanName</InitialTip>
     <ChildContent>
         @foreach (var plan in _economyPlanModels)
         {
@@ -17,37 +22,144 @@
 </Dropdown>
 
 <div class="alert alert-secondary mt-4">
-    <br/>
-    <ul class="list-group">
-        @foreach (var expense in expenseModels)
+    <div>
+        <div class="row">
+            <div class="col-md">
+                <b>Type: </b>
+            </div>
+            <div class="col-md">
+                <b>Name: </b>
+            </div>
+            <div class="col-md">
+                <b>Amount: </b>
+            </div>
+            <div class="col-md">
+            </div>
+        </div>
+        <hr/>
+        @foreach (var expense in _expenseModels)
         {
-            <li class="list-group-item">@expense.Name</li>
+            <div class="row">
+                <div class="col-md text-left">
+                    <div class="span2">
+                        <button class="btn btn-dark btn-block btn-sm text-left" @onclick="@(_ => ShowEditTypePopup(expense.ExpenseType.ToString()))">@expense.ExpenseType</button>
+                    </div>
+                </div>
+                <div class="col-md">
+                    <div class="span2">
+                        <button class="btn btn-dark btn-block btn-sm text-left" @onclick="@(_ => ShowEditNamePopup(expense.Name))">@expense.Name</button>
+                    </div>
+                </div>
+                <div class="col-md">
+                    <div class="span2">
+                        <button class="btn btn-dark btn-block btn-sm text-left" @onclick="@(_ => ShowEditAmountPopup(expense.Amount))">@expense.Amount</button>
+                    </div>
+                </div>
+                <div class="col-md">
+                    <button class="btn btn-danger btn-sm text-left" @onclick="@(_ => ShowDeletePopup("Are you sure you wish to delete ", expense.Name))">
+                        Delete
+                    </button>
+                </div>
+            </div>
+            <br/>
         }
-    </ul>
+    </div>
+</div>
+<br/><hr/><br/>
+<h4>Recurring expenses:</h4>
+<div class="alert alert-secondary mt-4">
+    <div>
+        <div class="row">
+            <div class="col-md">
+                <b>Type: </b>
+            </div>
+            <div class="col-md">
+                <b>Name: </b>
+            </div>
+            <div class="col-md">
+                <b>Amount: </b>
+            </div>
+            <div class="col-md">
+            </div>
+        </div>
+        <hr/>
+    </div>
 </div>
 
 @code {
+
+    [CascadingParameter]
+    public IModalService Modal { get; set; }
+
     [Inject]
-    private IEconomyPlanService EconomyPlanService { get; set; }
-    
+    private IEconomyPlanService EconomyPlanService { get; set; } = null!;
+
     [Inject]
-    private IExpenseService ExpenseService { get; set; }
-    
-    private List<ExpenseModel> expenseModels = new();
+    private IExpenseService ExpenseService { get; set; } = null!;
+
+    private List<ExpenseModel> _expenseModels = new();
     private List<EconomyPlanModel> _economyPlanModels = new();
-    
+    private string InitialEconomyPlanName { get; set; } = "";
+
     protected override async Task OnInitializedAsync()
     {
         await GetEconomyPlanModes();
+        if (_economyPlanModels.Any())
+        {
+            InitialEconomyPlanName = _economyPlanModels.First().Name;
+            _expenseModels = ExpenseService.GetExpenses(_economyPlanModels.First()).ToList();
+        }
     }
 
     private async Task GetEconomyPlanModes()
     {
         _economyPlanModels = (await EconomyPlanService.GetEconomyPlans()).ToList();
     }
+
     private void OnSelected(EconomyPlanModel selection)
     {
-        expenseModels = ExpenseService.GetExpenses(selection).ToList();
+        _expenseModels = ExpenseService.GetExpenses(selection).ToList();
+    }
+
+    private void ShowDeletePopup(string preText, string expenseName)
+    {
+        var parameters = new ModalParameters()
+            .Add(nameof(DeleteTransaction.PreText), preText)
+            .Add(nameof(DeleteTransaction.TransactionName), expenseName);
+
+        Modal.Show<DeleteTransaction>("Delete?", parameters);
+    }
+
+    private void ShowEditAmountPopup(decimal amount)
+    {
+        var parameters = new ModalParameters()
+            .Add(nameof(EditTransactionAmount.Amount), amount);
+
+        Modal.Show<EditTransactionAmount>("Edit", parameters);
+    }
+
+    private void ShowEditNamePopup(string expenseName)
+    {
+        var parameters = new ModalParameters()
+            .Add(nameof(EditTransactionName.Name), expenseName);
+
+        Modal.Show<EditTransactionName>("Edit", parameters);
+    }
+
+    private void ShowEditTypePopup(string oldExpenseType)
+    {
+        var expenseTypes = new List<string>
+                           {
+                               "Loan",
+                               "Household",
+                               "Subscription"
+                           };
+
+        var parameters = new ModalParameters()
+            .Add(nameof(EditTransactionType.OldTransactionType), oldExpenseType)
+            .Add(nameof(EditTransactionType.TransactionTypes), expenseTypes);
+
+        Modal.Show<EditTransactionType>("Edit", parameters);
     }
 
 }

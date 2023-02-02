@@ -38,7 +38,7 @@ namespace EconomyPlanner.Repository.Languages {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Alms_Ekonomikalkylator.Repository.Languages.CommonLoc", typeof(CommonLoc).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("EconomyPlanner.Repository.Languages.CommonLoc", typeof(CommonLoc).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -65,15 +65,6 @@ namespace EconomyPlanner.Repository.Languages {
         internal static string ExpenseTypeHousehold {
             get {
                 return ResourceManager.GetString("ExpenseTypeHousehold", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Other.
-        /// </summary>
-        internal static string ExpenseTypeOther {
-            get {
-                return ResourceManager.GetString("ExpenseTypeOther", resourceCulture);
             }
         }
         
@@ -105,15 +96,6 @@ namespace EconomyPlanner.Repository.Languages {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Other.
-        /// </summary>
-        internal static string IncomeTypeOther {
-            get {
-                return ResourceManager.GetString("IncomeTypeOther", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Refund.
         /// </summary>
         internal static string IncomeTypeRefund {
@@ -128,6 +110,15 @@ namespace EconomyPlanner.Repository.Languages {
         internal static string IncomeTypeSalary {
             get {
                 return ResourceManager.GetString("IncomeTypeSalary", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Other.
+        /// </summary>
+        internal static string TransactionTypeOther {
+            get {
+                return ResourceManager.GetString("TransactionTypeOther", resourceCulture);
             }
         }
     }

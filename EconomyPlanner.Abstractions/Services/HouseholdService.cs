@@ -3,7 +3,6 @@ using EconomyPlanner.Abstractions.Interfaces;
 using EconomyPlanner.Abstractions.Models;
 using EconomyPlanner.Repository.Configuration;
 using EconomyPlanner.Repository.Entities;
-using EconomyPlanner.Repository.Enums;
 
 namespace EconomyPlanner.Abstractions.Services;
 

@@ -1,4 +1,5 @@
 using Blazored.LocalStorage;
+using Blazored.Modal;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using EconomyPlanner.Web;
@@ -16,4 +17,6 @@ builder.Services.AddBlazoredLocalStorage(config => config.JsonSerializerOptions.
 builder.Services.AddScoped<IHouseholdService, HouseholdService>();
 builder.Services.AddScoped<IEconomyPlanService, EconomyPlanService>();
 builder.Services.AddScoped<IExpenseService, ExpenseService>();
+builder.Services.AddBlazoredModal();   
+
 await builder.Build().RunAsync();

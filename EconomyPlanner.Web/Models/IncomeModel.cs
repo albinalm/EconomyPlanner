@@ -1,4 +1,4 @@
-﻿namespace EconomyPlanner.Abstractions.Models;
+﻿namespace EconomyPlanner.Web.Models;
 
 public class IncomeModel
 {

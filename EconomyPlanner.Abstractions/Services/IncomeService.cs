@@ -3,7 +3,6 @@ using EconomyPlanner.Abstractions.Interfaces;
 using EconomyPlanner.Abstractions.Models;
 using EconomyPlanner.Repository.Configuration;
 using EconomyPlanner.Repository.Entities;
-using EconomyPlanner.Repository.Enums;
 
 namespace EconomyPlanner.Abstractions.Services;
 
@@ -18,18 +17,18 @@ public class IncomeService : IIncomeService
         _mapper = mapper;
     }
 
-    public void CreateIncome(int economyPlanId, string name, decimal amount, int incomeTypeId, bool isRecurring)
+    public void CreateIncome(int economyPlanId, string name, decimal amount, string incomeType, bool isRecurring)
     {
         var economyPlan = _dbContext.GetEconomyPlanFromId(economyPlanId);
 
             if (economyPlan is null)
                 return;
             
-            var income = Income.Create(name, amount, (IncomeType)incomeTypeId, null);
+            var income = Income.Create(name, amount, incomeType, null);
             
             if (isRecurring)
             {
-                var recurringIncome = RecurringIncome.Create(name, amount, (IncomeType)incomeTypeId);
+                var recurringIncome = RecurringIncome.Create(name, amount, incomeType);
                 
                 _dbContext.Add(recurringIncome);
                 

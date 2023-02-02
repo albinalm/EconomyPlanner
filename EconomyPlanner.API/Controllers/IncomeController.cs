@@ -22,7 +22,7 @@ public class IncomeController : ControllerBase
     {
         try
         {
-            _incomeService.CreateIncome(incomeBody.EconomyPlanId, incomeBody.Name, incomeBody.Amount, incomeBody.IncomeTypeId, incomeBody.IsRecurring);
+            _incomeService.CreateIncome(incomeBody.EconomyPlanId, incomeBody.Name, incomeBody.Amount, incomeBody.IncomeType, incomeBody.IsRecurring);
             return Ok(incomeBody);
         }
         catch (Exception ex)

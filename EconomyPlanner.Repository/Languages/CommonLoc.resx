@@ -123,7 +123,7 @@
   <data name="ExpenseTypeShopping" xml:space="preserve">
     <value>Shopping</value>
   </data>
-  <data name="ExpenseTypeOther" xml:space="preserve">
+  <data name="TransactionTypeOther" xml:space="preserve">
     <value>Other</value>
   </data>
   <data name="ExpenseTypeSubscription" xml:space="preserve">
@@ -137,8 +137,5 @@
   </data>
   <data name="IncomeTypeGift" xml:space="preserve">
     <value>Gift</value>
-  </data>
-  <data name="IncomeTypeOther" xml:space="preserve">
-    <value>Other</value>
   </data>
 </root>

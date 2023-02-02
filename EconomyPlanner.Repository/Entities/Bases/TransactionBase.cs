@@ -1,6 +1,4 @@
-﻿using EconomyPlanner.Repository.Enums;
-
-namespace EconomyPlanner.Repository.Entities.Bases;
+﻿namespace EconomyPlanner.Repository.Entities.Bases;
 
 public class TransactionBase : EntityBase
 {

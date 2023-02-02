@@ -1,0 +1,32 @@
+﻿<p>Old value:</p>
+<input class="form-control" type="text" placeholder="@OldTransactionType" readonly>
+<br/>
+<p>New value:</p>
+  <div class="form-group">
+    <label for="transactionTypeSelector">@OldTransactionType</label>
+      <select class="form-control" id="transactionTypeSelector">
+          @foreach (var transactionType in TransactionTypes)
+          {
+              <option>@transactionType</option>
+          }
+      </select>
+  </div>
+<br/>
+<button class="btn btn-dark text-center" @onclick="Save">Save</button>
+@code
+{
+    [CascadingParameter] BlazoredModalInstance BlazoredModal { get; set; } = default!;
+    [CascadingParameter] public IModalService Modal { get; set; } = default!;
+
+    [Parameter]
+    public string OldTransactionType { get; set; } = "";
+    
+    [Parameter]
+    public List<string> TransactionTypes { get; set; } = new();
+
+    private async Task Save()
+    {
+        await Close();
+    }
+    private async Task Close() => await BlazoredModal.CloseAsync();
+}

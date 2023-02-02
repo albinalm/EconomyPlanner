@@ -1,8 +1,7 @@
-﻿using System.Net;
-using System.Net.Http.Json;
+﻿using System.Net.Http.Json;
 using Blazored.LocalStorage;
-using EconomyPlanner.Abstractions.Models;
 using EconomyPlanner.Web.Services.Interfaces;
+using HouseholdModel = EconomyPlanner.Web.Models.HouseholdModel;
 
 namespace EconomyPlanner.Web.Services;
 

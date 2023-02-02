@@ -1,0 +1,35 @@
+﻿<p>@PreText<b>@TransactionName</b>?</p>
+<div class="form-check">
+  <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault" @onchange="eventArgs => { RecurringCheckboxClicked(eventArgs.Value); }">
+  <label class="form-check-label" for="flexSwitchCheckDefault">Also delete recurring transaction</label>
+</div>
+<br/>
+<button class="btn btn-warning text-center" @onclick="Delete">Yes</button>
+<button class="btn btn-info text-center" @onclick="Close">No</button>
+@code
+{
+    public bool DeleteRecurring { get; set; }
+    
+    [Parameter] public string? TransactionName { get; set; }
+    [Parameter] public string? PreText { get; set; }
+    [CascadingParameter] BlazoredModalInstance BlazoredModal { get; set; } = default!;
+    [CascadingParameter] public IModalService Modal { get; set; } = default!;
+
+    private async Task Delete()
+    {
+        await Close();
+    }
+    private async Task Close() => await BlazoredModal.CloseAsync();
+    
+    void RecurringCheckboxClicked(object checkedValue)
+    {
+        if ((bool)checkedValue)
+        {
+            DeleteRecurring = true;
+        }
+        else
+        {
+            DeleteRecurring = false;
+        }
+    }
+}

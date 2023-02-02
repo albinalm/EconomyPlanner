@@ -1,4 +1,5 @@
-﻿using EconomyPlanner.Abstractions.Models;
+﻿using EconomyPlanModel = EconomyPlanner.Web.Models.EconomyPlanModel;
+using ExpenseModel = EconomyPlanner.Web.Models.ExpenseModel;
 
 namespace EconomyPlanner.Web.Services.Interfaces;
 
