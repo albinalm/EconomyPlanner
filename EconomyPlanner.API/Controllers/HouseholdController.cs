@@ -25,7 +25,7 @@ public class HouseholdController : ControllerBase
             if (householdModel is null)
                 return NotFound();
             
-            return Ok(true);
+            return Ok(householdModel);
         }
         catch (Exception ex)
         {

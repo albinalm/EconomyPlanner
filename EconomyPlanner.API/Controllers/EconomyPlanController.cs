@@ -5,23 +5,23 @@ using Microsoft.AspNetCore.Mvc;
 namespace EconomyPlanner.API.Controllers;
 [ApiController]
 [Route("api/[controller]/[action]")]
-public class EconomyPlannerController : ControllerBase
+public class EconomyPlanController : ControllerBase
 {
-    private readonly ILogger<EconomyPlannerController> _logger;
+    private readonly ILogger<EconomyPlanController> _logger;
     private readonly IEconomyPlannerService _economyPlannerService;
 
-    public EconomyPlannerController(ILogger<EconomyPlannerController> logger, IEconomyPlannerService economyPlannerService)
+    public EconomyPlanController(ILogger<EconomyPlanController> logger, IEconomyPlannerService economyPlannerService)
     {
         _logger = logger;
         _economyPlannerService = economyPlannerService;
     }
 
     [HttpPost(Name = "CreateEconomyPlan")]
-    public IActionResult CreateEconomyPlan(string name)
+    public IActionResult CreateEconomyPlan(string name, string householdGuid)
     {
         try
         {
-            _economyPlannerService.CreateEconomyPlan(name);
+            _economyPlannerService.CreateEconomyPlan(name, householdGuid);
             return Ok();
         }
         catch (Exception ex)
@@ -79,6 +79,19 @@ public class EconomyPlannerController : ControllerBase
         {
             _economyPlannerService.RemoveIncome(economyPlanId, incomeId, removeRecurring);
             return Ok();
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ex.Message);
+        }
+    }
+
+    [HttpGet(Name = "GetEconomyPlansFromHouseholdGuid")]
+    public IActionResult GetEconomyPlansFromHouseholdGuid(string guid)
+    {
+        try
+        {
+            return Ok(_economyPlannerService.GetEconomyPlansFromHouseholdId(guid).ToList());
         }
         catch (Exception ex)
         {

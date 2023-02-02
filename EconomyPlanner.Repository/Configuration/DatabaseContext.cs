@@ -24,12 +24,17 @@ public class DatabaseContext : DbContext
 
     public Household? GetHouseholdFromGuid(string guid)
     {
-        return Households.Include(h => h.EconomyPlans).FirstOrDefault(h => h.Guid == guid);
+        return Households.Where(h => h.Guid == guid).Include(h => h.EconomyPlans).FirstOrDefault();
     }
 
     public Expense? GetExpenseFromId(int expenseId) => Expenses.Find(expenseId);
     public Income? GetIncomeFromId(int incomeId) => Incomes.Find(incomeId);
     public RecurringExpense? GetRecurringExpenseFromId(int recurringExpenseId) => RecurringExpenses.Find(recurringExpenseId);
     public RecurringIncome? GetRecurringIncomeFromId(int recurringIncomeId) => RecurringIncomes.Find(recurringIncomeId);
-    
+
+    public IEnumerable<EconomyPlan> GetEconomyPlansFromHousehold(Household household)
+    {
+        return EconomyPlans.Where(e => household.EconomyPlans.Contains(e)).Include(e => e.Expenses).Include(e => e.Incomes);
+    }
+
 }

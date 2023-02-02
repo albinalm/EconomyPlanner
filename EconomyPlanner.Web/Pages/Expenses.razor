@@ -1,0 +1,53 @@
+﻿@page "/expenses"
+@using EconomyPlanner.Abstractions.Models
+@using EconomyPlanner.Web.Services.Interfaces
+
+<PageTitle>Expenses</PageTitle>
+
+<h1>Expenses</h1>
+
+<Dropdown TItem="EconomyPlanModel" OnSelected="@OnSelected">
+    <InitialTip>This is a dropdown list</InitialTip>
+    <ChildContent>
+        @foreach (var plan in _economyPlanModels)
+        {
+            <DropdownListItem Item="@plan">@plan.Name</DropdownListItem>
+        }
+    </ChildContent>
+</Dropdown>
+
+<div class="alert alert-secondary mt-4">
+    <br/>
+    <ul class="list-group">
+        @foreach (var expense in expenseModels)
+        {
+            <li class="list-group-item">@expense.Name</li>
+        }
+    </ul>
+</div>
+
+@code {
+    [Inject]
+    private IEconomyPlanService EconomyPlanService { get; set; }
+    
+    [Inject]
+    private IExpenseService ExpenseService { get; set; }
+    
+    private List<ExpenseModel> expenseModels = new();
+    private List<EconomyPlanModel> _economyPlanModels = new();
+    
+    protected override async Task OnInitializedAsync()
+    {
+        await GetEconomyPlanModes();
+    }
+
+    private async Task GetEconomyPlanModes()
+    {
+        _economyPlanModels = (await EconomyPlanService.GetEconomyPlans()).ToList();
+    }
+    private void OnSelected(EconomyPlanModel selection)
+    {
+        expenseModels = ExpenseService.GetExpenses(selection).ToList();
+    }
+
+}

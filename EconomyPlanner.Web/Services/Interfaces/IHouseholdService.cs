@@ -1,3 +1,5 @@
+using EconomyPlanner.Abstractions.Models;
+
 namespace EconomyPlanner.Web.Services.Interfaces;
 
 public interface IHouseholdService
@@ -6,4 +8,5 @@ public interface IHouseholdService
    Task Logout();
    Task<bool> HasSavedLogin();
    Task<string?> GetSavedLogin();
+   Task<HouseholdModel> GetHouseholdModel();
 }
