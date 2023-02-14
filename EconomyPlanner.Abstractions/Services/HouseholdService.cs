@@ -31,4 +31,14 @@ public class HouseholdService : IHouseholdService
         _dbContext.Add(household);
         _dbContext.SaveChanges();
     }
+
+    public IEnumerable<ExpenseModel> GetRecurringExpenses(string guid)
+    {
+        var household = _dbContext.GetHouseholdFromGuid(guid);
+
+        if (household is null)
+            throw new InvalidOperationException("HouseholdService > GetRecurringExpenses Household not found");
+
+        return _mapper.Map<IEnumerable<ExpenseModel>>(household.RecurringExpenses);
+    }
 }

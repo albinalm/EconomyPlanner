@@ -2,6 +2,7 @@
 @using EconomyPlanner.Web.Services.Interfaces
 @using EconomyPlanModel = EconomyPlanner.Web.Models.EconomyPlanModel
 @using ExpenseModel = EconomyPlanner.Web.Models.ExpenseModel
+@inject NavigationManager NavManager
 
 <PageTitle>Expenses</PageTitle>
 
@@ -83,6 +84,32 @@
             </div>
         </div>
         <hr/>
+        @foreach (var recurringExpense in _recurringExpenses)
+        {
+            <div class="row">
+                <div class="col-md text-left">
+                    <div class="span2">
+                        <button class="btn btn-dark btn-block btn-sm text-left" @onclick="@(_ => ShowEditTypePopup(recurringExpense.ExpenseType))">@recurringExpense.ExpenseType</button>
+                    </div>
+                </div>
+                <div class="col-md">
+                    <div class="span2">
+                        <button class="btn btn-dark btn-block btn-sm text-left" @onclick="@(_ => ShowEditNamePopup(recurringExpense.Name))">@recurringExpense.Name</button>
+                    </div>
+                </div>
+                <div class="col-md">
+                    <div class="span2">
+                        <button class="btn btn-dark btn-block btn-sm text-left" @onclick="@(_ => ShowEditAmountPopup(recurringExpense.Amount))">@recurringExpense.Amount</button>
+                    </div>
+                </div>
+                <div class="col-md">
+                    <button class="btn btn-danger btn-sm text-left" @onclick="@(_ => ShowDeletePopup("Are you sure you wish to delete ", recurringExpense.Name))">
+                        Delete
+                    </button>
+                </div>
+            </div>
+            <br/>
+        }
     </div>
 </div>
 
@@ -96,21 +123,38 @@
 
     [Inject]
     private IExpenseService ExpenseService { get; set; } = null!;
+    
+    [Inject]
+    private IHouseholdService HouseholdService { get; set; } = null!;
 
     private List<ExpenseModel> _expenseModels = new();
+    private List<ExpenseModel> _recurringExpenses = new();
     private List<EconomyPlanModel> _economyPlanModels = new();
     private string InitialEconomyPlanName { get; set; } = "";
 
     protected override async Task OnInitializedAsync()
+    {
+        if (!await HouseholdService.HasSavedLogin())
+            NavManager.NavigateTo("/login");
+        else
+            await InitializePage();
+    }
+
+    private async Task InitializePage()
     {
         await GetEconomyPlanModes();
         if (_economyPlanModels.Any())
         {
             InitialEconomyPlanName = _economyPlanModels.First().Name;
             _expenseModels = ExpenseService.GetExpenses(_economyPlanModels.First()).ToList();
-        }
+            await GetRecurringExpenses();
+        } 
     }
-
+    
+    private async Task GetRecurringExpenses()
+    {
+        _recurringExpenses = (await HouseholdService.GetRecurringExpenses()).ToList();
+    }
     private async Task GetEconomyPlanModes()
     {
         _economyPlanModels = (await EconomyPlanService.GetEconomyPlans()).ToList();

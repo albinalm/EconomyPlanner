@@ -16,6 +16,9 @@ public class MappingProfile : Profile
 
         CreateMap<RecurringExpense, Expense>().ForMember(x => x.Id, opt => opt.Ignore());
         CreateMap<RecurringIncome, Income>().ForMember(x => x.Id, opt => opt.Ignore());
+        
+        CreateMap<RecurringExpense, ExpenseModel>().ForMember(x => x.Id, opt => opt.Ignore());
+        CreateMap<RecurringIncome, IncomeModel>().ForMember(x => x.Id, opt => opt.Ignore());
 
         CreateMap<EconomyPlanModel, EconomyPlan>();
         CreateMap<EconomyPlan, EconomyPlanModel>().ForMember(x => x.Id, opt => opt.Ignore());

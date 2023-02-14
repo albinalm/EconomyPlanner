@@ -24,7 +24,11 @@ public class DatabaseContext : DbContext
 
     public Household? GetHouseholdFromGuid(string guid)
     {
-        return Households.Where(h => h.Guid == guid).Include(h => h.EconomyPlans).FirstOrDefault();
+        return Households.Where(h => h.Guid == guid)
+                         .Include(h => h.EconomyPlans)
+                         .Include(h => h.RecurringExpenses)
+                         .Include(h => h.RecurringIncomes)
+                         .FirstOrDefault();
     }
 
     public Expense? GetExpenseFromId(int expenseId) => Expenses.Find(expenseId);

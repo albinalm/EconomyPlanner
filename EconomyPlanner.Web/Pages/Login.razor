@@ -21,8 +21,11 @@
 
     public async Task SetGuid()
     {
-        if(await HouseholdService.AttemptLogin(TxtGuidText))
-            NavManager.NavigateTo("/");
+        if (await HouseholdService.AttemptLogin(TxtGuidText))
+        {
+            
+            NavManager.NavigateTo("/", forceLoad: true);
+        }
         
         Console.WriteLine("Login failed :(");
     }
@@ -34,8 +37,10 @@
             var login = await HouseholdService.GetSavedLogin();
             if (!string.IsNullOrEmpty(login))
             {
-                if(await HouseholdService.AttemptLogin(login))
-                    NavManager.NavigateTo("/");
+                if (await HouseholdService.AttemptLogin(login))
+                {
+                    NavManager.NavigateTo("/", forceLoad: true);
+                }
             }
         }
             

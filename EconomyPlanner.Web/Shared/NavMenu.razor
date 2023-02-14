@@ -1,6 +1,8 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+﻿@inject NavigationManager NavManager
+@using EconomyPlanner.Web.Services.Interfaces
+<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
-        <a class="navbar-brand bi-bank2" href="">  Economy Planner</a>
+        <a class="navbar-brand bi-bank2" href=""> Economy Planner</a>
         <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -25,21 +27,59 @@
             </NavLink>
         </div>
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="login">
-                <span class="oi oi-account-login" aria-hidden="true"></span> Login
-            </NavLink>
+            @if (!IsLoggedIn)
+            {
+                <NavLink class="nav-link" href="login">
+                    <span class="oi oi-account-login" aria-hidden="true"></span> Login
+                </NavLink>
+            }
+            else
+            {
+                <NavLink class="nav-link" @onclick="Logout">
+                    <span class="oi oi-account-logout" aria-hidden="true"></span> Logout
+                </NavLink>
+            }
         </div>
     </nav>
 </div>
 
 @code {
+
+    [Inject]
+    private IHouseholdService HouseholdService { get; set; }
+
+    private bool IsLoggedIn { get; set; }
     private bool collapseNavMenu = true;
 
     private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
 
+
     private void ToggleNavMenu()
     {
         collapseNavMenu = !collapseNavMenu;
+    }
+
+    public async Task CheckForLogin()
+    {
+        if (await HouseholdService.HasSavedLogin())
+        {
+            if (await HouseholdService.AttemptLogin((await HouseholdService.GetSavedLogin())!))
+            {
+                IsLoggedIn = true;
+            }
+        }
+    }
+
+    private async Task Logout()
+    {
+        await HouseholdService.Logout();
+        IsLoggedIn = false;
+        NavManager.NavigateTo("/login");
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CheckForLogin();
     }
 
 }

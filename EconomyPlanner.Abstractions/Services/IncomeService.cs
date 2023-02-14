@@ -17,34 +17,35 @@ public class IncomeService : IIncomeService
         _mapper = mapper;
     }
 
-    public void CreateIncome(int economyPlanId, string name, decimal amount, string incomeType, bool isRecurring)
+    public void CreateIncome(int economyPlanId, string householdGuid, string name, decimal amount, string incomeType, bool isRecurring)
     {
         var economyPlan = _dbContext.GetEconomyPlanFromId(economyPlanId);
+        var household = _dbContext.GetHouseholdFromGuid(householdGuid);
+        
+        if (economyPlan == null || household == null)
+            return;
 
-            if (economyPlan is null)
-                return;
-            
-            var income = Income.Create(name, amount, incomeType, null);
-            
-            if (isRecurring)
-            {
-                var recurringIncome = RecurringIncome.Create(name, amount, incomeType);
-                
-                _dbContext.Add(recurringIncome);
-                
-                income.SetRecurringIncome(recurringIncome);
-            }
-            
-            _dbContext.Incomes.Add(income);
-            economyPlan.Incomes.Add(income);
-            _dbContext.EconomyPlans.Update(economyPlan);
-            _dbContext.SaveChanges();
+        var income = Income.Create(name, amount, incomeType, null);
+
+        if (isRecurring)
+        {
+            var recurringIncome = RecurringIncome.Create(name, amount, incomeType);
+
+            _dbContext.Add(recurringIncome);
+
+            income.SetRecurringIncome(recurringIncome);
+        }
+
+        _dbContext.Incomes.Add(income);
+        economyPlan.Incomes.Add(income);
+        _dbContext.EconomyPlans.Update(economyPlan);
+        _dbContext.SaveChanges();
     }
-    
+
     public void UpdateIncomeFromModel(IncomeModel incomeModel)
     {
         var income = _dbContext.GetIncomeFromId(incomeModel.Id);
-        
+
         if (income is null)
             return;
 
@@ -53,11 +54,11 @@ public class IncomeService : IIncomeService
         _dbContext.Update(income);
         _dbContext.SaveChanges();
     }
-    
+
     public IncomeModel? GetIncomeModel(int incomeId)
     {
         var income = _dbContext.Expenses.Find(incomeId);
-        
+
         return income is not null ? _mapper.Map<IncomeModel>(income) : null;
     }
 }

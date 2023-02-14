@@ -1,5 +1,6 @@
 ﻿using System.Net.Http.Json;
 using Blazored.LocalStorage;
+using EconomyPlanner.Web.Models;
 using EconomyPlanner.Web.Services.Interfaces;
 using HouseholdModel = EconomyPlanner.Web.Models.HouseholdModel;
 
@@ -44,7 +45,7 @@ public class HouseholdService : IHouseholdService
     public async Task<HouseholdModel> GetHouseholdModel()
     {
         if (!await HasSavedLogin())
-            throw new InvalidOperationException("");
+            throw new InvalidOperationException("No valid login");
 
         var householdModel = await _httpClient.GetFromJsonAsync<HouseholdModel>($"http://localhost:5179/api/Household/GetHouseholdFromGuid?guid={await GetSavedLogin()}");
         
@@ -52,5 +53,18 @@ public class HouseholdService : IHouseholdService
             throw new InvalidOperationException("Could not find household via login");
 
         return householdModel;
+    }
+
+    public async Task<IEnumerable<ExpenseModel>> GetRecurringExpenses()
+    {
+        if (!await HasSavedLogin())
+            throw new InvalidOperationException("No valid login");
+        
+        var expenseModels = await _httpClient.GetFromJsonAsync<IEnumerable<ExpenseModel>>($"http://localhost:5179/api/Household/GetRecurringExpenses?guid={await GetSavedLogin()}");
+        
+        if (expenseModels is null)
+            throw new InvalidOperationException("Could not find household via login");
+
+        return expenseModels;
     }
 }
