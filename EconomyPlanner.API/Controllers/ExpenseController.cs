@@ -22,7 +22,7 @@ public class ExpenseController : ControllerBase
     {
         try
         {
-            _expenseService.CreateExpense(expenseBody.EconomyPlanId, expenseBody.HouseholdGuid, expenseBody.Name, expenseBody.Amount, expenseBody.ExpenseType, expenseBody.IsRecurring);
+            _expenseService.CreateExpense(expenseBody.EconomyPlanId, expenseBody.HouseholdGuid, expenseBody.Name, expenseBody.Amount, expenseBody.ExpenseType, expenseBody.IsRecurring, expenseBody.RecurringAmount ?? 0);
             return Ok(expenseBody);
         }
         catch (Exception ex)

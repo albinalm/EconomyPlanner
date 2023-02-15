@@ -129,7 +129,8 @@ public class EconomyPlanService : IEconomyPlannerService
                          {
                              ExpenseModels = _mapper.Map<ICollection<ExpenseModel>>(economyPlan.Expenses),
                              IncomeModels = _mapper.Map<ICollection<IncomeModel>>(economyPlan.Incomes),
-                             Name = economyPlan.Name
+                             Name = economyPlan.Name,
+                             Id = economyPlan.Id
                          };
         }
     }

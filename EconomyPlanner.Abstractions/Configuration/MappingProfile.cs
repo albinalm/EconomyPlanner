@@ -22,6 +22,6 @@ public class MappingProfile : Profile
 
         CreateMap<EconomyPlanModel, EconomyPlan>();
         CreateMap<EconomyPlan, EconomyPlanModel>().ForMember(x => x.Id, opt => opt.Ignore());
-        
+
     }
 }

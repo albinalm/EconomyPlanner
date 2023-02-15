@@ -19,7 +19,7 @@ public class ExpenseService : IExpenseService
         _mapper = mapper;
     }
 
-    public void CreateExpense(int economyPlanId, string householdGuid, string name, decimal amount, string expenseType, bool isRecurring)
+    public void CreateExpense(int economyPlanId, string householdGuid, string name, decimal amount, string expenseType, bool isRecurring, decimal recurringAmount)
     {
         var economyPlan = _dbContext.GetEconomyPlanFromId(economyPlanId);
         var household = _dbContext.GetHouseholdFromGuid(householdGuid);
@@ -31,7 +31,7 @@ public class ExpenseService : IExpenseService
 
         if (isRecurring)
         {
-            var recurringExpense = RecurringExpense.Create(name, amount, expenseType);
+            var recurringExpense = RecurringExpense.Create(name, recurringAmount, expenseType);
 
             _dbContext.Add(recurringExpense);
             

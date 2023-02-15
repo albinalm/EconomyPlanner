@@ -25,7 +25,7 @@ public class EconomyPlanService : IEconomyPlanService
         
         var householdModel = await _householdService.GetHouseholdModel();
         var economyPlanModels = await _httpClient.GetFromJsonAsync<IEnumerable<EconomyPlanModel>>($"http://localhost:5179/api/EconomyPlan/GetEconomyPlansFromHouseholdGuid?guid={householdModel.Guid}");
-        Console.WriteLine("From service: " + economyPlanModels.First().ExpenseModels);
+
         if (economyPlanModels is null)
             throw new InvalidOperationException("EconomyPlanService > EconomyPlanModels is null");
         

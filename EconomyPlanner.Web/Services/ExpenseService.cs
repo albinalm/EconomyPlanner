@@ -1,5 +1,6 @@
 ﻿using System.Net.Http.Json;
 using System.Runtime.InteropServices;
+using EconomyPlanner.Web.Models;
 using EconomyPlanner.Web.Services.Interfaces;
 using EconomyPlanModel = EconomyPlanner.Web.Models.EconomyPlanModel;
 using ExpenseModel = EconomyPlanner.Web.Models.ExpenseModel;
@@ -40,5 +41,10 @@ public class ExpenseService : IExpenseService
     public async Task<bool> CheckIfExpenseIsRecurring(ExpenseModel expenseModel)
     {
         return await _httpClient.GetFromJsonAsync<bool>($"http://localhost:5179/api/Expense/CheckIfExpenseIsRecurring?expenseId={expenseModel.Id}");
+    }
+
+    public async Task AddExpense(CreateExpenseModel createExpenseModel)
+    {
+        await _httpClient.PostAsJsonAsync("http://localhost:5179/api/Expense/CreateExpense", createExpenseModel);
     }
 }

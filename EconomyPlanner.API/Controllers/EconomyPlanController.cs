@@ -1,5 +1,4 @@
 ﻿using EconomyPlanner.Abstractions.Interfaces;
-using EconomyPlanner.Abstractions.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EconomyPlanner.API.Controllers;
@@ -29,35 +28,7 @@ public class EconomyPlanController : ControllerBase
             return StatusCode(500, ex.Message);
         }
     }
-    
-    // [HttpPost(Name = "AddExpense")]
-    // public IActionResult AddExpense(int economyPlanId, int expenseId)
-    // {
-    //     try
-    //     {
-    //         _economyPlannerService.AddExpense(economyPlanId, expenseId);
-    //         return Ok();
-    //     }
-    //     catch (Exception ex)
-    //     {
-    //         return StatusCode(500, ex.Message);
-    //     }
-    // }
-    //
-    // [HttpPost(Name = "AddIncome")]
-    // public IActionResult AddIncome(int economyPlanId, int incomeId)
-    // {
-    //     try
-    //     {
-    //         _economyPlannerService.AddIncome(economyPlanId, incomeId);
-    //         return Ok();
-    //     }
-    //     catch (Exception ex)
-    //     {
-    //         return StatusCode(500, ex.Message);
-    //     }
-    // }
-    
+
     [HttpPost(Name = "RemoveExpense")]
     public IActionResult RemoveExpense(int economyPlanId, int expenseId, bool removeRecurring)
     {
