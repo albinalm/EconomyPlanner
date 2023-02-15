@@ -16,4 +16,7 @@ public interface IExpenseService
     IEnumerable<string> GetExpenseTypes();
     void DeleteExpense(int expenseId, bool deleteRecurring);
     bool CheckIfExpenseIsRecurring(int expenseId);
+    void CreateRecurringExpense(string householdGuid, string name, decimal amount, string expenseType);
+    void UpdateRecurringExpenseFromModel(ExpenseModel expenseModel);
+    void DeleteRecurringExpense(int recurringExpenseId);
 }

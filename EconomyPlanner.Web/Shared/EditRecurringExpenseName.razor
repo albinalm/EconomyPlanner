@@ -2,10 +2,10 @@
 @using EconomyPlanner.Web.Models
 
 <p>Old value:</p>
-<input class="form-control" type="text" placeholder="@ExpenseModel.Name" readonly>
+<input class="form-control" type="text" placeholder="@RecurringExpenseModel.Name" readonly>
 <br/>
 <p>New value:</p>
-<input class="form-control" type="text" @bind="NewExpenseName" placeholder="@ExpenseModel.Name">
+<input class="form-control" type="text" @bind="NewRecurringExpenseName" placeholder="@RecurringExpenseModel.Name">
 <br/>
 <button class="btn btn-dark text-center" @onclick="Save">Save</button>
 @code
@@ -14,18 +14,18 @@
     [CascadingParameter] public IModalService Modal { get; set; } = default!;
 
     [Parameter]
-    public ExpenseModel ExpenseModel { get; set; } = new();
+    public ExpenseModel RecurringExpenseModel { get; set; } = new();
 
     [Inject]
     private IExpenseService ExpenseService { get; set; } = null!;
 
-    private string NewExpenseName { get; set; } = "";
+    private string NewRecurringExpenseName { get; set; } = "";
     
     private async Task Save()
     {
-        ExpenseModel.Name = NewExpenseName;
+        RecurringExpenseModel.Name = NewRecurringExpenseName;
         
-        await ExpenseService.UpdateExpense(ExpenseModel);
+        await ExpenseService.UpdateRecurringExpense(RecurringExpenseModel);
         
         await Close();
     }

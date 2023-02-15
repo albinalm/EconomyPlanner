@@ -1,7 +1,7 @@
 ﻿@using EconomyPlanner.Web.Models
 @using EconomyPlanner.Web.Services.Interfaces
 <p>Old value:</p>
-<input class="form-control" type="text" placeholder="@ExpenseModel.ExpenseType" readonly>
+<input class="form-control" type="text" placeholder="@RecurringExpenseModel.ExpenseType" readonly>
 <br/>
 <p>New value:</p>
   <div class="form-group">
@@ -20,7 +20,7 @@
     [CascadingParameter] public IModalService Modal { get; set; } = default!;
 
     [Parameter]
-    public ExpenseModel ExpenseModel { get; set; } = new();
+    public ExpenseModel RecurringExpenseModel { get; set; } = new();
     
     [Parameter]
     public List<string> ExpenseTypes { get; set; } = new();
@@ -28,25 +28,26 @@
     [Inject]
     private IExpenseService ExpenseService { get; set; } = null!;
 
-    private string NewExpenseType { get; set; } = "";
+    private string NewRecurringExpenseType { get; set; } = "";
 
     private async Task Save()
     {
-        ExpenseModel.ExpenseType = NewExpenseType;
+        RecurringExpenseModel.ExpenseType = NewRecurringExpenseType;
         
-        await ExpenseService.UpdateExpense(ExpenseModel);
+        await ExpenseService.UpdateRecurringExpense(RecurringExpenseModel);
         
         await Close();
     }
+    
     private async Task Close() => await BlazoredModal.CloseAsync();
 
     private void SelectorOnChange(ChangeEventArgs e)
     {
-        NewExpenseType = e.Value?.ToString() ?? string.Empty;
+        NewRecurringExpenseType = e.Value?.ToString() ?? string.Empty;
     }
     
     protected override async Task OnInitializedAsync()
     {
-        NewExpenseType = ExpenseTypes.FirstOrDefault() ?? string.Empty;
+        NewRecurringExpenseType = ExpenseTypes.FirstOrDefault() ?? string.Empty;
     }
 }

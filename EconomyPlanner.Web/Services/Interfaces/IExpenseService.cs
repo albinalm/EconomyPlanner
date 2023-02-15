@@ -12,4 +12,7 @@ public interface IExpenseService
     Task DeleteExpense(ExpenseModel expenseModel, bool deleteRecurring);
     Task<bool> CheckIfExpenseIsRecurring(ExpenseModel expenseModel);
     Task AddExpense(CreateExpenseModel createExpenseModel);
+    Task AddRecurringExpense(CreateExpenseModel createExpenseModel);
+    Task UpdateRecurringExpense(ExpenseModel expenseModel);
+    Task DeleteRecurringExpense(ExpenseModel expenseModel);
 }

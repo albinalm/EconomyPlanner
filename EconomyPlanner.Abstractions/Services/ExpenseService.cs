@@ -19,11 +19,17 @@ public class ExpenseService : IExpenseService
         _mapper = mapper;
     }
 
-    public void CreateExpense(int economyPlanId, string householdGuid, string name, decimal amount, string expenseType, bool isRecurring, decimal recurringAmount)
+    public void CreateExpense(int economyPlanId,
+                              string householdGuid,
+                              string name,
+                              decimal amount,
+                              string expenseType,
+                              bool isRecurring,
+                              decimal recurringAmount)
     {
         var economyPlan = _dbContext.GetEconomyPlanFromId(economyPlanId);
         var household = _dbContext.GetHouseholdFromGuid(householdGuid);
-        
+
         if (economyPlan == null || household == null)
             return;
 
@@ -34,7 +40,7 @@ public class ExpenseService : IExpenseService
             var recurringExpense = RecurringExpense.Create(name, recurringAmount, expenseType);
 
             _dbContext.Add(recurringExpense);
-            
+
             household.RecurringExpenses.Add(recurringExpense);
             expense.SetRecurringExpense(recurringExpense);
         }
@@ -46,10 +52,27 @@ public class ExpenseService : IExpenseService
         _dbContext.SaveChanges();
     }
 
+    public void CreateRecurringExpense(string householdGuid, string name, decimal amount, string expenseType)
+    {
+        var household = _dbContext.GetHouseholdFromGuid(householdGuid);
+
+        if (household == null)
+            return;
+
+        var recurringExpense = RecurringExpense.Create(name, amount, expenseType);
+
+        _dbContext.Add(recurringExpense);
+
+        household.RecurringExpenses.Add(recurringExpense);
+
+        _dbContext.Households.Update(household);
+        _dbContext.SaveChanges();
+    }
+
     public void UpdateExpenseFromModel(ExpenseModel expenseModel)
     {
         var expense = _dbContext.GetExpenseFromId(expenseModel.Id);
-        
+
         if (expense is null)
             return;
 
@@ -59,10 +82,23 @@ public class ExpenseService : IExpenseService
         _dbContext.SaveChanges();
     }
 
+    public void UpdateRecurringExpenseFromModel(ExpenseModel expenseModel)
+    {
+        var recurringExpense = _dbContext.GetRecurringExpenseFromId(expenseModel.Id);
+        
+        if (recurringExpense is null)
+            return;
+        
+        _mapper.Map(expenseModel, recurringExpense);
+
+        _dbContext.Update(recurringExpense);
+        _dbContext.SaveChanges();
+    }
+    
     public ExpenseModel? GetExpenseModel(int expenseId)
     {
         var expense = _dbContext.Expenses.Find(expenseId);
-        
+
         return expense is not null ? _mapper.Map<ExpenseModel>(expense) : null;
     }
 
@@ -70,7 +106,7 @@ public class ExpenseService : IExpenseService
     {
         return ExpenseType.GetExpenseTypes();
     }
-    
+
     public void DeleteExpense(int expenseId, bool deleteRecurring)
     {
         var expense = _dbContext.Expenses.Where(e => e.Id == expenseId)
@@ -79,7 +115,7 @@ public class ExpenseService : IExpenseService
 
         if (expense is null)
             return;
-        
+
         if (deleteRecurring && expense.RecurringExpense != null)
             _dbContext.RecurringExpenses.Remove(expense.RecurringExpense);
 
@@ -87,12 +123,23 @@ public class ExpenseService : IExpenseService
         _dbContext.SaveChanges();
     }
     
+    public void DeleteRecurringExpense(int recurringExpenseId)
+    {
+        var recurringExpense = _dbContext.RecurringExpenses.Find(recurringExpenseId);
+
+        if (recurringExpense is null)
+            return;
+        
+        _dbContext.RecurringExpenses.Remove(recurringExpense);
+        _dbContext.SaveChanges();
+    }
+
     public bool CheckIfExpenseIsRecurring(int expenseId)
     {
         var expense = _dbContext.Expenses.Where(e => e.Id == expenseId)
                                 .Include(e => e.RecurringExpense)
                                 .FirstOrDefault();
-        
+
         return expense?.RecurringExpense != null;
     }
 }

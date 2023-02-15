@@ -1,0 +1,30 @@
+﻿@using EconomyPlanner.Web.Services.Interfaces
+@using EconomyPlanner.Web.Models
+
+<p>@PreText<b>@RecurringExpenseModel.Name</b>?</p>
+<br/>
+<button class="btn btn-warning text-center" @onclick="Delete">Yes</button>
+<button class="btn btn-info text-center" @onclick="Close">No</button>
+
+@code
+{
+    [Parameter]
+    public ExpenseModel RecurringExpenseModel { get; set; } = new();
+
+    [Parameter] public string? PreText { get; set; }
+    [CascadingParameter] BlazoredModalInstance BlazoredModal { get; set; } = default!;
+    [CascadingParameter] public IModalService Modal { get; set; } = default!;
+
+    
+    [Inject]
+    private IExpenseService ExpenseService { get; set; } = null!;
+    
+    private async Task Delete()
+    {
+        await ExpenseService.DeleteRecurringExpense(RecurringExpenseModel);
+        
+        await Close();
+    }
+    
+    private async Task Close() => await BlazoredModal.CloseAsync();
+}

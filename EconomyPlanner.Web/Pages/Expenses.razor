@@ -91,21 +91,21 @@
             <div class="row">
                 <div class="col-md text-left">
                     <div class="span2">
-                        <button class="btn btn-dark btn-block btn-sm text-left" @onclick="@(_ => ShowEditTypePopup(recurringExpense))">@recurringExpense.ExpenseType</button>
+                        <button class="btn btn-dark btn-block btn-sm text-left" @onclick="@(_ => ShowEditRecurringTypePopup(recurringExpense))">@recurringExpense.ExpenseType</button>
                     </div>
                 </div>
                 <div class="col-md">
                     <div class="span2">
-                        <button class="btn btn-dark btn-block btn-sm text-left" @onclick="@(_ => ShowEditNamePopup(recurringExpense))">@recurringExpense.Name</button>
+                        <button class="btn btn-dark btn-block btn-sm text-left" @onclick="@(_ => ShowEditRecurringNamePopup(recurringExpense))">@recurringExpense.Name</button>
                     </div>
                 </div>
                 <div class="col-md">
                     <div class="span2">
-                        <button class="btn btn-dark btn-block btn-sm text-left" @onclick="@(_ => ShowEditAmountPopup(recurringExpense))">@recurringExpense.Amount</button>
+                        <button class="btn btn-dark btn-block btn-sm text-left" @onclick="@(_ => ShowEditRecurringAmountPopup(recurringExpense))">@recurringExpense.Amount</button>
                     </div>
                 </div>
                 <div class="col-md">
-                    <button class="btn btn-danger btn-sm text-left" @onclick="@(_ => ShowDeletePopup("Are you sure you wish to delete ", recurringExpense))">
+                    <button class="btn btn-danger btn-sm text-left" @onclick="@(_ => ShowDeleteRecurringPopup("Are you sure you wish to delete recurring expense: ", recurringExpense))">
                         Delete
                     </button>
                 </div>
@@ -113,7 +113,7 @@
             <br/>
         }
     </div>
-    <button class="btn btn-success text-left oi oi-plus"></button>
+    <button class="btn btn-success text-left oi oi-plus" onclick="@ShowAddRecurringExpensePopup"></button>
 </div>
 
 @code {
@@ -234,6 +234,57 @@
 
              await Modal.Show<AddExpenseForm>("Add new expense", parameters).Result;
         await RefreshExpenses();
+        await GetRecurringExpenses();
+    }
+    
+    private async Task ShowAddRecurringExpensePopup()
+    {
+        var parameters = new ModalParameters()
+            .Add(nameof(AddExpenseForm.ExpenseTypes), await ExpenseService.GetExpenseTypes())
+            .Add(nameof(AddExpenseForm.HouseholdGuid), await HouseholdService.GetSavedLogin());
+
+        await Modal.Show<AddRecurringExpenseForm>("Add new recurring expense", parameters).Result;
+        await GetRecurringExpenses();
+    }
+    
+    private async Task ShowEditRecurringAmountPopup(ExpenseModel expenseModel)
+    {
+        var parameters = new ModalParameters()
+            .Add(nameof(EditRecurringExpenseAmount.RecurringExpenseModel), expenseModel);
+
+        await Modal.Show<EditRecurringExpenseAmount>("Edit", parameters).Result;
+
+        await GetRecurringExpenses();
+    }
+    
+    private async Task ShowEditRecurringNamePopup(ExpenseModel expenseModel)
+    {
+        var parameters = new ModalParameters()
+            .Add(nameof(EditRecurringExpenseName.RecurringExpenseModel), expenseModel);
+
+        await Modal.Show<EditRecurringExpenseName>("Edit", parameters).Result;
+
+        await GetRecurringExpenses();
+    }
+    
+    private async Task ShowEditRecurringTypePopup(ExpenseModel expenseModel)
+    {
+        var parameters = new ModalParameters()
+            .Add(nameof(EditRecurringExpenseType.RecurringExpenseModel), expenseModel)
+            .Add(nameof(EditRecurringExpenseType.ExpenseTypes), await ExpenseService.GetExpenseTypes());
+
+        await Modal.Show<EditRecurringExpenseType>("Edit", parameters).Result;
+
+        await GetRecurringExpenses();
+    }
+    
+    private async Task ShowDeleteRecurringPopup(string preText, ExpenseModel expenseModel)
+    {
+        var parameters = new ModalParameters()
+            .Add(nameof(DeleteRecurringExpense.PreText), preText)
+            .Add(nameof(DeleteRecurringExpense.RecurringExpenseModel), expenseModel);
+
+        await Modal.Show<DeleteRecurringExpense>("Delete?", parameters).Result;
         await GetRecurringExpenses();
     }
 }

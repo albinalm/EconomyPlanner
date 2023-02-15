@@ -47,4 +47,19 @@ public class ExpenseService : IExpenseService
     {
         await _httpClient.PostAsJsonAsync("http://localhost:5179/api/Expense/CreateExpense", createExpenseModel);
     }
+
+    public async Task AddRecurringExpense(CreateExpenseModel createExpenseModel)
+    {
+        await _httpClient.PostAsJsonAsync("http://localhost:5179/api/Expense/CreateRecurringExpense", createExpenseModel);
+    }
+    
+    public async Task UpdateRecurringExpense(ExpenseModel expenseModel)
+    {
+        await _httpClient.PostAsJsonAsync("http://localhost:5179/api/Expense/UpdateRecurringExpense", expenseModel);
+    }
+    
+    public async Task DeleteRecurringExpense(ExpenseModel expenseModel)
+    { 
+        await _httpClient.GetAsync($"http://localhost:5179/api/Expense/DeleteRecurringExpense?recurringExpenseId={expenseModel.Id}");
+    }
 }
