@@ -1,0 +1,48 @@
+﻿@using EconomyPlanner.Web.Models
+@using EconomyPlanner.Web.Services.Interfaces
+<p>Old value:</p>
+<input class="form-control" type="text" placeholder="@ExpenseModel.ExpenseType" readonly>
+<br/>
+<p>New value:</p>
+  <div class="form-group">
+    <label for="transactionTypeSelector">@ExpenseModel.ExpenseType</label>
+      <select class="form-control" id="transactionTypeSelector" onchange="@SelectorOnChange">
+          @foreach (var expenseType in ExpenseTypes)
+          {
+              <option>@expenseType</option>
+          }
+      </select>
+  </div>
+<br/>
+<button class="btn btn-dark text-center" @onclick="Save">Save</button>
+@code
+{
+    [CascadingParameter] BlazoredModalInstance BlazoredModal { get; set; } = default!;
+    [CascadingParameter] public IModalService Modal { get; set; } = default!;
+
+    [Parameter]
+    public ExpenseModel ExpenseModel { get; set; } = new();
+    
+    [Parameter]
+    public List<string> ExpenseTypes { get; set; } = new();
+    
+    [Inject]
+    private IExpenseService ExpenseService { get; set; } = null!;
+
+    private string NewExpenseType { get; set; } = "";
+
+    private async Task Save()
+    {
+        ExpenseModel.ExpenseType = NewExpenseType;
+        
+        await ExpenseService.UpdateExpense(ExpenseModel);
+        
+        await Close();
+    }
+    private async Task Close() => await BlazoredModal.CloseAsync();
+
+    private void SelectorOnChange(ChangeEventArgs e)
+    {
+        NewExpenseType = e.Value?.ToString() ?? string.Empty;
+    }
+}

@@ -1,0 +1,54 @@
+﻿@using EconomyPlanner.Web.Services.Interfaces
+@using EconomyPlanner.Web.Models
+
+<p>@PreText<b>@ExpenseModel.Name</b>?</p>
+<div class="form-check" hidden="@IsNotRecurring">
+  <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault" hidden="@IsNotRecurring" @onchange="eventArgs => { RecurringCheckboxClicked(eventArgs.Value); }">
+  <label class="form-check-label" for="flexSwitchCheckDefault" hidden="@IsNotRecurring">Also delete recurring transaction</label>
+</div>
+<br/>
+<button class="btn btn-warning text-center" @onclick="Delete">Yes</button>
+<button class="btn btn-info text-center" @onclick="Close">No</button>
+
+@code
+{
+    public bool DeleteRecurring { get; set; }
+    public bool IsNotRecurring { get; set; } = true;
+
+    [Parameter]
+    public ExpenseModel ExpenseModel { get; set; } = new();
+
+    [Parameter] public string? PreText { get; set; }
+    [CascadingParameter] BlazoredModalInstance BlazoredModal { get; set; } = default!;
+    [CascadingParameter] public IModalService Modal { get; set; } = default!;
+
+    
+    [Inject]
+    private IExpenseService ExpenseService { get; set; } = null!;
+    
+    private async Task Delete()
+    {
+        await ExpenseService.DeleteExpense(ExpenseModel, DeleteRecurring);
+        
+        await Close();
+    }
+    
+    private async Task Close() => await BlazoredModal.CloseAsync();
+    
+    private void RecurringCheckboxClicked(object checkedValue)
+    {
+        if ((bool)checkedValue)
+        {
+            DeleteRecurring = true;
+        }
+        else
+        {
+            DeleteRecurring = false;
+        }
+    }
+    
+    protected override async Task OnInitializedAsync()
+    {
+        IsNotRecurring = !await ExpenseService.CheckIfExpenseIsRecurring(ExpenseModel);
+    }
+}

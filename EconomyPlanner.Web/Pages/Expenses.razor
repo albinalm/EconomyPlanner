@@ -2,6 +2,7 @@
 @using EconomyPlanner.Web.Services.Interfaces
 @using EconomyPlanModel = EconomyPlanner.Web.Models.EconomyPlanModel
 @using ExpenseModel = EconomyPlanner.Web.Models.ExpenseModel
+@using System.Net.Sockets
 @inject NavigationManager NavManager
 
 <PageTitle>Expenses</PageTitle>
@@ -43,21 +44,21 @@
             <div class="row">
                 <div class="col-md text-left">
                     <div class="span2">
-                        <button class="btn btn-dark btn-block btn-sm text-left" @onclick="@(_ => ShowEditTypePopup(expense.ExpenseType.ToString()))">@expense.ExpenseType</button>
+                        <button class="btn btn-dark btn-block btn-sm text-left" @onclick="@(_ => ShowEditTypePopup(expense))">@expense.ExpenseType</button>
                     </div>
                 </div>
                 <div class="col-md">
                     <div class="span2">
-                        <button class="btn btn-dark btn-block btn-sm text-left" @onclick="@(_ => ShowEditNamePopup(expense.Name))">@expense.Name</button>
+                        <button class="btn btn-dark btn-block btn-sm text-left" @onclick="@(_ => ShowEditNamePopup(expense))">@expense.Name</button>
                     </div>
                 </div>
                 <div class="col-md">
                     <div class="span2">
-                        <button class="btn btn-dark btn-block btn-sm text-left" @onclick="@(_ => ShowEditAmountPopup(expense.Amount))">@expense.Amount</button>
+                        <button class="btn btn-dark btn-block btn-sm text-left" @onclick="@(_ => ShowEditAmountPopup(expense))">@expense.Amount</button>
                     </div>
                 </div>
                 <div class="col-md">
-                    <button class="btn btn-danger btn-sm text-left" @onclick="@(_ => ShowDeletePopup("Are you sure you wish to delete ", expense.Name))">
+                    <button class="btn btn-danger btn-sm text-left" @onclick="@(_ => ShowDeletePopup("Are you sure you wish to delete ", expense))">
                         Delete
                     </button>
                 </div>
@@ -89,21 +90,21 @@
             <div class="row">
                 <div class="col-md text-left">
                     <div class="span2">
-                        <button class="btn btn-dark btn-block btn-sm text-left" @onclick="@(_ => ShowEditTypePopup(recurringExpense.ExpenseType))">@recurringExpense.ExpenseType</button>
+                        <button class="btn btn-dark btn-block btn-sm text-left" @onclick="@(_ => ShowEditTypePopup(recurringExpense))">@recurringExpense.ExpenseType</button>
                     </div>
                 </div>
                 <div class="col-md">
                     <div class="span2">
-                        <button class="btn btn-dark btn-block btn-sm text-left" @onclick="@(_ => ShowEditNamePopup(recurringExpense.Name))">@recurringExpense.Name</button>
+                        <button class="btn btn-dark btn-block btn-sm text-left" @onclick="@(_ => ShowEditNamePopup(recurringExpense))">@recurringExpense.Name</button>
                     </div>
                 </div>
                 <div class="col-md">
                     <div class="span2">
-                        <button class="btn btn-dark btn-block btn-sm text-left" @onclick="@(_ => ShowEditAmountPopup(recurringExpense.Amount))">@recurringExpense.Amount</button>
+                        <button class="btn btn-dark btn-block btn-sm text-left" @onclick="@(_ => ShowEditAmountPopup(recurringExpense))">@recurringExpense.Amount</button>
                     </div>
                 </div>
                 <div class="col-md">
-                    <button class="btn btn-danger btn-sm text-left" @onclick="@(_ => ShowDeletePopup("Are you sure you wish to delete ", recurringExpense.Name))">
+                    <button class="btn btn-danger btn-sm text-left" @onclick="@(_ => ShowDeletePopup("Are you sure you wish to delete ", recurringExpense))">
                         Delete
                     </button>
                 </div>
@@ -123,7 +124,7 @@
 
     [Inject]
     private IExpenseService ExpenseService { get; set; } = null!;
-    
+
     [Inject]
     private IHouseholdService HouseholdService { get; set; } = null!;
 
@@ -148,13 +149,23 @@
             InitialEconomyPlanName = _economyPlanModels.First().Name;
             _expenseModels = ExpenseService.GetExpenses(_economyPlanModels.First()).ToList();
             await GetRecurringExpenses();
-        } 
+        }
     }
-    
+
+    private async Task RefreshExpenses()
+    {
+        await GetEconomyPlanModes();
+        if (_economyPlanModels.Any())
+        {
+            _expenseModels = ExpenseService.GetExpenses(_economyPlanModels.First()).ToList();
+        }
+    }
+
     private async Task GetRecurringExpenses()
     {
         _recurringExpenses = (await HouseholdService.GetRecurringExpenses()).ToList();
     }
+
     private async Task GetEconomyPlanModes()
     {
         _economyPlanModels = (await EconomyPlanService.GetEconomyPlans()).ToList();
@@ -165,45 +176,44 @@
         _expenseModels = ExpenseService.GetExpenses(selection).ToList();
     }
 
-    private void ShowDeletePopup(string preText, string expenseName)
+    private async Task ShowDeletePopup(string preText, ExpenseModel expenseModel)
     {
         var parameters = new ModalParameters()
-            .Add(nameof(DeleteTransaction.PreText), preText)
-            .Add(nameof(DeleteTransaction.TransactionName), expenseName);
+            .Add(nameof(DeleteExpense.PreText), preText)
+            .Add(nameof(DeleteExpense.ExpenseModel), expenseModel);
 
-        Modal.Show<DeleteTransaction>("Delete?", parameters);
+        Modal.Show<DeleteExpense>("Delete?", parameters);
     }
 
-    private void ShowEditAmountPopup(decimal amount)
+    private async Task ShowEditAmountPopup(ExpenseModel expenseModel)
     {
         var parameters = new ModalParameters()
-            .Add(nameof(EditTransactionAmount.Amount), amount);
+            .Add(nameof(EditExpenseAmount.ExpenseModel), expenseModel);
 
-        Modal.Show<EditTransactionAmount>("Edit", parameters);
+        await Modal.Show<EditExpenseAmount>("Edit", parameters).Result;
+
+        await RefreshExpenses();
     }
 
-    private void ShowEditNamePopup(string expenseName)
+    private async Task ShowEditNamePopup(ExpenseModel expenseModel)
     {
         var parameters = new ModalParameters()
-            .Add(nameof(EditTransactionName.Name), expenseName);
+            .Add(nameof(EditExpenseName.ExpenseModel), expenseModel);
 
-        Modal.Show<EditTransactionName>("Edit", parameters);
+        await Modal.Show<EditExpenseName>("Edit", parameters).Result;
+
+        await RefreshExpenses();
     }
 
-    private void ShowEditTypePopup(string oldExpenseType)
+    private async Task ShowEditTypePopup(ExpenseModel expenseModel)
     {
-        var expenseTypes = new List<string>
-                           {
-                               "Loan",
-                               "Household",
-                               "Subscription"
-                           };
-
         var parameters = new ModalParameters()
-            .Add(nameof(EditTransactionType.OldTransactionType), oldExpenseType)
-            .Add(nameof(EditTransactionType.TransactionTypes), expenseTypes);
+            .Add(nameof(EditExpenseType.ExpenseModel), expenseModel)
+            .Add(nameof(EditExpenseType.ExpenseTypes), await ExpenseService.GetExpenseTypes());
 
-        Modal.Show<EditTransactionType>("Edit", parameters);
+        await Modal.Show<EditExpenseType>("Edit", parameters).Result;
+
+        await RefreshExpenses();
     }
 
 }

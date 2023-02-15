@@ -62,4 +62,23 @@ public class ExpenseController : ControllerBase
             return StatusCode(500, ex.Message);
         }
     }
+
+    [HttpGet(Name = "GetExpenseTypes")]
+    public IActionResult GetExpenseTypes()
+    {
+        return Ok(_expenseService.GetExpenseTypes());
+    }
+
+    [HttpGet(Name = "DeleteExpense")]
+    public IActionResult DeleteExpense(int expenseId, bool deleteRecurring)
+    {
+        _expenseService.DeleteExpense(expenseId, deleteRecurring);
+        return Ok();
+    }
+
+    [HttpGet(Name = "CheckIfExpenseIsRecurring")]
+    public IActionResult CheckIfExpenseIsRecurring(int expenseId)
+    {
+        return Ok(_expenseService.CheckIfExpenseIsRecurring(expenseId));
+    }
 }

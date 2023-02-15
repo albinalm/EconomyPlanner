@@ -3,6 +3,8 @@ using EconomyPlanner.Abstractions.Interfaces;
 using EconomyPlanner.Abstractions.Models;
 using EconomyPlanner.Repository.Configuration;
 using EconomyPlanner.Repository.Entities;
+using EconomyPlanner.Repository.TransactionTypes;
+using Microsoft.EntityFrameworkCore;
 
 namespace EconomyPlanner.Abstractions.Services;
 
@@ -62,5 +64,35 @@ public class ExpenseService : IExpenseService
         var expense = _dbContext.Expenses.Find(expenseId);
         
         return expense is not null ? _mapper.Map<ExpenseModel>(expense) : null;
+    }
+
+    public IEnumerable<string> GetExpenseTypes()
+    {
+        return ExpenseType.GetExpenseTypes();
+    }
+    
+    public void DeleteExpense(int expenseId, bool deleteRecurring)
+    {
+        var expense = _dbContext.Expenses.Where(e => e.Id == expenseId)
+                                .Include(e => e.RecurringExpense)
+                                .FirstOrDefault();
+
+        if (expense is null)
+            return;
+        
+        if (deleteRecurring && expense.RecurringExpense != null)
+            _dbContext.RecurringExpenses.Remove(expense.RecurringExpense);
+
+        _dbContext.Expenses.Remove(expense);
+        _dbContext.SaveChanges();
+    }
+    
+    public bool CheckIfExpenseIsRecurring(int expenseId)
+    {
+        var expense = _dbContext.Expenses.Where(e => e.Id == expenseId)
+                                .Include(e => e.RecurringExpense)
+                                .FirstOrDefault();
+        
+        return expense?.RecurringExpense != null;
     }
 }

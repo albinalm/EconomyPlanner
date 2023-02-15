@@ -1,0 +1,33 @@
+﻿@using EconomyPlanner.Web.Services.Interfaces
+@using EconomyPlanner.Web.Models
+
+<p>Old value:</p>
+<input class="form-control" type="text" placeholder="@ExpenseModel.Name" readonly>
+<br/>
+<p>New value:</p>
+<input class="form-control" type="text" @bind="NewExpenseName" placeholder="@ExpenseModel.Name">
+<br/>
+<button class="btn btn-dark text-center" @onclick="Save">Save</button>
+@code
+{
+    [CascadingParameter] BlazoredModalInstance BlazoredModal { get; set; } = default!;
+    [CascadingParameter] public IModalService Modal { get; set; } = default!;
+
+    [Parameter]
+    public ExpenseModel ExpenseModel { get; set; } = new();
+
+    [Inject]
+    private IExpenseService ExpenseService { get; set; } = null!;
+
+    private string NewExpenseName { get; set; } = "";
+    
+    private async Task Save()
+    {
+        ExpenseModel.Name = NewExpenseName;
+        
+        await ExpenseService.UpdateExpense(ExpenseModel);
+        
+        await Close();
+    }
+    private async Task Close() => await BlazoredModal.CloseAsync();
+}
