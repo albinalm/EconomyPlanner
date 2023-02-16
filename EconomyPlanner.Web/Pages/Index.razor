@@ -2,50 +2,156 @@
 @inject NavigationManager NavManager
 @page "/"
 @using EconomyPlanner.Web.Services.Interfaces
+@using EconomyPlanner.Web.Models
+@using System.Numerics
 
 <PageTitle>Index</PageTitle>
 
 <h1>Economic overview</h1>
-<h2>+ 1200:-</h2>
+<Dropdown TItem="EconomyPlanModel" OnSelected="@OnSelected">
+    <InitialTip>@InitialEconomyPlanName</InitialTip>
+    <ChildContent>
+        @foreach (var plan in _economyPlanModels)
+        {
+            <DropdownListItem Item="@plan">@plan.Name</DropdownListItem>
+        }
+    </ChildContent>
+</Dropdown>
+<hr/>
+<h2 class="@OverviewStyle">@OverviewCaption</h2>
 <br/>
+<br/>
+<p>
+    <b>Incomes:</b>
+</p>
+<div class="alert alert-secondary mt-4">
+    @foreach (var incomeType in IncomeTypes)
+    {
+        <span class="@GetIconFromType(incomeType)" aria-hidden="true"></span>
+        <span class="text-nowrap">
+            <b>@incomeType</b> @GetSumPerIncomeType(incomeType):-
+        </span>
+        <br/>
+    }
+    <br/>
+    <p class="font-weight-bold float-left">Total: @_incomeModels.Select(i => i.Amount).Sum():-</p>
+    <br/>
+</div>
+
 <br/>
 
-<p><b>Expenses:</b></p>
+<p>
+    <b>Expenses:</b>
+</p>
 <div class="alert alert-secondary mt-4">
-    <span class="bi-basket-fill" aria-hidden="true"></span>
-    <span class="text-nowrap">
-        <b>Shopping</b> 500:-
-    </span>
+    @foreach (var expenseType in ExpenseTypes)
+    {
+        <span class="@GetIconFromType(expenseType)" aria-hidden="true"></span>
+        <span class="text-nowrap">
+            <b>@expenseType</b> @GetSumPerExpenseType(expenseType):-
+        </span>
+        <br/>
+    }
     <br/>
-    <span class="bi-house-heart-fill" aria-hidden="true"></span>
-    <span class="text-nowrap">
-        <b>Household</b> 750:-
-    </span>
-</div>
-<br/>
-<p><b>Incomes:</b></p>
-<div class="alert alert-secondary mt-4">
-    <span class="bi-cash-stack" aria-hidden="true"></span>
-    <span class="text-nowrap">
-        <b>Salary</b> 28000:-
-    </span>
+    <p class="font-weight-bold float-left">Total: @_expenseModels.Select(e => e.Amount).Sum():-</p>
     <br/>
-    <span class="bi-bag-plus-fill" aria-hidden="true"></span>
-    <span class="text-nowrap">
-        <b>Returns</b> 750:-
-    </span>
 </div>
 
 @code{
 
     [Inject]
+    private IEconomyPlanService EconomyPlanService { get; set; } = null!;
+
+    [Inject]
+    private IExpenseService ExpenseService { get; set; } = null!;
+
+    [Inject]
+    private IIncomeService IncomeService { get; set; } = null!;
+
+    [Inject]
     private IHouseholdService HouseholdService { get; set; }
+
+    private EconomyPlanModel? SelectedEconomyPlan { get; set; } = null;
+    private List<ExpenseModel> _expenseModels = new();
+    private List<IncomeModel> _incomeModels = new();
+    private List<EconomyPlanModel> _economyPlanModels = new();
+    private string InitialEconomyPlanName { get; set; } = "";
+    public IEnumerable<string> IncomeTypes { get; set; } = Enumerable.Empty<string>();
+    public IEnumerable<string> ExpenseTypes { get; set; } = Enumerable.Empty<string>();
+    public string OverviewCaption => GetOverviewCaption(_incomeModels.Select(i => i.Amount).Sum() - _expenseModels.Select(e => e.Amount).Sum()).caption;
+    public string OverviewStyle => GetOverviewCaption(_incomeModels.Select(i => i.Amount).Sum() - _expenseModels.Select(e => e.Amount).Sum()).style;
 
     protected override async Task OnInitializedAsync()
     {
         if (!await HouseholdService.HasSavedLogin())
             NavManager.NavigateTo("/login");
+        else
+            await InitializePage();
     }
 
+    private async Task InitializePage()
+    {
+        await GetEconomyPlanModes();
+        if (_economyPlanModels.Any())
+        {
+            SelectedEconomyPlan = _economyPlanModels.First();
+            InitialEconomyPlanName = SelectedEconomyPlan.Name;
+            _expenseModels = ExpenseService.GetExpenses(SelectedEconomyPlan).ToList();
+            _incomeModels = IncomeService.GetIncomes(SelectedEconomyPlan).ToList();
+            IncomeTypes = await IncomeService.GetIncomeTypes();
+            ExpenseTypes = await ExpenseService.GetExpenseTypes();
+        }
+        else
+        {
+        }
+    }
+
+    private async Task CreateMonthlyEconomyPlan()
+    {
+    }
+
+    private async Task GetEconomyPlanModes()
+    {
+        _economyPlanModels = (await EconomyPlanService.GetActiveEconomyPlans()).ToList();
+    }
+
+    private string GetIconFromType(string transactionType)
+    {
+        return transactionType.ToLowerInvariant() switch
+               {
+               "shopping" => "bi-basket-fill",
+               "hushåll" => "bi-house-heart-fill",
+               "abonnemang" => "bi-arrow-clockwise",
+               "lön" => "bi-cash-stack",
+               "återbetalning" => "bi-bag-plus-fill",
+               "gåva" => "bi-box2-heart-fill",
+               _ => "bi-patch-question-fill"};
+    }
+
+    private decimal GetSumPerExpenseType(string expenseType)
+    {
+        return _expenseModels.Where(e => e.ExpenseType == expenseType).Select(e => e.Amount).Sum();
+    }
+
+    private decimal GetSumPerIncomeType(string incomeType)
+    {
+        return _incomeModels.Where(e => e.IncomeType == incomeType).Select(e => e.Amount).Sum();
+    }
+
+    private void OnSelected(EconomyPlanModel selection)
+    {
+        _expenseModels = ExpenseService.GetExpenses(selection).ToList();
+        _incomeModels = IncomeService.GetIncomes(selection).ToList();
+        SelectedEconomyPlan = selection;
+        Console.WriteLine("Current economy plan!" + SelectedEconomyPlan.Name + " ID: " + SelectedEconomyPlan.Id);
+    }
+
+    private (string caption, string style) GetOverviewCaption(decimal result)
+    {
+        if (result > 0)
+            return ($"Du har {result}:- över!", "text-success");
+
+        return ($"Du ligger {result}:- back!", "text-danger");
+    }
 
 }

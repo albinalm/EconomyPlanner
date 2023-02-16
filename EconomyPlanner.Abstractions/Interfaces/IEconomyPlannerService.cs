@@ -11,5 +11,5 @@ public interface IEconomyPlannerService
     // void AddIncome(int economyPlanId, int incomeId);
     void RemoveIncome(int economyPlanId, int incomeId, bool removeRecurring);
     EconomyPlan? GetEconomyPlanByDate(DateTime startPeriod);
-    IEnumerable<EconomyPlanModel> GetEconomyPlansFromHouseholdId(string guid);
+    IEnumerable<EconomyPlanModel> GetActiveEconomyPlansFromHouseholdId(string guid);
 }

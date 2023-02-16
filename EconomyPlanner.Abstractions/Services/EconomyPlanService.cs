@@ -112,13 +112,13 @@ public class EconomyPlanService : IEconomyPlannerService
     //     _dbContext.SaveChanges();
     // }
 
-    public IEnumerable<EconomyPlanModel> GetEconomyPlansFromHouseholdId(string guid)
+    public IEnumerable<EconomyPlanModel> GetActiveEconomyPlansFromHouseholdId(string guid)
     {
         var household = _dbContext.GetHouseholdFromGuid(guid);
         if (household is null)
             throw new InvalidOperationException("GetEconomyPlansFromHouseholdId > Household not found");
 
-        var economyPlans = _dbContext.GetEconomyPlansFromHousehold(household).ToList();
+        var economyPlans = _dbContext.GetEconomyPlansFromHousehold(household).Where(ep => DateTime.Parse(ep.EndDate) > DateTime.Now).ToList();
 
         if (!economyPlans.Any())
             throw new InvalidOperationException("GetEconomyPlansFromHouseholdId > No economyplans found");
@@ -130,7 +130,8 @@ public class EconomyPlanService : IEconomyPlannerService
                              ExpenseModels = _mapper.Map<ICollection<ExpenseModel>>(economyPlan.Expenses),
                              IncomeModels = _mapper.Map<ICollection<IncomeModel>>(economyPlan.Incomes),
                              Name = economyPlan.Name,
-                             Id = economyPlan.Id
+                             Id = economyPlan.Id,
+                             EndDate = economyPlan.EndDate
                          };
         }
     }

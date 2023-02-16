@@ -57,12 +57,12 @@ public class EconomyPlanController : ControllerBase
         }
     }
 
-    [HttpGet(Name = "GetEconomyPlansFromHouseholdGuid")]
-    public IActionResult GetEconomyPlansFromHouseholdGuid(string guid)
+    [HttpGet(Name = "GetActiveEconomyPlansFromHouseholdGuid")]
+    public IActionResult GetActiveEconomyPlansFromHouseholdGuid(string guid)
     {
         try
         {
-            return Ok(_economyPlannerService.GetEconomyPlansFromHouseholdId(guid).ToList());
+            return Ok(_economyPlannerService.GetActiveEconomyPlansFromHouseholdId(guid).ToList());
         }
         catch (Exception ex)
         {
