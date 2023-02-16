@@ -1,0 +1,59 @@
+﻿@using EconomyPlanner.Web.Models
+@using EconomyPlanner.Web.Services.Interfaces
+
+<p>Name:</p>
+<input class="form-control" type="text" @bind="NewRecurringIncome.Name">
+<br/>
+<p>Amount:</p>
+<input class="form-control" type="number" @bind="NewRecurringIncome.Amount">
+<br/>
+<p>Income type:</p>
+<div class="form-group">
+    <select class="form-control" id="transactionTypeSelector" onchange="@SelectorOnChange">
+        @foreach (var incomeType in IncomeTypes)
+        {
+            <option>@incomeType</option>
+        }
+    </select>
+</div>
+<br/>
+<button class="btn btn-dark text-center" @onclick="AddIncome">Add</button>
+@code
+{
+    [Inject]
+    private IIncomeService IncomeService { get; set; } = null!;
+    
+    [CascadingParameter]
+    BlazoredModalInstance BlazoredModal { get; set; } = default!;
+
+    [CascadingParameter]
+    public IModalService Modal { get; set; } = default!;
+
+    [Parameter]
+    public List<string> IncomeTypes { get; set; } = new();
+
+    [Parameter]
+    public string HouseholdGuid { get; set; } = "";
+    
+    private CreateIncomeModel NewRecurringIncome { get; set; } = new();
+
+    private void SelectorOnChange(ChangeEventArgs e)
+    {
+        NewRecurringIncome.IncomeType = e.Value?.ToString() ?? string.Empty;
+    }
+
+    private async Task AddIncome()
+    {
+        NewRecurringIncome.HouseholdGuid = HouseholdGuid;
+        
+        await IncomeService.AddRecurringIncome(NewRecurringIncome);
+        await Close();
+    }
+    
+    protected override async Task OnInitializedAsync()
+    {
+        NewRecurringIncome.IncomeType = IncomeTypes.FirstOrDefault() ?? string.Empty;
+    }
+    
+    private async Task Close() => await BlazoredModal.CloseAsync();
+}

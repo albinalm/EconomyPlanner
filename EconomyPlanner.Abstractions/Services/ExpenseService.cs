@@ -187,7 +187,7 @@ public class ExpenseService : IExpenseService
         _dbContext.SaveChanges();
     }
 
-    public IEnumerable<ExpenseModel> GetAllExpensesLinkedToRecurringExpense(int recurringExpenseId)
+    public IEnumerable<ExpenseModel> GetAllExpenseModelsLinkedToRecurringExpense(int recurringExpenseId)
     {
         var recurringExpense = _dbContext.RecurringExpenses.Find(recurringExpenseId);
         return _mapper.Map<IEnumerable<ExpenseModel>>(_dbContext.Expenses.Where(e => e.RecurringExpense == recurringExpense).ToList());

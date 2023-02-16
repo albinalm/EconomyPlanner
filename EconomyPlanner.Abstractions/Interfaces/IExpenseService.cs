@@ -20,6 +20,6 @@ public interface IExpenseService
     void UpdateRecurringExpenseFromModel(ExpenseModel expenseModel);
     void DeleteRecurringExpense(int recurringExpenseId);
     void AddRecurringExpenseAsExpense(int recurringExpenseId, int economyPlanId);
-    IEnumerable<ExpenseModel> GetAllExpensesLinkedToRecurringExpense(int recurringExpenseId);
+    IEnumerable<ExpenseModel> GetAllExpenseModelsLinkedToRecurringExpense(int recurringExpenseId);
     ExpenseModel GetRecurringExpenseFromExpense(int expenseId);
 }

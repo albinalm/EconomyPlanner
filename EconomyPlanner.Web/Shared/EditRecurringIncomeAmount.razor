@@ -1,0 +1,36 @@
+﻿@using EconomyPlanner.Web.Models
+@using EconomyPlanner.Web.Services.Interfaces
+<p>Old value:</p>
+<input class="form-control" type="text" placeholder="@RecurringIncomeModel.Amount" readonly>
+<br/>
+<p>New value:</p>
+<input class="form-control" type="number" @bind="NewRecurringIncomeAmount" placeholder="@RecurringIncomeModel.Amount">
+<br/>
+<button class="btn btn-dark text-center" @onclick="Save">Save</button>
+@code
+{
+    [CascadingParameter] BlazoredModalInstance BlazoredModal { get; set; } = default!;
+    [CascadingParameter] public IModalService Modal { get; set; } = default!;
+
+    [Parameter]
+    public IncomeModel RecurringIncomeModel { get; set; } = new();
+    
+    [Inject]
+    private IIncomeService IncomeService { get; set; } = null!;
+
+    private decimal NewRecurringIncomeAmount { get; set; } = 0;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        NewRecurringIncomeAmount = RecurringIncomeModel.Amount;
+    }
+    
+    private async Task Save()
+    {
+        RecurringIncomeModel.Amount = NewRecurringIncomeAmount;
+        await IncomeService.UpdateIncome(RecurringIncomeModel);
+        
+        await Close();
+    }
+    private async Task Close() => await BlazoredModal.CloseAsync();
+}

@@ -126,7 +126,7 @@ public class ExpenseController : ControllerBase
     [HttpGet(Name = "GetAllExpensesLinkedToRecurringExpense")]
     public IActionResult GetAllExpensesLinkedToRecurringExpense(int recurringExpenseId)
     {
-        return Ok(_expenseService.GetAllExpensesLinkedToRecurringExpense(recurringExpenseId));
+        return Ok(_expenseService.GetAllExpenseModelsLinkedToRecurringExpense(recurringExpenseId));
     }
     
     [HttpGet(Name = "GetRecurringExpenseFromExpense")]
@@ -134,6 +134,4 @@ public class ExpenseController : ControllerBase
     {
         return Ok(_expenseService.GetRecurringExpenseFromExpense(expenseId));
     }
-    
-    
 }

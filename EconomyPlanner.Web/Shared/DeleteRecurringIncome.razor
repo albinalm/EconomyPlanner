@@ -1,0 +1,43 @@
+﻿@using EconomyPlanner.Web.Services.Interfaces
+@using EconomyPlanner.Web.Models
+
+<p>@PreText<b>@RecurringIncomeModel.Name</b>?</p>
+<p hidden="@HideSeveralIncomesMessage" class="font-italic text-danger">This recurring income is linked to multiple incomes. Removing this will keep but unlink all connected incomes</p>
+<br/>
+<button class="btn btn-warning text-center" @onclick="Delete">Yes</button>
+<button class="btn btn-info text-center" @onclick="Close">No</button>
+
+@code
+{
+    public bool HideSeveralIncomesMessage { get; set; } = true;
+    
+    [Parameter]
+    public IncomeModel RecurringIncomeModel { get; set; } = new();
+
+    [Parameter] public string? PreText { get; set; }
+    [CascadingParameter] BlazoredModalInstance BlazoredModal { get; set; } = default!;
+    [CascadingParameter] public IModalService Modal { get; set; } = default!;
+
+    
+    [Inject]
+    private IIncomeService IncomeService { get; set; } = null!;
+    
+    private async Task Delete()
+    {
+        await IncomeService.DeleteRecurringIncome(RecurringIncomeModel);
+        
+        await Close();
+    }
+    
+    protected override async Task OnInitializedAsync()
+    {
+        await CheckIfRecurringIncomeIsLinkedToSeveralIncomes();
+    }
+    
+    private async Task CheckIfRecurringIncomeIsLinkedToSeveralIncomes()
+    {
+        HideSeveralIncomesMessage = (await IncomeService.GetAllIncomesLinkedToRecurringIncome(RecurringIncomeModel)).Count() <= 1;
+    }
+    
+    private async Task Close() => await BlazoredModal.CloseAsync();
+}

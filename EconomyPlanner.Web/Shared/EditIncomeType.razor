@@ -1,0 +1,52 @@
+﻿@using EconomyPlanner.Web.Models
+@using EconomyPlanner.Web.Services.Interfaces
+<p>Old value:</p>
+<input class="form-control" type="text" placeholder="@IncomeModel.IncomeType" readonly>
+<br/>
+<p>New value:</p>
+  <div class="form-group">
+      <select class="form-control" id="transactionTypeSelector" onchange="@SelectorOnChange">
+          @foreach (var incomeType in IncomeTypes)
+          {
+              <option>@incomeType</option>
+          }
+      </select>
+  </div>
+<br/>
+<button class="btn btn-dark text-center" @onclick="Save">Save</button>
+@code
+{
+    [CascadingParameter] BlazoredModalInstance BlazoredModal { get; set; } = default!;
+    [CascadingParameter] public IModalService Modal { get; set; } = default!;
+
+    [Parameter]
+    public IncomeModel IncomeModel { get; set; } = new();
+    
+    [Parameter]
+    public List<string> IncomeTypes { get; set; } = new();
+    
+    [Inject]
+    private IIncomeService IncomeService { get; set; } = null!;
+
+    private string NewIncomeType { get; set; } = "";
+
+    private async Task Save()
+    {
+        IncomeModel.IncomeType = NewIncomeType;
+        
+        await IncomeService.UpdateIncome(IncomeModel);
+        
+        await Close();
+    }
+    private async Task Close() => await BlazoredModal.CloseAsync();
+
+    private void SelectorOnChange(ChangeEventArgs e)
+    {
+        NewIncomeType = e.Value?.ToString() ?? string.Empty;
+    }
+    
+    protected override async Task OnInitializedAsync()
+    {
+        NewIncomeType = IncomeTypes.FirstOrDefault() ?? string.Empty;
+    }
+}

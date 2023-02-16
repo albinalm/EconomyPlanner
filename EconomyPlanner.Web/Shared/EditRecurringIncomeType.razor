@@ -1,0 +1,53 @@
+﻿@using EconomyPlanner.Web.Models
+@using EconomyPlanner.Web.Services.Interfaces
+<p>Old value:</p>
+<input class="form-control" type="text" placeholder="@RecurringIncomeModel.IncomeType" readonly>
+<br/>
+<p>New value:</p>
+  <div class="form-group">
+      <select class="form-control" id="transactionTypeSelector" onchange="@SelectorOnChange">
+          @foreach (var incomeType in IncomeTypes)
+          {
+              <option>@incomeType</option>
+          }
+      </select>
+  </div>
+<br/>
+<button class="btn btn-dark text-center" @onclick="Save">Save</button>
+@code
+{
+    [CascadingParameter] BlazoredModalInstance BlazoredModal { get; set; } = default!;
+    [CascadingParameter] public IModalService Modal { get; set; } = default!;
+
+    [Parameter]
+    public IncomeModel RecurringIncomeModel { get; set; } = new();
+    
+    [Parameter]
+    public List<string> IncomeTypes { get; set; } = new();
+    
+    [Inject]
+    private IIncomeService IncomeService { get; set; } = null!;
+
+    private string NewRecurringIncomeType { get; set; } = "";
+
+    private async Task Save()
+    {
+        RecurringIncomeModel.IncomeType = NewRecurringIncomeType;
+        
+        await IncomeService.UpdateRecurringIncome(RecurringIncomeModel);
+        
+        await Close();
+    }
+    
+    private async Task Close() => await BlazoredModal.CloseAsync();
+
+    private void SelectorOnChange(ChangeEventArgs e)
+    {
+        NewRecurringIncomeType = e.Value?.ToString() ?? string.Empty;
+    }
+    
+    protected override async Task OnInitializedAsync()
+    {
+        NewRecurringIncomeType = IncomeTypes.FirstOrDefault() ?? string.Empty;
+    }
+}

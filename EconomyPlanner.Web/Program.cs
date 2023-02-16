@@ -17,6 +17,7 @@ builder.Services.AddBlazoredLocalStorage(config => config.JsonSerializerOptions.
 builder.Services.AddScoped<IHouseholdService, HouseholdService>();
 builder.Services.AddScoped<IEconomyPlanService, EconomyPlanService>();
 builder.Services.AddScoped<IExpenseService, ExpenseService>();
+builder.Services.AddScoped<IIncomeService, IncomeService>();
 builder.Services.AddBlazoredModal();   
 
 await builder.Build().RunAsync();

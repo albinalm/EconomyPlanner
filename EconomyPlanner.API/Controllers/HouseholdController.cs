@@ -60,4 +60,17 @@ public class HouseholdController : ControllerBase
             return StatusCode(500, ex.Message);
         }
     }
+    
+    [HttpGet(Name = "GetRecurringIncomes")]
+    public IActionResult GetRecurringIncomes(string guid)
+    {
+        try
+        {
+            return Ok( _householdService.GetRecurringIncomes(guid));
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ex.Message);
+        }
+    }
 }

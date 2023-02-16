@@ -1,0 +1,74 @@
+﻿@using EconomyPlanner.Web.Services.Interfaces
+@using EconomyPlanner.Web.Models
+
+<p>@PreText<b>@IncomeModel.Name</b>?</p>
+<div class="form-check" hidden="@IsNotRecurring">
+  <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault" hidden="@IsNotRecurring" @onchange="eventArgs => { RecurringCheckboxClicked(eventArgs.Value); }">
+  <label class="form-check-label" for="flexSwitchCheckDefault" hidden="@IsNotRecurring">Also delete recurring transaction</label>
+  <p hidden="@HideSeveralIncomesMessage" class="font-italic text-danger">The recurring income is linked to multiple incomes. Checking this will unlink the all the other incomes from the recurring counterpart</p>
+</div>
+<br/>
+<button class="btn btn-warning text-center" @onclick="Delete">Yes</button>
+<button class="btn btn-info text-center" @onclick="Close">No</button>
+
+@code
+{
+    public bool RecurringHasSeveralIncomes { get; set; }
+    public bool HideSeveralIncomesMessage { get; set; } = true;
+    public bool DeleteRecurring { get; set; }
+    public bool IsNotRecurring { get; set; } = true;
+
+    [Parameter]
+    public IncomeModel IncomeModel { get; set; } = new();
+
+    [Parameter] public string? PreText { get; set; }
+    [CascadingParameter] BlazoredModalInstance BlazoredModal { get; set; } = default!;
+    [CascadingParameter] public IModalService Modal { get; set; } = default!;
+
+    
+    [Inject]
+    private IIncomeService IncomeService { get; set; } = null!;
+    
+    private async Task Delete()
+    {
+        await IncomeService.DeleteIncome(IncomeModel, DeleteRecurring);
+        
+        await Close();
+    }
+    
+    private async Task Close() => await BlazoredModal.CloseAsync();
+
+    private async Task CheckIfRecurringIncomeIsLinkedToSeveraIncomes()
+    {
+        var recurringIncome = await IncomeService.GetRecurringIncomeFromIncome(IncomeModel);
+        
+        if (recurringIncome is null)
+            return;
+        
+        RecurringHasSeveralIncomes = (await IncomeService.GetAllIncomesLinkedToRecurringIncome(recurringIncome)).Count() > 1;
+    }
+    
+    private void RecurringCheckboxClicked(object checkedValue)
+    {
+        if ((bool)checkedValue)
+        {
+            if (RecurringHasSeveralIncomes)
+                HideSeveralIncomesMessage = false;
+            
+            DeleteRecurring = true;
+        }
+        else
+        {
+            DeleteRecurring = false;
+            HideSeveralIncomesMessage = true;
+        }
+    }
+    
+    protected override async Task OnInitializedAsync()
+    {
+        IsNotRecurring = !await IncomeService.CheckIfIncomeIsRecurring(IncomeModel);
+        
+        if(!IsNotRecurring)
+            await CheckIfRecurringIncomeIsLinkedToSeveraIncomes();
+    }
+}

@@ -11,4 +11,5 @@ public interface IHouseholdService
    Task<string?> GetSavedLogin();
    Task<HouseholdModel> GetHouseholdModel();
    Task<IEnumerable<ExpenseModel>> GetRecurringExpenses();
+   Task<IEnumerable<IncomeModel>> GetRecurringIncomes();
 }

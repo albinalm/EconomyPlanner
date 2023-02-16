@@ -67,4 +67,17 @@ public class HouseholdService : IHouseholdService
 
         return expenseModels;
     }
+    
+    public async Task<IEnumerable<IncomeModel>> GetRecurringIncomes()
+    {
+        if (!await HasSavedLogin())
+            throw new InvalidOperationException("No valid login");
+        
+        var incomeModels = await _httpClient.GetFromJsonAsync<IEnumerable<IncomeModel>>($"http://localhost:5179/api/Household/GetRecurringIncomes?guid={await GetSavedLogin()}");
+        
+        if (incomeModels is null)
+            throw new InvalidOperationException("Could not find household via login");
+
+        return incomeModels;
+    }
 }

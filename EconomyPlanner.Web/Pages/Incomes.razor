@@ -1,6 +1,318 @@
 ﻿@page "/incomes"
-@inject HttpClient Http
+@using EconomyPlanner.Web.Services.Interfaces
+@using EconomyPlanModel = EconomyPlanner.Web.Models.EconomyPlanModel
+@using EconomyPlanner.Web.Models
+@inject NavigationManager NavManager
 
-<PageTitle>Weather forecast</PageTitle>
+<PageTitle>Incomes</PageTitle>
 
-<h1>Incomes</h1>
+<h1>Current incomes</h1>
+<br/>
+
+<div>
+    <b>Selected economy plan:</b>
+</div>
+<Dropdown TItem="EconomyPlanModel" OnSelected="@OnSelected">
+    <InitialTip>@InitialEconomyPlanName</InitialTip>
+    <ChildContent>
+        @foreach (var plan in _economyPlanModels)
+        {
+            <DropdownListItem Item="@plan">@plan.Name</DropdownListItem>
+        }
+    </ChildContent>
+</Dropdown>
+
+<div class="alert alert-secondary mt-4">
+    <div>
+        <div class="row">
+            <div class="col-md">
+                <b>Type: </b>
+            </div>
+            <div class="col-md">
+                <b>Name: </b>
+            </div>
+            <div class="col-md">
+                <b>Amount: </b>
+            </div>
+            <div class="col-md">
+            </div>
+        </div>
+        <hr/>
+        @foreach (var income in _incomeModels)
+        {
+            <div class="row">
+                <div class="col-md text-left">
+                    <div class="span2">
+                        <button class="btn btn-dark btn-block btn-sm text-left" @onclick="@(_ => ShowEditTypePopup(income))">@income.IncomeType</button>
+                    </div>
+                </div>
+                <div class="col-md">
+                    <div class="span2">
+                        <button class="btn btn-dark btn-block btn-sm text-left" @onclick="@(_ => ShowEditNamePopup(income))">@income.Name</button>
+                    </div>
+                </div>
+                <div class="col-md">
+                    <div class="span2">
+                        <button class="btn btn-dark btn-block btn-sm text-left" @onclick="@(_ => ShowEditAmountPopup(income))">@income.Amount</button>
+                    </div>
+                </div>
+                <div class="col-md">
+                    <button class="btn btn-danger btn-sm text-left" @onclick="@(_ => ShowDeletePopup("Are you sure you wish to delete ", income))">
+                        Delete
+                    </button>
+                </div>
+            </div>
+            <br/>
+        }
+    </div>
+    <div>
+        <button class="btn btn-success text-left oi oi-plus" onclick="@ShowAddIncomePopup"></button>
+        <p class="float-right font-weight-bold">Sum total: @TotalIncomeCost:-</p>
+    </div>
+
+</div>
+<br/><hr/><br/>
+<h4>Recurring incomes:</h4>
+<div class="alert alert-secondary mt-4">
+    <div>
+        <div class="row">
+            <div class="col-md">
+                <b>Type: </b>
+            </div>
+            <div class="col-md">
+                <b>Name: </b>
+            </div>
+            <div class="col-md">
+                <b>Amount: </b>
+            </div>
+            <div class="col-md">
+            </div>
+        </div>
+        <hr/>
+        @foreach (var recurringIncome in _recurringIncomes)
+        {
+            <div class="row">
+                <div class="col-md text-left">
+                    <div class="span2">
+                        <button class="btn btn-dark btn-block btn-sm text-left" @onclick="@(_ => ShowEditRecurringTypePopup(recurringIncome))">@recurringIncome.IncomeType</button>
+                    </div>
+                </div>
+                <div class="col-md">
+                    <div class="span2">
+                        <button class="btn btn-dark btn-block btn-sm text-left" @onclick="@(_ => ShowEditRecurringNamePopup(recurringIncome))">@recurringIncome.Name</button>
+                    </div>
+                </div>
+                <div class="col-md">
+                    <div class="span2">
+                        <button class="btn btn-dark btn-block btn-sm text-left" @onclick="@(_ => ShowEditRecurringAmountPopup(recurringIncome))">@recurringIncome.Amount</button>
+                    </div>
+                </div>
+                <div class="col-md">
+                    <button class="btn btn-danger btn-sm text-left" @onclick="@(_ => ShowDeleteRecurringPopup("Are you sure you wish to delete recurring income: ", recurringIncome))">
+                        Delete
+                    </button>
+                    <button class="btn btn-success btn-sm text-left" @onclick="@(_ => AddIncomeFromRecurringIncome(recurringIncome))">
+                        Add to current plan
+                    </button>
+                </div>
+            </div>
+            <br/>
+        }
+    </div>
+    <button class="btn btn-success text-left oi oi-plus" onclick="@ShowAddRecurringIncomePopup"></button>
+    <p class="float-right font-weight-bold">Sum total: @TotalRecurringIncomeCost:-</p>
+</div>
+
+@code {
+
+    [CascadingParameter]
+    public IModalService Modal { get; set; }
+
+    [Inject]
+    private IEconomyPlanService EconomyPlanService { get; set; } = null!;
+
+    [Inject]
+    private IIncomeService IncomeService { get; set; } = null!;
+
+    [Inject]
+    private IHouseholdService HouseholdService { get; set; } = null!;
+
+    private EconomyPlanModel? SelectedEconomyPlan { get; set; } = null;
+    private List<IncomeModel> _incomeModels = new();
+    private List<IncomeModel> _recurringIncomes = new();
+    private List<EconomyPlanModel> _economyPlanModels = new();
+    private string InitialEconomyPlanName { get; set; } = "";
+
+    public decimal TotalIncomeCost
+    {
+        get
+        {
+           return _incomeModels.Select(e => e.Amount).Sum();
+        }
+    }
+
+    public decimal TotalRecurringIncomeCost
+    {
+        get
+        {
+            return _recurringIncomes.Select(e => e.Amount).Sum();
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!await HouseholdService.HasSavedLogin())
+            NavManager.NavigateTo("/login");
+        else
+            await InitializePage();
+    }
+
+    private async Task InitializePage()
+    {
+        await GetEconomyPlanModes();
+        if (_economyPlanModels.Any())
+        {
+            SelectedEconomyPlan = _economyPlanModels.First();
+            InitialEconomyPlanName = SelectedEconomyPlan.Name;
+            _incomeModels = IncomeService.GetIncomes(SelectedEconomyPlan).ToList();
+            await GetRecurringIncomes();
+        }
+    }
+
+    private async Task RefreshIncomes()
+    {
+        await GetEconomyPlanModes();
+        if (_economyPlanModels.Any())
+        {
+            _incomeModels = IncomeService.GetIncomes(_economyPlanModels.First(e => e.Id == SelectedEconomyPlan.Id)).ToList();
+        }
+    }
+
+    private async Task GetRecurringIncomes()
+    {
+        _recurringIncomes = (await HouseholdService.GetRecurringIncomes()).ToList();
+    }
+
+    private async Task GetEconomyPlanModes()
+    {
+        _economyPlanModels = (await EconomyPlanService.GetEconomyPlans()).ToList();
+    }
+
+    private void OnSelected(EconomyPlanModel selection)
+    {
+        _incomeModels = IncomeService.GetIncomes(selection).ToList();
+        SelectedEconomyPlan = selection;
+        Console.WriteLine("Current economy plan!" + SelectedEconomyPlan.Name + " ID: " + SelectedEconomyPlan.Id);
+    }
+
+    private async Task ShowDeletePopup(string preText, IncomeModel incomeModel)
+    {
+        var parameters = new ModalParameters()
+            .Add(nameof(DeleteIncome.PreText), preText)
+            .Add(nameof(DeleteIncome.IncomeModel), incomeModel);
+
+        await Modal.Show<DeleteIncome>("Delete?", parameters).Result;
+        await RefreshIncomes();
+        await GetRecurringIncomes();
+    }
+
+    private async Task ShowEditAmountPopup(IncomeModel incomeModel)
+    {
+        var parameters = new ModalParameters()
+            .Add(nameof(EditIncomeAmount.IncomeModel), incomeModel);
+
+        await Modal.Show<EditIncomeAmount>("Edit", parameters).Result;
+
+        await RefreshIncomes();
+    }
+
+    private async Task ShowEditNamePopup(IncomeModel incomeModel)
+    {
+        var parameters = new ModalParameters()
+            .Add(nameof(EditIncomeName.IncomeModel), incomeModel);
+
+        await Modal.Show<EditIncomeName>("Edit", parameters).Result;
+
+        await RefreshIncomes();
+    }
+
+    private async Task ShowEditTypePopup(IncomeModel incomeModel)
+    {
+        var parameters = new ModalParameters()
+            .Add(nameof(EditIncomeType.IncomeModel), incomeModel)
+            .Add(nameof(EditIncomeType.IncomeTypes), await IncomeService.GetIncomeTypes());
+
+        await Modal.Show<EditIncomeType>("Edit", parameters).Result;
+
+        await RefreshIncomes();
+    }
+
+    private async Task ShowAddIncomePopup()
+    {
+        var parameters = new ModalParameters()
+            .Add(nameof(AddIncomeForm.IncomeTypes), await IncomeService.GetIncomeTypes())
+            .Add(nameof(AddIncomeForm.EconomyPlanModel), SelectedEconomyPlan!)
+            .Add(nameof(AddIncomeForm.HouseholdGuid), await HouseholdService.GetSavedLogin());
+
+        await Modal.Show<AddIncomeForm>("Add new income", parameters).Result;
+        await RefreshIncomes();
+        await GetRecurringIncomes();
+    }
+
+    private async Task ShowAddRecurringIncomePopup()
+    {
+        var parameters = new ModalParameters()
+            .Add(nameof(AddRecurringIncomeForm.IncomeTypes), await IncomeService.GetIncomeTypes())
+            .Add(nameof(AddRecurringIncomeForm.HouseholdGuid), await HouseholdService.GetSavedLogin());
+
+        await Modal.Show<AddRecurringIncomeForm>("Add new recurring income", parameters).Result;
+        await GetRecurringIncomes();
+    }
+
+    private async Task ShowEditRecurringAmountPopup(IncomeModel incomeModel)
+    {
+        var parameters = new ModalParameters()
+            .Add(nameof(EditRecurringIncomeAmount.RecurringIncomeModel), incomeModel);
+
+        await Modal.Show<EditRecurringIncomeAmount>("Edit", parameters).Result;
+
+        await GetRecurringIncomes();
+    }
+
+    private async Task ShowEditRecurringNamePopup(IncomeModel incomeModel)
+    {
+        var parameters = new ModalParameters()
+            .Add(nameof(EditRecurringIncomeName.RecurringIncomeModel), incomeModel);
+
+        await Modal.Show<EditRecurringIncomeName>("Edit", parameters).Result;
+
+        await GetRecurringIncomes();
+    }
+
+    private async Task ShowEditRecurringTypePopup(IncomeModel incomeModel)
+    {
+        var parameters = new ModalParameters()
+            .Add(nameof(EditRecurringIncomeType.RecurringIncomeModel), incomeModel)
+            .Add(nameof(EditRecurringIncomeType.IncomeTypes), await IncomeService.GetIncomeTypes());
+
+        await Modal.Show<EditRecurringIncomeType>("Edit", parameters).Result;
+
+        await GetRecurringIncomes();
+    }
+
+    private async Task ShowDeleteRecurringPopup(string preText, IncomeModel incomeModel)
+    {
+        var parameters = new ModalParameters()
+            .Add(nameof(DeleteRecurringIncome.PreText), preText)
+            .Add(nameof(DeleteRecurringIncome.RecurringIncomeModel), incomeModel);
+
+        await Modal.Show<DeleteRecurringIncome>("Delete?", parameters).Result;
+        await GetRecurringIncomes();
+    }
+
+    private async Task AddIncomeFromRecurringIncome(IncomeModel incomeModel)
+    {
+        await IncomeService.AddRecurringIncomeAsIncome(incomeModel, SelectedEconomyPlan);
+        await RefreshIncomes();
+    }
+}

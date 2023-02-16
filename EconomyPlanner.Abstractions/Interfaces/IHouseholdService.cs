@@ -8,4 +8,5 @@ public interface IHouseholdService
     HouseholdModel? GetHouseholdByGuid(string guid);
     void CreateHousehold(string name);
     IEnumerable<ExpenseModel> GetRecurringExpenses(string guid);
+    IEnumerable<IncomeModel> GetRecurringIncomes(string guid);
 }
