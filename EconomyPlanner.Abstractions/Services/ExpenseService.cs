@@ -85,16 +85,16 @@ public class ExpenseService : IExpenseService
     public void UpdateRecurringExpenseFromModel(ExpenseModel expenseModel)
     {
         var recurringExpense = _dbContext.GetRecurringExpenseFromId(expenseModel.Id);
-        
+
         if (recurringExpense is null)
             return;
-        
+
         _mapper.Map(expenseModel, recurringExpense);
 
         _dbContext.Update(recurringExpense);
         _dbContext.SaveChanges();
     }
-    
+
     public ExpenseModel? GetExpenseModel(int expenseId)
     {
         var expense = _dbContext.Expenses.Find(expenseId);
@@ -117,12 +117,25 @@ public class ExpenseService : IExpenseService
             return;
 
         if (deleteRecurring && expense.RecurringExpense != null)
-            _dbContext.RecurringExpenses.Remove(expense.RecurringExpense);
+        {
+            var recurringExpense = expense.RecurringExpense;
+            
+            var linkedExpenses = GetAllExpensesLinkedToRecurringExpense(expense.RecurringExpense);
+            if (linkedExpenses.Any())
+            {
+                foreach (var linkedExpense in linkedExpenses)
+                {
+                    linkedExpense.RecurringExpense = null;
+                }
+            }
+            _dbContext.RecurringExpenses.Remove(recurringExpense); 
+        }
+            
 
         _dbContext.Expenses.Remove(expense);
         _dbContext.SaveChanges();
     }
-    
+
     public void DeleteRecurringExpense(int recurringExpenseId)
     {
         var recurringExpense = _dbContext.RecurringExpenses.Find(recurringExpenseId);
@@ -130,10 +143,24 @@ public class ExpenseService : IExpenseService
         if (recurringExpense is null)
             return;
         
+        var linkedExpenses = GetAllExpensesLinkedToRecurringExpense(recurringExpense);
+        if (linkedExpenses.Any())
+        {
+            foreach (var linkedExpense in linkedExpenses)
+            {
+                linkedExpense.RecurringExpense = null;
+            }
+        }
+        
         _dbContext.RecurringExpenses.Remove(recurringExpense);
         _dbContext.SaveChanges();
     }
 
+    private List<Expense> GetAllExpensesLinkedToRecurringExpense(RecurringExpense recurringExpense)
+    {
+        return _dbContext.Expenses.Where(e => e.RecurringExpense == recurringExpense).ToList();
+    }
+    
     public bool CheckIfExpenseIsRecurring(int expenseId)
     {
         var expense = _dbContext.Expenses.Where(e => e.Id == expenseId)
@@ -141,5 +168,33 @@ public class ExpenseService : IExpenseService
                                 .FirstOrDefault();
 
         return expense?.RecurringExpense != null;
+    }
+
+    public void AddRecurringExpenseAsExpense(int recurringExpenseId, int economyPlanId)
+    {
+        var economyPlan = _dbContext.GetEconomyPlanFromId(economyPlanId);
+        var recurringExpense = _dbContext.RecurringExpenses.Find(recurringExpenseId);
+
+        if (economyPlan == null || recurringExpense == null)
+            return;
+
+        var expense = Expense.Create(recurringExpense.Name, recurringExpense.Amount, recurringExpense.ExpenseType, null);
+        expense.RecurringExpense = recurringExpense;
+        
+        _dbContext.Expenses.Add(expense);
+        economyPlan.Expenses.Add(expense);
+        _dbContext.EconomyPlans.Update(economyPlan);
+        _dbContext.SaveChanges();
+    }
+
+    public IEnumerable<ExpenseModel> GetAllExpensesLinkedToRecurringExpense(int recurringExpenseId)
+    {
+        var recurringExpense = _dbContext.RecurringExpenses.Find(recurringExpenseId);
+        return _mapper.Map<IEnumerable<ExpenseModel>>(_dbContext.Expenses.Where(e => e.RecurringExpense == recurringExpense).ToList());
+    }
+
+    public ExpenseModel GetRecurringExpenseFromExpense(int expenseId)
+    {
+        return _mapper.Map<ExpenseModel>(_dbContext.Expenses.Where(e => e.Id == expenseId).Include(e => e.RecurringExpense).FirstOrDefault()?.RecurringExpense);
     }
 }

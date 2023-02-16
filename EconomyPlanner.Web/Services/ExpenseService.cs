@@ -62,4 +62,19 @@ public class ExpenseService : IExpenseService
     { 
         await _httpClient.GetAsync($"http://localhost:5179/api/Expense/DeleteRecurringExpense?recurringExpenseId={expenseModel.Id}");
     }
+    
+    public async Task AddRecurringExpenseAsExpense(ExpenseModel expenseModel, EconomyPlanModel economyPlanModel)
+    {
+        await _httpClient.GetAsync($"http://localhost:5179/api/Expense/AddRecurringExpenseAsExpense?recurringExpenseId={expenseModel.Id}&economyPlanId={economyPlanModel.Id}");
+    }
+
+    public async Task<IEnumerable<ExpenseModel>> GetAllExpensesLinkedToRecurringExpense(ExpenseModel expenseModel)
+    {
+        return await _httpClient.GetFromJsonAsync<IEnumerable<ExpenseModel>>($"http://localhost:5179/api/Expense/GetAllExpensesLinkedToRecurringExpense?recurringExpenseId={expenseModel.Id}") ?? Enumerable.Empty<ExpenseModel>();
+    }
+    
+    public async Task<ExpenseModel?> GetRecurringExpenseFromExpense(ExpenseModel expenseModel)
+    {
+        return await _httpClient.GetFromJsonAsync<ExpenseModel?>($"http://localhost:5179/api/Expense/GetRecurringExpenseFromExpense?expenseId={expenseModel.Id}");
+    }
 }

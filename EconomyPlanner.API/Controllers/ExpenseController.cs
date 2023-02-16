@@ -115,4 +115,25 @@ public class ExpenseController : ControllerBase
         _expenseService.DeleteRecurringExpense(recurringExpenseId);
         return Ok();
     }
+
+    [HttpGet(Name = "AddRecurringExpenseAsExpense")]
+    public IActionResult AddRecurringExpenseAsExpense(int recurringExpenseId, int economyPlanId)
+    {
+        _expenseService.AddRecurringExpenseAsExpense(recurringExpenseId, economyPlanId);
+        return Ok();
+    }
+
+    [HttpGet(Name = "GetAllExpensesLinkedToRecurringExpense")]
+    public IActionResult GetAllExpensesLinkedToRecurringExpense(int recurringExpenseId)
+    {
+        return Ok(_expenseService.GetAllExpensesLinkedToRecurringExpense(recurringExpenseId));
+    }
+    
+    [HttpGet(Name = "GetRecurringExpenseFromExpense")]
+    public IActionResult GetRecurringExpenseFromExpense(int expenseId)
+    {
+        return Ok(_expenseService.GetRecurringExpenseFromExpense(expenseId));
+    }
+    
+    
 }

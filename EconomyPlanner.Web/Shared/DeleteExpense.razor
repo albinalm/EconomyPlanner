@@ -5,6 +5,7 @@
 <div class="form-check" hidden="@IsNotRecurring">
   <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault" hidden="@IsNotRecurring" @onchange="eventArgs => { RecurringCheckboxClicked(eventArgs.Value); }">
   <label class="form-check-label" for="flexSwitchCheckDefault" hidden="@IsNotRecurring">Also delete recurring transaction</label>
+  <p hidden="@HideSeveralExpensesMessage" class="font-italic text-danger">The recurring expense is linked to multiple expenses. Checking this will unlink the all the other expenses from the recurring counterpart</p>
 </div>
 <br/>
 <button class="btn btn-warning text-center" @onclick="Delete">Yes</button>
@@ -12,6 +13,8 @@
 
 @code
 {
+    public bool RecurringHasSeveralExpenses { get; set; }
+    public bool HideSeveralExpensesMessage { get; set; } = true;
     public bool DeleteRecurring { get; set; }
     public bool IsNotRecurring { get; set; } = true;
 
@@ -34,21 +37,38 @@
     }
     
     private async Task Close() => await BlazoredModal.CloseAsync();
+
+    private async Task CheckIfRecurringExpenseIsLinkedToSeveralExpenses()
+    {
+        var recurringExpense = await ExpenseService.GetRecurringExpenseFromExpense(ExpenseModel);
+        
+        if (recurringExpense is null)
+            return;
+        
+        RecurringHasSeveralExpenses = (await ExpenseService.GetAllExpensesLinkedToRecurringExpense(recurringExpense)).Count() > 1;
+    }
     
     private void RecurringCheckboxClicked(object checkedValue)
     {
         if ((bool)checkedValue)
         {
+            if (RecurringHasSeveralExpenses)
+                HideSeveralExpensesMessage = false;
+            
             DeleteRecurring = true;
         }
         else
         {
             DeleteRecurring = false;
+            HideSeveralExpensesMessage = true;
         }
     }
     
     protected override async Task OnInitializedAsync()
     {
         IsNotRecurring = !await ExpenseService.CheckIfExpenseIsRecurring(ExpenseModel);
+        
+        if(!IsNotRecurring)
+            await CheckIfRecurringExpenseIsLinkedToSeveralExpenses();
     }
 }

@@ -15,4 +15,7 @@ public interface IExpenseService
     Task AddRecurringExpense(CreateExpenseModel createExpenseModel);
     Task UpdateRecurringExpense(ExpenseModel expenseModel);
     Task DeleteRecurringExpense(ExpenseModel expenseModel);
+    Task AddRecurringExpenseAsExpense(ExpenseModel expenseModel, EconomyPlanModel economyPlanModel);
+    Task<IEnumerable<ExpenseModel>> GetAllExpensesLinkedToRecurringExpense(ExpenseModel expenseModel);
+    Task<ExpenseModel?> GetRecurringExpenseFromExpense(ExpenseModel expenseModel);
 }

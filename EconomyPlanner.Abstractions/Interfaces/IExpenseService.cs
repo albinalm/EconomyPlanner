@@ -19,4 +19,7 @@ public interface IExpenseService
     void CreateRecurringExpense(string householdGuid, string name, decimal amount, string expenseType);
     void UpdateRecurringExpenseFromModel(ExpenseModel expenseModel);
     void DeleteRecurringExpense(int recurringExpenseId);
+    void AddRecurringExpenseAsExpense(int recurringExpenseId, int economyPlanId);
+    IEnumerable<ExpenseModel> GetAllExpensesLinkedToRecurringExpense(int recurringExpenseId);
+    ExpenseModel GetRecurringExpenseFromExpense(int expenseId);
 }

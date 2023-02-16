@@ -2,12 +2,15 @@
 @using EconomyPlanner.Web.Models
 
 <p>@PreText<b>@RecurringExpenseModel.Name</b>?</p>
+<p hidden="@HideSeveralExpensesMessage" class="font-italic text-danger">This recurring expense is linked to multiple expenses. Removing this will keep but unlink all connected expenses</p>
 <br/>
 <button class="btn btn-warning text-center" @onclick="Delete">Yes</button>
 <button class="btn btn-info text-center" @onclick="Close">No</button>
 
 @code
 {
+    public bool HideSeveralExpensesMessage { get; set; } = true;
+    
     [Parameter]
     public ExpenseModel RecurringExpenseModel { get; set; } = new();
 
@@ -24,6 +27,16 @@
         await ExpenseService.DeleteRecurringExpense(RecurringExpenseModel);
         
         await Close();
+    }
+    
+    protected override async Task OnInitializedAsync()
+    {
+        await CheckIfRecurringExpenseIsLinkedToSeveralExpenses();
+    }
+    
+    private async Task CheckIfRecurringExpenseIsLinkedToSeveralExpenses()
+    {
+        HideSeveralExpensesMessage = (await ExpenseService.GetAllExpensesLinkedToRecurringExpense(RecurringExpenseModel)).Count() <= 1;
     }
     
     private async Task Close() => await BlazoredModal.CloseAsync();
