@@ -2,7 +2,7 @@
 @using EconomyPlanner.Web.Services.Interfaces
 @using EconomyPlanModel = EconomyPlanner.Web.Models.EconomyPlanModel
 @using ExpenseModel = EconomyPlanner.Web.Models.ExpenseModel
-@using System.Net.Sockets
+@using EconomyPlanner.Web.Shared.Expense
 @inject NavigationManager NavManager
 
 <PageTitle>Expenses</PageTitle>
@@ -146,18 +146,12 @@
 
     public decimal TotalExpenseCost
     {
-        get
-        {
-           return _expenseModels.Select(e => e.Amount).Sum();
-        }
+        get { return _expenseModels.Select(e => e.Amount).Sum(); }
     }
 
     public decimal TotalRecurringExpenseCost
     {
-        get
-        {
-            return _recurringExpenses.Select(e => e.Amount).Sum();
-        }
+        get { return _recurringExpenses.Select(e => e.Amount).Sum(); }
     }
 
     protected override async Task OnInitializedAsync()
@@ -316,4 +310,5 @@
         await ExpenseService.AddRecurringExpenseAsExpense(expenseModel, SelectedEconomyPlan);
         await RefreshExpenses();
     }
+
 }

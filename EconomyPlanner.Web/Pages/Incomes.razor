@@ -2,6 +2,7 @@
 @using EconomyPlanner.Web.Services.Interfaces
 @using EconomyPlanModel = EconomyPlanner.Web.Models.EconomyPlanModel
 @using EconomyPlanner.Web.Models
+@using EconomyPlanner.Web.Shared.Income
 @inject NavigationManager NavManager
 
 <PageTitle>Incomes</PageTitle>
@@ -145,18 +146,12 @@
 
     public decimal TotalIncomeCost
     {
-        get
-        {
-           return _incomeModels.Select(e => e.Amount).Sum();
-        }
+        get { return _incomeModels.Select(e => e.Amount).Sum(); }
     }
 
     public decimal TotalRecurringIncomeCost
     {
-        get
-        {
-            return _recurringIncomes.Select(e => e.Amount).Sum();
-        }
+        get { return _recurringIncomes.Select(e => e.Amount).Sum(); }
     }
 
     protected override async Task OnInitializedAsync()
@@ -315,4 +310,5 @@
         await IncomeService.AddRecurringIncomeAsIncome(incomeModel, SelectedEconomyPlan);
         await RefreshIncomes();
     }
+
 }
