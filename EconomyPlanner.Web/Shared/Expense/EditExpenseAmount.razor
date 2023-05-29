@@ -20,9 +20,10 @@
 
     private decimal NewExpenseAmount { get; set; }
     
-    protected override async Task OnInitializedAsync()
+    protected override Task OnInitializedAsync()
     {
         NewExpenseAmount = ExpenseModel.Amount;
+        return Task.CompletedTask;
     }
     
     private async Task Save()

@@ -24,7 +24,7 @@ builder.Services.AddCors(options =>
                       });
 });
 
-builder.Services.AddSingleton<ITimeService, TimeService>();
+builder.Services.AddScoped<ITimeService, TimeService>();
 
 builder.Services.AddScoped<IEconomyPlanService, EconomyPlanService>();
 builder.Services.AddScoped<IExpenseService, ExpenseService>();
@@ -61,6 +61,6 @@ static void RegisterRepository(IServiceCollection services, IConfiguration confi
     if (string.IsNullOrWhiteSpace(connectionString))
         throw new InvalidOperationException("A connection string needs to be provided");
         
-    services.AddDbContext<DatabaseContext>(options => options.UseSqlServer(connectionString, b => b.MigrationsAssembly("EconomyPlannerMigrationDummy")), ServiceLifetime.Singleton);
+    services.AddDbContext<DatabaseContext>(options => options.UseSqlServer(connectionString, b => b.MigrationsAssembly("EconomyPlannerMigrationDummy")));
     
 }
