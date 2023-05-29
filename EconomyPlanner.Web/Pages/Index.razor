@@ -1,9 +1,7 @@
-﻿@inject Blazored.LocalStorage.ILocalStorageService LocalStorage
-@inject NavigationManager NavManager
+﻿@inject NavigationManager NavManager
 @page "/"
 @using EconomyPlanner.Web.Services.Interfaces
 @using EconomyPlanner.Web.Models
-@using System.Numerics
 
 <PageTitle>Index</PageTitle>
 
@@ -69,17 +67,17 @@
     private IIncomeService IncomeService { get; set; } = null!;
 
     [Inject]
-    private IHouseholdService HouseholdService { get; set; }
+    private IHouseholdService HouseholdService { get; set; } = default!;
 
-    private EconomyPlanModel? SelectedEconomyPlan { get; set; } = null;
+    private EconomyPlanModel? SelectedEconomyPlan { get; set; }
     private List<ExpenseModel> _expenseModels = new();
     private List<IncomeModel> _incomeModels = new();
     private List<EconomyPlanModel> _economyPlanModels = new();
     private string InitialEconomyPlanName { get; set; } = "";
-    public IEnumerable<string> IncomeTypes { get; set; } = Enumerable.Empty<string>();
-    public IEnumerable<string> ExpenseTypes { get; set; } = Enumerable.Empty<string>();
-    public string OverviewCaption => GetOverviewCaption(_incomeModels.Select(i => i.Amount).Sum() - _expenseModels.Select(e => e.Amount).Sum()).caption;
-    public string OverviewStyle => GetOverviewCaption(_incomeModels.Select(i => i.Amount).Sum() - _expenseModels.Select(e => e.Amount).Sum()).style;
+    private IEnumerable<string> IncomeTypes { get; set; } = Enumerable.Empty<string>();
+    private IEnumerable<string> ExpenseTypes { get; set; } = Enumerable.Empty<string>();
+    private string OverviewCaption => GetOverviewCaption(_incomeModels.Select(i => i.Amount).Sum() - _expenseModels.Select(e => e.Amount).Sum()).caption;
+    private string OverviewStyle => GetOverviewCaption(_incomeModels.Select(i => i.Amount).Sum() - _expenseModels.Select(e => e.Amount).Sum()).style;
 
     protected override async Task OnInitializedAsync()
     {
@@ -91,7 +89,7 @@
 
     private async Task InitializePage()
     {
-        await GetEconomyPlanModes();
+        await GetEconomyPlanModels();
         if (_economyPlanModels.Any())
         {
             SelectedEconomyPlan = _economyPlanModels.First();
@@ -101,16 +99,9 @@
             IncomeTypes = await IncomeService.GetIncomeTypes();
             ExpenseTypes = await ExpenseService.GetExpenseTypes();
         }
-        else
-        {
-        }
     }
 
-    private async Task CreateMonthlyEconomyPlan()
-    {
-    }
-
-    private async Task GetEconomyPlanModes()
+    private async Task GetEconomyPlanModels()
     {
         _economyPlanModels = (await EconomyPlanService.GetActiveEconomyPlans()).ToList();
     }
@@ -148,10 +139,7 @@
 
     private (string caption, string style) GetOverviewCaption(decimal result)
     {
-        if (result > 0)
-            return ($"Du har {result}:- över!", "text-success");
-
-        return ($"Du ligger {result}:- back!", "text-danger");
+        return result > 0 ? ($"Du har {result}:- över!", "text-success") : ($"Du ligger {result}:- back!", "text-danger");
     }
 
 }

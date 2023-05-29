@@ -18,7 +18,7 @@
     [Inject]
     private IIncomeService IncomeService { get; set; } = null!;
 
-    private decimal NewIncomeAmount { get; set; } = 0;
+    private decimal NewIncomeAmount { get; set; }
     
     protected override async Task OnInitializedAsync()
     {

@@ -5,10 +5,10 @@ namespace EconomyPlanner.Web.Services.Interfaces;
 
 public interface IHouseholdService
 {
-   Task<bool> AttemptLogin(string guid);
+   Task<string?> GetGuid();
+   Task<bool> AttemptLogin(string? guid);
    Task Logout();
    Task<bool> HasSavedLogin();
-   Task<string?> GetSavedLogin();
    Task<HouseholdModel> GetHouseholdModel();
    Task<IEnumerable<ExpenseModel>> GetRecurringExpenses();
    Task<IEnumerable<IncomeModel>> GetRecurringIncomes();

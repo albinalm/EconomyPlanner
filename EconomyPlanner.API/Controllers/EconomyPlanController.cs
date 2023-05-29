@@ -7,12 +7,12 @@ namespace EconomyPlanner.API.Controllers;
 public class EconomyPlanController : ControllerBase
 {
     private readonly ILogger<EconomyPlanController> _logger;
-    private readonly IEconomyPlannerService _economyPlannerService;
+    private readonly IEconomyPlanService _economyPlanService;
 
-    public EconomyPlanController(ILogger<EconomyPlanController> logger, IEconomyPlannerService economyPlannerService)
+    public EconomyPlanController(ILogger<EconomyPlanController> logger, IEconomyPlanService economyPlanService)
     {
         _logger = logger;
-        _economyPlannerService = economyPlannerService;
+        _economyPlanService = economyPlanService;
     }
 
     [HttpPost(Name = "CreateEconomyPlan")]
@@ -20,7 +20,7 @@ public class EconomyPlanController : ControllerBase
     {
         try
         {
-            _economyPlannerService.CreateEconomyPlan(name, householdGuid);
+            _economyPlanService.CreateEconomyPlan(name, householdGuid);
             return Ok();
         }
         catch (Exception ex)
@@ -34,7 +34,7 @@ public class EconomyPlanController : ControllerBase
     {
         try
         {
-            _economyPlannerService.RemoveExpense(economyPlanId, expenseId, removeRecurring);
+            _economyPlanService.RemoveExpense(economyPlanId, expenseId, removeRecurring);
             return Ok();
         }
         catch (Exception ex)
@@ -48,7 +48,7 @@ public class EconomyPlanController : ControllerBase
     {
         try
         {
-            _economyPlannerService.RemoveIncome(economyPlanId, incomeId, removeRecurring);
+            _economyPlanService.RemoveIncome(economyPlanId, incomeId, removeRecurring);
             return Ok();
         }
         catch (Exception ex)
@@ -62,7 +62,7 @@ public class EconomyPlanController : ControllerBase
     {
         try
         {
-            return Ok(_economyPlannerService.GetActiveEconomyPlansFromHouseholdId(guid).ToList());
+            return Ok(_economyPlanService.GetActiveEconomyPlansFromHouseholdId(guid).ToList());
         }
         catch (Exception ex)
         {

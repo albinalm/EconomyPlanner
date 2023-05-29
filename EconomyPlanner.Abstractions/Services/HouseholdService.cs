@@ -10,11 +10,15 @@ public class HouseholdService : IHouseholdService
 {
     private readonly DatabaseContext _dbContext;
     private readonly IMapper _mapper;
+    private readonly IEconomyPlanService _economyPlanService;
+    private readonly ITimeService _timeService;
 
-    public HouseholdService(DatabaseContext dbContext, IMapper mapper)
+    public HouseholdService(DatabaseContext dbContext, IMapper mapper, IEconomyPlanService economyPlanService, ITimeService timeService)
     {
         _dbContext = dbContext;
         _mapper = mapper;
+        _economyPlanService = economyPlanService;
+        _timeService = timeService;
     }
 
     public HouseholdModel? GetHouseholdByGuid(string guid)
@@ -30,6 +34,8 @@ public class HouseholdService : IHouseholdService
         
         _dbContext.Add(household);
         _dbContext.SaveChanges();
+        
+        _economyPlanService.CreateEconomyPlan(_timeService.GetNow().ToString("MMMM"), household.Guid);
     }
 
     public IEnumerable<ExpenseModel> GetRecurringExpenses(string guid)

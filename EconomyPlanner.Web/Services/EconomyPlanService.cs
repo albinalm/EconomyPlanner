@@ -23,8 +23,7 @@ public class EconomyPlanService : IEconomyPlanService
         if (!hasLogin)
             throw new InvalidOperationException("ExpenseService > Login not valid");
         
-        var householdModel = await _householdService.GetHouseholdModel();
-        var economyPlanModels = await _httpClient.GetFromJsonAsync<IEnumerable<EconomyPlanModel>>($"http://localhost:5179/api/EconomyPlan/GetActiveEconomyPlansFromHouseholdGuid?guid={householdModel.Guid}");
+        var economyPlanModels = await _httpClient.GetFromJsonAsync<IEnumerable<EconomyPlanModel>>($"http://localhost:5179/api/EconomyPlan/GetActiveEconomyPlansFromHouseholdGuid?guid={await _householdService.GetGuid()}");
 
         if (economyPlanModels is null)
             throw new InvalidOperationException("EconomyPlanService > EconomyPlanModels is null");

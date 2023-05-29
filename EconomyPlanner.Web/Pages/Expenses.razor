@@ -112,7 +112,7 @@
                     <button class="btn btn-danger btn-sm text-left" @onclick="@(_ => ShowDeleteRecurringPopup("Are you sure you wish to delete recurring expense: ", recurringExpense))">
                         Delete
                     </button>
-                    <button class="btn btn-success btn-sm text-left" @onclick="@(_ => AddExpenseFromRecurringExpense(recurringExpense))">
+                    <button class="btn btn-success btn-sm text-left" @onclick="@(_ => AddExpenseFromRecurringExpense(recurringExpense, SelectedEconomyPlan))">
                         Add to current plan
                     </button>
                 </div>
@@ -127,7 +127,7 @@
 @code {
 
     [CascadingParameter]
-    public IModalService Modal { get; set; }
+    public IModalService Modal { get; set; } = default!;
 
     [Inject]
     private IEconomyPlanService EconomyPlanService { get; set; } = null!;
@@ -138,18 +138,18 @@
     [Inject]
     private IHouseholdService HouseholdService { get; set; } = null!;
 
-    private EconomyPlanModel? SelectedEconomyPlan { get; set; } = null;
+    private EconomyPlanModel SelectedEconomyPlan { get; set; } = default!;
     private List<ExpenseModel> _expenseModels = new();
     private List<ExpenseModel> _recurringExpenses = new();
     private List<EconomyPlanModel> _economyPlanModels = new();
     private string InitialEconomyPlanName { get; set; } = "";
 
-    public decimal TotalExpenseCost
+    private decimal TotalExpenseCost
     {
         get { return _expenseModels.Select(e => e.Amount).Sum(); }
     }
 
-    public decimal TotalRecurringExpenseCost
+    private decimal TotalRecurringExpenseCost
     {
         get { return _recurringExpenses.Select(e => e.Amount).Sum(); }
     }
@@ -164,7 +164,7 @@
 
     private async Task InitializePage()
     {
-        await GetEconomyPlanModes();
+        await GetEconomyPlanModels();
         if (_economyPlanModels.Any())
         {
             SelectedEconomyPlan = _economyPlanModels.First();
@@ -176,7 +176,7 @@
 
     private async Task RefreshExpenses()
     {
-        await GetEconomyPlanModes();
+        await GetEconomyPlanModels();
         if (_economyPlanModels.Any())
         {
             _expenseModels = ExpenseService.GetExpenses(_economyPlanModels.First(e => e.Id == SelectedEconomyPlan.Id)).ToList();
@@ -188,7 +188,7 @@
         _recurringExpenses = (await HouseholdService.GetRecurringExpenses()).ToList();
     }
 
-    private async Task GetEconomyPlanModes()
+    private async Task GetEconomyPlanModels()
     {
         _economyPlanModels = (await EconomyPlanService.GetActiveEconomyPlans()).ToList();
     }
@@ -206,9 +206,13 @@
             .Add(nameof(DeleteExpense.PreText), preText)
             .Add(nameof(DeleteExpense.ExpenseModel), expenseModel);
 
-        await Modal.Show<DeleteExpense>("Delete?", parameters).Result;
-        await RefreshExpenses();
-        await GetRecurringExpenses();
+        var result = await Modal.Show<DeleteExpense>("Delete?", parameters).Result;
+
+        if (result.Confirmed)
+        {
+            await RefreshExpenses();
+            await GetRecurringExpenses();
+        }
     }
 
     private async Task ShowEditAmountPopup(ExpenseModel expenseModel)
@@ -216,9 +220,12 @@
         var parameters = new ModalParameters()
             .Add(nameof(EditExpenseAmount.ExpenseModel), expenseModel);
 
-        await Modal.Show<EditExpenseAmount>("Edit", parameters).Result;
+        var result = await Modal.Show<EditExpenseAmount>("Edit", parameters).Result;
 
-        await RefreshExpenses();
+        if (result.Confirmed)
+        {
+            await RefreshExpenses();
+        }
     }
 
     private async Task ShowEditNamePopup(ExpenseModel expenseModel)
@@ -226,9 +233,12 @@
         var parameters = new ModalParameters()
             .Add(nameof(EditExpenseName.ExpenseModel), expenseModel);
 
-        await Modal.Show<EditExpenseName>("Edit", parameters).Result;
+        var result = await Modal.Show<EditExpenseName>("Edit", parameters).Result;
 
-        await RefreshExpenses();
+        if (result.Confirmed)
+        {
+            await RefreshExpenses();
+        }
     }
 
     private async Task ShowEditTypePopup(ExpenseModel expenseModel)
@@ -237,31 +247,50 @@
             .Add(nameof(EditExpenseType.ExpenseModel), expenseModel)
             .Add(nameof(EditExpenseType.ExpenseTypes), await ExpenseService.GetExpenseTypes());
 
-        await Modal.Show<EditExpenseType>("Edit", parameters).Result;
+        var result = await Modal.Show<EditExpenseType>("Edit", parameters).Result;
 
-        await RefreshExpenses();
+        if (result.Confirmed)
+        {
+            await RefreshExpenses();
+        }
     }
 
     private async Task ShowAddExpensePopup()
     {
+        var guid = await HouseholdService.GetGuid();
+
+        if (string.IsNullOrEmpty(guid)) return;
+        
         var parameters = new ModalParameters()
             .Add(nameof(AddExpenseForm.ExpenseTypes), await ExpenseService.GetExpenseTypes())
-            .Add(nameof(AddExpenseForm.EconomyPlanModel), SelectedEconomyPlan!)
-            .Add(nameof(AddExpenseForm.HouseholdGuid), await HouseholdService.GetSavedLogin());
+            .Add(nameof(AddExpenseForm.EconomyPlanModel), SelectedEconomyPlan)
+            .Add(nameof(AddExpenseForm.HouseholdGuid), guid);
 
-        await Modal.Show<AddExpenseForm>("Add new expense", parameters).Result;
-        await RefreshExpenses();
-        await GetRecurringExpenses();
+        var result = await Modal.Show<AddExpenseForm>("Add new expense", parameters).Result;
+
+        if (result.Confirmed)
+        {
+            await RefreshExpenses();
+            await GetRecurringExpenses();
+        }
     }
 
     private async Task ShowAddRecurringExpensePopup()
     {
+        var guid = await HouseholdService.GetGuid();
+
+        if (string.IsNullOrEmpty(guid)) return;
+
         var parameters = new ModalParameters()
             .Add(nameof(AddExpenseForm.ExpenseTypes), await ExpenseService.GetExpenseTypes())
-            .Add(nameof(AddExpenseForm.HouseholdGuid), await HouseholdService.GetSavedLogin());
+            .Add(nameof(AddExpenseForm.HouseholdGuid), guid);
 
-        await Modal.Show<AddRecurringExpenseForm>("Add new recurring expense", parameters).Result;
-        await GetRecurringExpenses();
+        var result = await Modal.Show<AddRecurringExpenseForm>("Add new recurring expense", parameters).Result;
+
+        if (result.Confirmed)
+        {
+            await GetRecurringExpenses();
+        }
     }
 
     private async Task ShowEditRecurringAmountPopup(ExpenseModel expenseModel)
@@ -269,9 +298,12 @@
         var parameters = new ModalParameters()
             .Add(nameof(EditRecurringExpenseAmount.RecurringExpenseModel), expenseModel);
 
-        await Modal.Show<EditRecurringExpenseAmount>("Edit", parameters).Result;
+        var result = await Modal.Show<EditRecurringExpenseAmount>("Edit", parameters).Result;
 
-        await GetRecurringExpenses();
+        if (result.Confirmed)
+        {
+            await GetRecurringExpenses();
+        }
     }
 
     private async Task ShowEditRecurringNamePopup(ExpenseModel expenseModel)
@@ -279,9 +311,12 @@
         var parameters = new ModalParameters()
             .Add(nameof(EditRecurringExpenseName.RecurringExpenseModel), expenseModel);
 
-        await Modal.Show<EditRecurringExpenseName>("Edit", parameters).Result;
+        var result = await Modal.Show<EditRecurringExpenseName>("Edit", parameters).Result;
 
-        await GetRecurringExpenses();
+        if (result.Confirmed)
+        {
+            await GetRecurringExpenses();
+        }
     }
 
     private async Task ShowEditRecurringTypePopup(ExpenseModel expenseModel)
@@ -290,9 +325,12 @@
             .Add(nameof(EditRecurringExpenseType.RecurringExpenseModel), expenseModel)
             .Add(nameof(EditRecurringExpenseType.ExpenseTypes), await ExpenseService.GetExpenseTypes());
 
-        await Modal.Show<EditRecurringExpenseType>("Edit", parameters).Result;
+        var result = await Modal.Show<EditRecurringExpenseType>("Edit", parameters).Result;
 
-        await GetRecurringExpenses();
+        if (result.Confirmed)
+        {
+            await GetRecurringExpenses();
+        }
     }
 
     private async Task ShowDeleteRecurringPopup(string preText, ExpenseModel expenseModel)
@@ -301,13 +339,17 @@
             .Add(nameof(DeleteRecurringExpense.PreText), preText)
             .Add(nameof(DeleteRecurringExpense.RecurringExpenseModel), expenseModel);
 
-        await Modal.Show<DeleteRecurringExpense>("Delete?", parameters).Result;
-        await GetRecurringExpenses();
+        var result = await Modal.Show<DeleteRecurringExpense>("Delete?", parameters).Result;
+
+        if (result.Confirmed)
+        {
+            await GetRecurringExpenses();
+        }
     }
 
-    private async Task AddExpenseFromRecurringExpense(ExpenseModel expenseModel)
+    private async Task AddExpenseFromRecurringExpense(ExpenseModel expenseModel, EconomyPlanModel economyPlanModel)
     {
-        await ExpenseService.AddRecurringExpenseAsExpense(expenseModel, SelectedEconomyPlan);
+        await ExpenseService.AddRecurringExpenseAsExpense(expenseModel, economyPlanModel);
         await RefreshExpenses();
     }
 

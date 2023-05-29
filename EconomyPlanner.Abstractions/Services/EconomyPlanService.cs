@@ -6,15 +6,17 @@ using EconomyPlanner.Repository.Entities;
 
 namespace EconomyPlanner.Abstractions.Services;
 
-public class EconomyPlanService : IEconomyPlannerService
+public class EconomyPlanService : IEconomyPlanService
 {
     private readonly DatabaseContext _dbContext;
     private readonly IMapper _mapper;
+    private readonly ITimeService _timeService;
 
-    public EconomyPlanService(DatabaseContext dbContext, IMapper mapper)
+    public EconomyPlanService(DatabaseContext dbContext, IMapper mapper, ITimeService timeService)
     {
         _dbContext = dbContext;
         _mapper = mapper;
+        _timeService = timeService;
     }
 
     public void CreateEconomyPlan(string name, string householdGuid)
@@ -24,7 +26,7 @@ public class EconomyPlanService : IEconomyPlannerService
         if (household is null)
             return;
 
-        var economyPlan = EconomyPlan.Create(name);
+        var economyPlan = EconomyPlan.Create(name, _timeService.GetNow());
 
         _dbContext.Add(economyPlan);
 
@@ -57,21 +59,7 @@ public class EconomyPlanService : IEconomyPlannerService
             economyPlan.Incomes.Add(income);
         }
     }
-
-    // public void AddExpense(int economyPlanId, int expenseId)
-    // {
-    //     var economyPlan = _dbContext.GetEconomyPlanFromId(economyPlanId);
-    //     var expense = _dbContext.GetExpenseFromId(expenseId);
-    //     
-    //     if (economyPlan is null || expense is null)
-    //         return;
-    //     
-    //     economyPlan.Expenses.Add(expense);
-    //     
-    //     _dbContext.Update(economyPlan);
-    //     _dbContext.SaveChanges();
-    // }
-
+    
     public void RemoveExpense(int economyPlanId, int expenseId, bool removeRecurring)
     {
         var economyPlan = _dbContext.GetEconomyPlanFromId(economyPlanId);
@@ -98,27 +86,14 @@ public class EconomyPlanService : IEconomyPlannerService
         _dbContext.SaveChanges();
     }
 
-    // public void AddIncome(int economyPlanId, int incomeId)
-    // {
-    //     var economyPlan = _dbContext.GetEconomyPlanFromId(economyPlanId);
-    //     var income = _dbContext.GetIncomeFromId(incomeId);
-    //     
-    //     if (economyPlan is null || income is null)
-    //         return;
-    //     
-    //     economyPlan.Incomes.Add(income);
-    //     
-    //     _dbContext.Update(economyPlan);
-    //     _dbContext.SaveChanges();
-    // }
-
     public IEnumerable<EconomyPlanModel> GetActiveEconomyPlansFromHouseholdId(string guid)
     {
         var household = _dbContext.GetHouseholdFromGuid(guid);
+        
         if (household is null)
             throw new InvalidOperationException("GetEconomyPlansFromHouseholdId > Household not found");
 
-        var economyPlans = _dbContext.GetEconomyPlansFromHousehold(household).Where(ep => DateTime.Parse(ep.EndDate) > DateTime.Now).ToList();
+        var economyPlans = _dbContext.GetEconomyPlansFromHousehold(household).Where(ep => DateTime.Parse(ep.EndDate) > _timeService.GetNow()).ToList();
 
         if (!economyPlans.Any())
             throw new InvalidOperationException("GetEconomyPlansFromHouseholdId > No economyplans found");

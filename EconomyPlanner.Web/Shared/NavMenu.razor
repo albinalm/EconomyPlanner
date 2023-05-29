@@ -63,7 +63,7 @@
     {
         if (await HouseholdService.HasSavedLogin())
         {
-            if (await HouseholdService.AttemptLogin((await HouseholdService.GetSavedLogin())!))
+            if (await HouseholdService.AttemptLogin(await HouseholdService.GetGuid()))
             {
                 IsLoggedIn = true;
             }

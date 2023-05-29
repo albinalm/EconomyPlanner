@@ -127,7 +127,7 @@
 @code {
 
     [CascadingParameter]
-    public IModalService Modal { get; set; }
+    public IModalService Modal { get; set; } = default!;
 
     [Inject]
     private IEconomyPlanService EconomyPlanService { get; set; } = null!;
@@ -138,18 +138,18 @@
     [Inject]
     private IHouseholdService HouseholdService { get; set; } = null!;
 
-    private EconomyPlanModel? SelectedEconomyPlan { get; set; } = null;
+    private EconomyPlanModel SelectedEconomyPlan { get; set; } = default!;
     private List<IncomeModel> _incomeModels = new();
     private List<IncomeModel> _recurringIncomes = new();
     private List<EconomyPlanModel> _economyPlanModels = new();
     private string InitialEconomyPlanName { get; set; } = "";
 
-    public decimal TotalIncomeCost
+    private decimal TotalIncomeCost
     {
         get { return _incomeModels.Select(e => e.Amount).Sum(); }
     }
 
-    public decimal TotalRecurringIncomeCost
+    private decimal TotalRecurringIncomeCost
     {
         get { return _recurringIncomes.Select(e => e.Amount).Sum(); }
     }
@@ -206,9 +206,13 @@
             .Add(nameof(DeleteIncome.PreText), preText)
             .Add(nameof(DeleteIncome.IncomeModel), incomeModel);
 
-        await Modal.Show<DeleteIncome>("Delete?", parameters).Result;
-        await RefreshIncomes();
-        await GetRecurringIncomes();
+        var result = await Modal.Show<DeleteIncome>("Delete?", parameters).Result;
+
+        if (result.Confirmed)
+        {
+            await RefreshIncomes();
+            await GetRecurringIncomes();
+        }
     }
 
     private async Task ShowEditAmountPopup(IncomeModel incomeModel)
@@ -216,9 +220,12 @@
         var parameters = new ModalParameters()
             .Add(nameof(EditIncomeAmount.IncomeModel), incomeModel);
 
-        await Modal.Show<EditIncomeAmount>("Edit", parameters).Result;
+        var result = await Modal.Show<EditIncomeAmount>("Edit", parameters).Result;
 
-        await RefreshIncomes();
+        if (result.Confirmed)
+        {
+            await RefreshIncomes();
+        }
     }
 
     private async Task ShowEditNamePopup(IncomeModel incomeModel)
@@ -226,9 +233,12 @@
         var parameters = new ModalParameters()
             .Add(nameof(EditIncomeName.IncomeModel), incomeModel);
 
-        await Modal.Show<EditIncomeName>("Edit", parameters).Result;
+        var result = await Modal.Show<EditIncomeName>("Edit", parameters).Result;
 
-        await RefreshIncomes();
+        if (result.Confirmed)
+        {
+            await RefreshIncomes();
+        }
     }
 
     private async Task ShowEditTypePopup(IncomeModel incomeModel)
@@ -237,31 +247,50 @@
             .Add(nameof(EditIncomeType.IncomeModel), incomeModel)
             .Add(nameof(EditIncomeType.IncomeTypes), await IncomeService.GetIncomeTypes());
 
-        await Modal.Show<EditIncomeType>("Edit", parameters).Result;
+        var result = await Modal.Show<EditIncomeType>("Edit", parameters).Result;
 
-        await RefreshIncomes();
+        if (result.Confirmed)
+        {
+            await RefreshIncomes();
+        }
     }
 
     private async Task ShowAddIncomePopup()
     {
+        var guid = await HouseholdService.GetGuid();
+
+        if (string.IsNullOrEmpty(guid)) return;
+
         var parameters = new ModalParameters()
             .Add(nameof(AddIncomeForm.IncomeTypes), await IncomeService.GetIncomeTypes())
-            .Add(nameof(AddIncomeForm.EconomyPlanModel), SelectedEconomyPlan!)
-            .Add(nameof(AddIncomeForm.HouseholdGuid), await HouseholdService.GetSavedLogin());
+            .Add(nameof(AddIncomeForm.EconomyPlanModel), SelectedEconomyPlan)
+            .Add(nameof(AddIncomeForm.HouseholdGuid), guid);
 
-        await Modal.Show<AddIncomeForm>("Add new income", parameters).Result;
-        await RefreshIncomes();
-        await GetRecurringIncomes();
+        var result = await Modal.Show<AddIncomeForm>("Add new income", parameters).Result;
+
+        if (result.Confirmed)
+        {
+            await RefreshIncomes();
+            await GetRecurringIncomes();
+        }
     }
 
     private async Task ShowAddRecurringIncomePopup()
     {
+        var guid = await HouseholdService.GetGuid();
+
+        if (string.IsNullOrEmpty(guid)) return;
+
         var parameters = new ModalParameters()
             .Add(nameof(AddRecurringIncomeForm.IncomeTypes), await IncomeService.GetIncomeTypes())
-            .Add(nameof(AddRecurringIncomeForm.HouseholdGuid), await HouseholdService.GetSavedLogin());
+            .Add(nameof(AddRecurringIncomeForm.HouseholdGuid), guid);
 
-        await Modal.Show<AddRecurringIncomeForm>("Add new recurring income", parameters).Result;
-        await GetRecurringIncomes();
+        var result = await Modal.Show<AddRecurringIncomeForm>("Add new recurring income", parameters).Result;
+
+        if (result.Confirmed)
+        {
+            await GetRecurringIncomes();
+        }
     }
 
     private async Task ShowEditRecurringAmountPopup(IncomeModel incomeModel)
@@ -269,9 +298,12 @@
         var parameters = new ModalParameters()
             .Add(nameof(EditRecurringIncomeAmount.RecurringIncomeModel), incomeModel);
 
-        await Modal.Show<EditRecurringIncomeAmount>("Edit", parameters).Result;
+        var result = await Modal.Show<EditRecurringIncomeAmount>("Edit", parameters).Result;
 
-        await GetRecurringIncomes();
+        if (result.Confirmed)
+        {
+            await GetRecurringIncomes();
+        }
     }
 
     private async Task ShowEditRecurringNamePopup(IncomeModel incomeModel)
@@ -279,9 +311,12 @@
         var parameters = new ModalParameters()
             .Add(nameof(EditRecurringIncomeName.RecurringIncomeModel), incomeModel);
 
-        await Modal.Show<EditRecurringIncomeName>("Edit", parameters).Result;
+        var result = await Modal.Show<EditRecurringIncomeName>("Edit", parameters).Result;
 
-        await GetRecurringIncomes();
+        if (result.Confirmed)
+        {
+            await GetRecurringIncomes();
+        }
     }
 
     private async Task ShowEditRecurringTypePopup(IncomeModel incomeModel)
@@ -290,9 +325,12 @@
             .Add(nameof(EditRecurringIncomeType.RecurringIncomeModel), incomeModel)
             .Add(nameof(EditRecurringIncomeType.IncomeTypes), await IncomeService.GetIncomeTypes());
 
-        await Modal.Show<EditRecurringIncomeType>("Edit", parameters).Result;
+        var result = await Modal.Show<EditRecurringIncomeType>("Edit", parameters).Result;
 
-        await GetRecurringIncomes();
+        if (result.Confirmed)
+        {
+            await GetRecurringIncomes();
+        }
     }
 
     private async Task ShowDeleteRecurringPopup(string preText, IncomeModel incomeModel)
@@ -301,8 +339,12 @@
             .Add(nameof(DeleteRecurringIncome.PreText), preText)
             .Add(nameof(DeleteRecurringIncome.RecurringIncomeModel), incomeModel);
 
-        await Modal.Show<DeleteRecurringIncome>("Delete?", parameters).Result;
-        await GetRecurringIncomes();
+        var result = await Modal.Show<DeleteRecurringIncome>("Delete?", parameters).Result;
+
+        if (result.Confirmed)
+        {
+            await GetRecurringIncomes();
+        }
     }
 
     private async Task AddIncomeFromRecurringIncome(IncomeModel incomeModel)

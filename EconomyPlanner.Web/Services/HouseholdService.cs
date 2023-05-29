@@ -13,17 +13,27 @@ public class HouseholdService : IHouseholdService
 
     public HouseholdService(HttpClient httpClient, ILocalStorageService localStorageService)
     {
-        this._httpClient = httpClient;
+        _httpClient = httpClient;
         _localStorageService = localStorageService;
     }
+    private string? SessionGuidCache { get; set; }
+    
+    public async Task<string?> GetGuid() => SessionGuidCache ?? await GetSavedLogin();
 
-    public async Task<bool> AttemptLogin(string guid)
+    public async Task<bool> AttemptLogin(string? guid)
     {
+        if (guid is null)
+        {
+            return false;
+        }
+        
         var loginSuccessful = await _httpClient.GetFromJsonAsync<HouseholdModel>($"http://localhost:5179/api/Household/GetHouseholdFromGuid?guid={guid}") != null;
+
+        if (!loginSuccessful) return loginSuccessful;
         
-        if (loginSuccessful)
-            await _localStorageService.SetItemAsync("EconomyPlanner.UserGuid", guid);
-        
+        await _localStorageService.SetItemAsync("EconomyPlanner.UserGuid", guid);
+        SessionGuidCache = guid;
+
         return loginSuccessful;
     }
 
@@ -37,17 +47,12 @@ public class HouseholdService : IHouseholdService
         return await _localStorageService.GetItemAsync<string>("EconomyPlanner.UserGuid") != null;
     }
 
-    public async Task<string?> GetSavedLogin()
-    {
-        return await HasSavedLogin() ? await _localStorageService.GetItemAsync<string>("EconomyPlanner.UserGuid") : null;
-    }
-
     public async Task<HouseholdModel> GetHouseholdModel()
     {
         if (!await HasSavedLogin())
             throw new InvalidOperationException("No valid login");
 
-        var householdModel = await _httpClient.GetFromJsonAsync<HouseholdModel>($"http://localhost:5179/api/Household/GetHouseholdFromGuid?guid={await GetSavedLogin()}");
+        var householdModel = await _httpClient.GetFromJsonAsync<HouseholdModel>($"http://localhost:5179/api/Household/GetHouseholdFromGuid?guid={await GetGuid()}");
         
         if (householdModel is null)
             throw new InvalidOperationException("Could not find household via login");
@@ -60,7 +65,7 @@ public class HouseholdService : IHouseholdService
         if (!await HasSavedLogin())
             throw new InvalidOperationException("No valid login");
         
-        var expenseModels = await _httpClient.GetFromJsonAsync<IEnumerable<ExpenseModel>>($"http://localhost:5179/api/Household/GetRecurringExpenses?guid={await GetSavedLogin()}");
+        var expenseModels = await _httpClient.GetFromJsonAsync<IEnumerable<ExpenseModel>>($"http://localhost:5179/api/Household/GetRecurringExpenses?guid={await GetGuid()}");
         
         if (expenseModels is null)
             throw new InvalidOperationException("Could not find household via login");
@@ -73,11 +78,16 @@ public class HouseholdService : IHouseholdService
         if (!await HasSavedLogin())
             throw new InvalidOperationException("No valid login");
         
-        var incomeModels = await _httpClient.GetFromJsonAsync<IEnumerable<IncomeModel>>($"http://localhost:5179/api/Household/GetRecurringIncomes?guid={await GetSavedLogin()}");
+        var incomeModels = await _httpClient.GetFromJsonAsync<IEnumerable<IncomeModel>>($"http://localhost:5179/api/Household/GetRecurringIncomes?guid={await GetGuid()}");
         
         if (incomeModels is null)
             throw new InvalidOperationException("Could not find household via login");
 
         return incomeModels;
+    }
+    
+    private async Task<string?> GetSavedLogin()
+    {
+        return await HasSavedLogin() ? await _localStorageService.GetItemAsync<string>("EconomyPlanner.UserGuid") : null;
     }
 }

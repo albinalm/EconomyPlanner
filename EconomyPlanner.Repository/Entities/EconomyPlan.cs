@@ -17,10 +17,10 @@ public class EconomyPlan : EntityBase
         Incomes = new HashSet<Income>();
     }
     
-    public static EconomyPlan Create(string name)
+    public static EconomyPlan Create(string name, DateTime now)
     {
-        var year = DateTime.Now.Year;
-        var month = DateTime.Now.Month;
+        var year = now.Year;
+        var month = now.Month;
 
         var startDate = $"{year}-" +
                         $"{month:00}-01";

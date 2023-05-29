@@ -1,5 +1,3 @@
-@inject Blazored.LocalStorage.ILocalStorageService LocalStorage
-@inject HttpClient Http
 @inject NavigationManager NavManager
 @page "/login"
 @using EconomyPlanner.Web.Services.Interfaces
@@ -15,11 +13,11 @@
 @code{
 
     [Inject]
-    private IHouseholdService HouseholdService { get; set; }
+    private IHouseholdService HouseholdService { get; set; } = default!;
 
-    public string TxtGuidText { get; set; } = "";
+    private string TxtGuidText { get; set; } = "";
 
-    public async Task SetGuid()
+    private async Task SetGuid()
     {
         if (await HouseholdService.AttemptLogin(TxtGuidText))
         {
@@ -34,7 +32,7 @@
     {
         if (await HouseholdService.HasSavedLogin())
         {
-            var login = await HouseholdService.GetSavedLogin();
+            var login = await HouseholdService.GetGuid();
             if (!string.IsNullOrEmpty(login))
             {
                 if (await HouseholdService.AttemptLogin(login))

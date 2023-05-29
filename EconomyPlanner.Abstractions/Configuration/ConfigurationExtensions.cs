@@ -16,13 +16,14 @@ public static class ConfigurationExtensions
         if (string.IsNullOrWhiteSpace(connectionString))
             throw new InvalidOperationException("A connection string needs to be provided");
         
-        services.AddDbContext<DatabaseContext>(options => options.UseSqlServer(connectionString, b => b.MigrationsAssembly("EconomyPlannerMigrationDummy")));
-
-        services.AddScoped<IEconomyPlannerService, EconomyPlanService>();
+        services.AddDbContext<DatabaseContext>(options => options.UseSqlServer(connectionString, b => b.MigrationsAssembly("EconomyPlannerMigrationDummy")), ServiceLifetime.Singleton);
+        
+        services.AddSingleton<ITimeService, TimeService>();
+        services.AddAutoMapper(typeof(MappingProfile));
+        
+        services.AddScoped<IEconomyPlanService, EconomyPlanService>();
         services.AddScoped<IExpenseService, ExpenseService>();
         services.AddScoped<IIncomeService, IncomeService>();
         services.AddScoped<IHouseholdService, HouseholdService>();
-        
-        services.AddAutoMapper(typeof(MappingProfile));
     }
 }

@@ -3,7 +3,7 @@ using EconomyPlanner.Repository.Entities;
 
 namespace EconomyPlanner.Abstractions.Interfaces;
 
-public interface IEconomyPlannerService
+public interface IEconomyPlanService
 {
     void CreateEconomyPlan(string name, string householdGuid);
     // void AddExpense(int economyPlanId, int expenseId);
