@@ -65,7 +65,7 @@ public class HouseholdService : IHouseholdService
         if (!await HasSavedLogin())
             throw new InvalidOperationException("No valid login");
         
-        var expenseModels = await _httpClient.GetFromJsonAsync<IEnumerable<ExpenseModel>>($"http://localhost:5179/api/Household/GetRecurringExpenses?guid={await GetGuid()}");
+        var expenseModels = await _httpClient.GetFromJsonAsync<IEnumerable<ExpenseModel>>($"http://localhost:5179/api/Expense/GetRecurringExpensesFromHouseholdGuid?guid={await GetGuid()}");
         
         if (expenseModels is null)
             throw new InvalidOperationException("Could not find household via login");
@@ -78,7 +78,7 @@ public class HouseholdService : IHouseholdService
         if (!await HasSavedLogin())
             throw new InvalidOperationException("No valid login");
         
-        var incomeModels = await _httpClient.GetFromJsonAsync<IEnumerable<IncomeModel>>($"http://localhost:5179/api/Household/GetRecurringIncomes?guid={await GetGuid()}");
+        var incomeModels = await _httpClient.GetFromJsonAsync<IEnumerable<IncomeModel>>($"http://localhost:5179/api/Income/GetRecurringIncomesFromHouseholdGuid?guid={await GetGuid()}");
         
         if (incomeModels is null)
             throw new InvalidOperationException("Could not find household via login");

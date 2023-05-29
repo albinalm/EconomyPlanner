@@ -1,4 +1,4 @@
-﻿namespace EconomyPlanner.Abstractions.Interfaces;
+﻿namespace EconomyPlanner.API.Services;
 
 public interface ITimeService
 {

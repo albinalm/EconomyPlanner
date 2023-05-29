@@ -1,32 +1,29 @@
 ﻿using AutoMapper;
-using EconomyPlanner.Abstractions.Interfaces;
-using EconomyPlanner.Abstractions.Models;
+using EconomyPlanner.API.Interfaces;
 using EconomyPlanner.Repository.Configuration;
 using EconomyPlanner.Repository.Entities;
 
-namespace EconomyPlanner.Abstractions.Services;
+namespace EconomyPlanner.API.Services;
 
 public class EconomyPlanService : IEconomyPlanService
 {
     private readonly DatabaseContext _dbContext;
     private readonly IMapper _mapper;
-    private readonly ITimeService _timeService;
 
-    public EconomyPlanService(DatabaseContext dbContext, IMapper mapper, ITimeService timeService)
+    public EconomyPlanService(DatabaseContext dbContext, IMapper mapper)
     {
         _dbContext = dbContext;
         _mapper = mapper;
-        _timeService = timeService;
     }
 
-    public void CreateEconomyPlan(string name, string householdGuid)
+    public void CreateEconomyPlan(string name, string householdGuid, DateTime period)
     {
         var household = _dbContext.GetHouseholdFromGuid(householdGuid);
 
         if (household is null)
             return;
 
-        var economyPlan = EconomyPlan.Create(name, _timeService.GetNow());
+        var economyPlan = EconomyPlan.Create(name, period);
 
         _dbContext.Add(economyPlan);
 
@@ -86,31 +83,21 @@ public class EconomyPlanService : IEconomyPlanService
         _dbContext.SaveChanges();
     }
 
-    public IEnumerable<EconomyPlanModel> GetActiveEconomyPlansFromHouseholdId(string guid)
+    public IEnumerable<EconomyPlan> GetEconomyPlansFromHouseholdId(string guid)
     {
         var household = _dbContext.GetHouseholdFromGuid(guid);
         
         if (household is null)
             throw new InvalidOperationException("GetEconomyPlansFromHouseholdId > Household not found");
 
-        var economyPlans = _dbContext.GetEconomyPlansFromHousehold(household).Where(ep => DateTime.Parse(ep.EndDate) > _timeService.GetNow()).ToList();
+        var economyPlans = _dbContext.GetEconomyPlansFromHousehold(household).ToList();
 
         if (!economyPlans.Any())
             throw new InvalidOperationException("GetEconomyPlansFromHouseholdId > No economyplans found");
 
-        foreach (var economyPlan in economyPlans)
-        {
-            yield return new EconomyPlanModel
-                         {
-                             ExpenseModels = _mapper.Map<ICollection<ExpenseModel>>(economyPlan.Expenses),
-                             IncomeModels = _mapper.Map<ICollection<IncomeModel>>(economyPlan.Incomes),
-                             Name = economyPlan.Name,
-                             Id = economyPlan.Id,
-                             EndDate = economyPlan.EndDate
-                         };
-        }
+        return economyPlans;
     }
-
+    
     public void RemoveIncome(int economyPlanId, int incomeId, bool removeRecurring)
     {
         var economyPlan = _dbContext.GetEconomyPlanFromId(economyPlanId);
@@ -137,12 +124,7 @@ public class EconomyPlanService : IEconomyPlanService
         _dbContext.SaveChanges();
     }
 
-    public EconomyPlanModel? GetEconomyPlan(int economyPlanId)
-    {
-        var economyPlan = _dbContext.GetEconomyPlanFromId(economyPlanId);
-
-        return economyPlan is not null ? _mapper.Map<EconomyPlanModel>(economyPlan) : null;
-    }
+    public EconomyPlan? GetEconomyPlan(int economyPlanId) => _dbContext.GetEconomyPlanFromId(economyPlanId);
 
     public EconomyPlan? GetEconomyPlanByDate(DateTime startPeriod)
     {

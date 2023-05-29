@@ -169,7 +169,7 @@
         {
             SelectedEconomyPlan = _economyPlanModels.First();
             InitialEconomyPlanName = SelectedEconomyPlan.Name;
-            _expenseModels = ExpenseService.GetExpenses(SelectedEconomyPlan).ToList();
+            _expenseModels = (await ExpenseService.GetExpenses(SelectedEconomyPlan)).ToList();
             await GetRecurringExpenses();
         }
     }
@@ -179,7 +179,7 @@
         await GetEconomyPlanModels();
         if (_economyPlanModels.Any())
         {
-            _expenseModels = ExpenseService.GetExpenses(_economyPlanModels.First(e => e.Id == SelectedEconomyPlan.Id)).ToList();
+            _expenseModels = (await ExpenseService.GetExpenses(_economyPlanModels.First(e => e.Id == SelectedEconomyPlan.Id))).ToList();
         }
     }
 
@@ -190,12 +190,12 @@
 
     private async Task GetEconomyPlanModels()
     {
-        _economyPlanModels = (await EconomyPlanService.GetActiveEconomyPlans()).ToList();
+        _economyPlanModels = (await EconomyPlanService.GetEconomyPlans()).ToList();
     }
 
-    private void OnSelected(EconomyPlanModel selection)
+    private async Task OnSelected(EconomyPlanModel selection)
     {
-        _expenseModels = ExpenseService.GetExpenses(selection).ToList();
+        _expenseModels = (await ExpenseService.GetExpenses(selection)).ToList();
         SelectedEconomyPlan = selection;
         Console.WriteLine("Current economy plan!" + SelectedEconomyPlan.Name + " ID: " + SelectedEconomyPlan.Id);
     }

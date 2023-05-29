@@ -4,5 +4,5 @@ namespace EconomyPlanner.Web.Services.Interfaces;
 
 public interface IEconomyPlanService
 {
-    Task<IEnumerable<EconomyPlanModel>> GetActiveEconomyPlans();
+    Task<IEnumerable<EconomyPlanModel>> GetEconomyPlans();
 }

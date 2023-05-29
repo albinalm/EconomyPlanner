@@ -1,20 +1,18 @@
-using EconomyPlanner.Abstractions.Configuration;
+using EconomyPlanner.API;
+using EconomyPlanner.API.Interfaces;
+using EconomyPlanner.API.Services;
+using EconomyPlanner.Repository.Configuration;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.RegisterRepository(builder.Configuration);
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-// builder.Services.AddCors(options =>
-// {
-//     options.AddDefaultPolicy(corsPolicyBuilder => 
-//                                  corsPolicyBuilder.WithOrigins("https://localhost:44338")
-//                                         .AllowAnyMethod()
-//                                         .AllowAnyHeader());
-// }); 
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(name: "AllowBlazorOrigin",
@@ -25,6 +23,17 @@ builder.Services.AddCors(options =>
                                            .AllowAnyHeader();
                       });
 });
+
+builder.Services.AddSingleton<ITimeService, TimeService>();
+
+builder.Services.AddScoped<IEconomyPlanService, EconomyPlanService>();
+builder.Services.AddScoped<IExpenseService, ExpenseService>();
+builder.Services.AddScoped<IIncomeService, IncomeService>();
+builder.Services.AddScoped<IHouseholdService, HouseholdService>();
+builder.Services.AddAutoMapper(typeof(MappingProfile));
+
+RegisterRepository(builder.Services, builder.Configuration);
+
 var app = builder.Build();
 
 app.UseCors("AllowBlazorOrigin");
@@ -44,3 +53,14 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+static void RegisterRepository(IServiceCollection services, IConfiguration config)
+{
+    var connectionString = config.GetConnectionString("Domain");
+            
+    if (string.IsNullOrWhiteSpace(connectionString))
+        throw new InvalidOperationException("A connection string needs to be provided");
+        
+    services.AddDbContext<DatabaseContext>(options => options.UseSqlServer(connectionString, b => b.MigrationsAssembly("EconomyPlannerMigrationDummy")), ServiceLifetime.Singleton);
+    
+}

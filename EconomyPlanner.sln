@@ -8,8 +8,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{E8318E8D
 		Tools\How to migrate.md = Tools\How to migrate.md
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EconomyPlanner.Abstractions", "EconomyPlanner.Abstractions\EconomyPlanner.Abstractions.csproj", "{C7EB1E1B-5CA7-4648-8B66-C52A8D76FC5D}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EconomyPlanner.API", "EconomyPlanner.API\EconomyPlanner.API.csproj", "{49E384EC-9BF5-40FF-AF40-873F7C098EDC}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EconomyPlanner.Repository", "EconomyPlanner.Repository\EconomyPlanner.Repository.csproj", "{6FA9598B-124A-469A-B32A-F052BCEDE49D}"
@@ -26,10 +24,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{C7EB1E1B-5CA7-4648-8B66-C52A8D76FC5D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C7EB1E1B-5CA7-4648-8B66-C52A8D76FC5D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C7EB1E1B-5CA7-4648-8B66-C52A8D76FC5D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C7EB1E1B-5CA7-4648-8B66-C52A8D76FC5D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{49E384EC-9BF5-40FF-AF40-873F7C098EDC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{49E384EC-9BF5-40FF-AF40-873F7C098EDC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{49E384EC-9BF5-40FF-AF40-873F7C098EDC}.Release|Any CPU.ActiveCfg = Release|Any CPU

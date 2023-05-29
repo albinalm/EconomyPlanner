@@ -1,4 +1,4 @@
-﻿using EconomyPlanner.Abstractions.Interfaces;
+﻿using EconomyPlanner.API.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EconomyPlanner.API.Controllers;
@@ -16,11 +16,11 @@ public class EconomyPlanController : ControllerBase
     }
 
     [HttpPost(Name = "CreateEconomyPlan")]
-    public IActionResult CreateEconomyPlan(string name, string householdGuid)
+    public IActionResult CreateEconomyPlan(string name, string householdGuid, DateTime period)
     {
         try
         {
-            _economyPlanService.CreateEconomyPlan(name, householdGuid);
+            _economyPlanService.CreateEconomyPlan(name, householdGuid, period);
             return Ok();
         }
         catch (Exception ex)
@@ -57,12 +57,12 @@ public class EconomyPlanController : ControllerBase
         }
     }
 
-    [HttpGet(Name = "GetActiveEconomyPlansFromHouseholdGuid")]
-    public IActionResult GetActiveEconomyPlansFromHouseholdGuid(string guid)
+    [HttpGet(Name = "GetEconomyPlansFromHouseholdGuid")]
+    public IActionResult GetEconomyPlansFromHouseholdGuid(string guid)
     {
         try
         {
-            return Ok(_economyPlanService.GetActiveEconomyPlansFromHouseholdId(guid).ToList());
+            return Ok(_economyPlanService.GetEconomyPlansFromHouseholdId(guid).ToList());
         }
         catch (Exception ex)
         {

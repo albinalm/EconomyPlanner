@@ -4,7 +4,7 @@ namespace EconomyPlanner.Web.Services.Interfaces;
 
 public interface IIncomeService
 {
-    IEnumerable<IncomeModel> GetIncomes(EconomyPlanModel economyPlanModel);
+    Task<IEnumerable<IncomeModel>> GetIncomes(EconomyPlanModel economyPlanModel);
     Task UpdateIncome(IncomeModel incomeModel);
     Task<IEnumerable<string>> GetIncomeTypes();
     Task DeleteIncome(IncomeModel incomeModel, bool deleteRecurring);

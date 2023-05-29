@@ -1,4 +1,4 @@
-﻿using EconomyPlanner.Abstractions.Interfaces;
+﻿using EconomyPlanner.API.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EconomyPlanner.API.Controllers;
@@ -20,7 +20,7 @@ public class HouseholdController : ControllerBase
     {
         try
         {
-            var householdModel = _householdService.GetHouseholdByGuid(guid);
+            var householdModel = _householdService.GetHouseholdFromGuid(guid);
             
             if (householdModel is null)
                 return NotFound();
@@ -41,32 +41,6 @@ public class HouseholdController : ControllerBase
             _householdService.CreateHousehold(name);
             
             return Ok();
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, ex.Message);
-        }
-    }
-    
-    [HttpGet(Name = "GetRecurringExpenses")]
-    public IActionResult GetRecurringExpenses(string guid)
-    {
-        try
-        {
-            return Ok( _householdService.GetRecurringExpenses(guid));
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, ex.Message);
-        }
-    }
-    
-    [HttpGet(Name = "GetRecurringIncomes")]
-    public IActionResult GetRecurringIncomes(string guid)
-    {
-        try
-        {
-            return Ok( _householdService.GetRecurringIncomes(guid));
         }
         catch (Exception ex)
         {

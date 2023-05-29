@@ -18,11 +18,12 @@ public class ExpenseService : IExpenseService
         _householdService = householdService;
     }
 
-    public IEnumerable<ExpenseModel> GetExpenses(EconomyPlanModel economyPlanModel)
+    public async Task<IEnumerable<ExpenseModel>> GetExpenses(EconomyPlanModel economyPlanModel)
     {
-        return economyPlanModel.ExpenseModels;
+        return await _httpClient.GetFromJsonAsync<IEnumerable<ExpenseModel>>($"http://localhost:5179/api/Expense/GetExpensesFromEconomyPlan?id={economyPlanModel.Id}")
+               ?? Enumerable.Empty<ExpenseModel>();
     }
-
+    
     public async Task UpdateExpense(ExpenseModel expenseModel)
     {
         await _httpClient.PostAsJsonAsync("http://localhost:5179/api/Expense/UpdateExpense", expenseModel);

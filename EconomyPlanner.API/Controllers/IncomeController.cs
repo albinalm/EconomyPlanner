@@ -1,6 +1,6 @@
-﻿using EconomyPlanner.Abstractions.Interfaces;
-using EconomyPlanner.Abstractions.Models;
-using EconomyPlanner.API.Bodies;
+﻿using EconomyPlanner.API.Bodies;
+using EconomyPlanner.API.Services;
+using EconomyPlanner.Repository.Entities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EconomyPlanner.API.Controllers;
@@ -39,12 +39,12 @@ public class IncomeController : ControllerBase
     }
 
     [HttpPost(Name = "UpdateIncome")]
-    public IActionResult UpdateIncome(IncomeModel incomeModel)
+    public IActionResult UpdateIncome(Income income)
     {
         try
         {
-            _incomeService.UpdateIncomeFromModel(incomeModel);
-            return Ok(incomeModel);
+            _incomeService.UpdateIncome(income);
+            return Ok(income);
         }
         catch (Exception ex)
         {
@@ -57,7 +57,7 @@ public class IncomeController : ControllerBase
     {
         try
         {
-            var incomeModel = _incomeService.GetIncomeModel(incomeId);
+            var incomeModel = _incomeService.GetIncome(incomeId);
 
             if (incomeModel is null)
                 return NotFound();
@@ -97,12 +97,12 @@ public class IncomeController : ControllerBase
     }
 
     [HttpPost(Name = "UpdateRecurringIncome")]
-    public IActionResult UpdateRecurringIncome(IncomeModel incomeModel)
+    public IActionResult UpdateRecurringIncome(RecurringIncome recurringIncome)
     {
         try
         {
-            _incomeService.UpdateRecurringIncomeFromModel(incomeModel);
-            return Ok(incomeModel);
+            _incomeService.UpdateRecurringIncome(recurringIncome);
+            return Ok();
         }
         catch (Exception ex)
         {
@@ -127,12 +127,38 @@ public class IncomeController : ControllerBase
     [HttpGet(Name = "GetAllIncomesLinkedToRecurringIncome")]
     public IActionResult GetAllIncomesLinkedToRecurringIncome(int recurringIncomeId)
     {
-        return Ok(_incomeService.GetAllIncomeModelsLinkedToRecurringIncome(recurringIncomeId));
+        return Ok(_incomeService.GetAllIncomesLinkedToRecurringIncome(recurringIncomeId));
     }
 
     [HttpGet(Name = "GetRecurringIncomeFromIncome")]
     public IActionResult GetRecurringIncomeFromIncome(int incomeId)
     {
         return Ok(_incomeService.GetRecurringIncomeFromIncome(incomeId));
+    }
+    
+    [HttpGet(Name = "GetRecurringIncomesFromHouseholdGuid")]
+    public IActionResult GetRecurringIncomesFromHouseholdGuid(string guid)
+    {
+        try
+        {
+            return Ok( _incomeService.GetRecurringIncomesFromHouseholdGuid(guid));
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ex.Message);
+        }
+    }
+    
+    [HttpGet(Name = "GetIncomesFromEconomyPlan")]
+    public IActionResult GetIncomesFromEconomyPlan(int id)
+    {
+        try
+        {
+            return Ok( _incomeService.GetIncomesFromEconomyPlan(id));
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ex.Message);
+        }
     }
 }

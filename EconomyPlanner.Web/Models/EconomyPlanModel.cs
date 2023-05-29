@@ -6,6 +6,4 @@ public class EconomyPlanModel
     public string Name { get; set; } 
     
     public string EndDate { get; set; }
-    public ICollection<ExpenseModel> ExpenseModels { get; set; }
-    public ICollection<IncomeModel> IncomeModels { get; set; }
 }

@@ -1,6 +1,6 @@
-﻿using EconomyPlanner.Abstractions.Models;
+﻿using EconomyPlanner.Repository.Entities;
 
-namespace EconomyPlanner.Abstractions.Interfaces;
+namespace EconomyPlanner.API.Services;
 
 public interface IIncomeService
 {
@@ -13,14 +13,16 @@ public interface IIncomeService
                       decimal recurringAmount);
 
     void CreateRecurringIncome(string householdGuid, string name, decimal amount, string incomeType);
-    void UpdateIncomeFromModel(IncomeModel incomeModel);
-    void UpdateRecurringIncomeFromModel(IncomeModel incomeModel);
-    IncomeModel? GetIncomeModel(int incomeId);
+    void UpdateIncome(Income income);
+    void UpdateRecurringIncome(RecurringIncome recurringIncome);
+    Income? GetIncome(int incomeId);
     IEnumerable<string> GetIncomeTypes();
     void DeleteIncome(int incomeId, bool deleteRecurring);
     void DeleteRecurringIncome(int recurringIncomeId);
+    IEnumerable<Income> GetAllIncomesLinkedToRecurringIncome(int recurringIncomeId);
     bool CheckIfIncomeIsRecurring(int incomeId);
     void AddRecurringIncomeAsIncome(int recurringIncomeId, int economyPlanId);
-    IncomeModel GetRecurringIncomeFromIncome(int incomeId);
-    IEnumerable<IncomeModel> GetAllIncomeModelsLinkedToRecurringIncome(int recurringIncomeId);
+    RecurringIncome? GetRecurringIncomeFromIncome(int incomeId);
+    IEnumerable<RecurringIncome> GetRecurringIncomesFromHouseholdGuid(string guid);
+    IEnumerable<Income> GetIncomesFromEconomyPlan(int id);
 }

@@ -14,12 +14,12 @@ public class IncomeService : IIncomeService
         _httpClient = httpClient;
         _householdService = householdService;
     }
-
-    public IEnumerable<IncomeModel> GetIncomes(EconomyPlanModel economyPlanModel)
+    public async Task<IEnumerable<IncomeModel>> GetIncomes(EconomyPlanModel economyPlanModel)
     {
-        return economyPlanModel.IncomeModels;
+        return await _httpClient.GetFromJsonAsync<IEnumerable<IncomeModel>>($"http://localhost:5179/api/Income/GetIncomesFromEconomyPlan?id={economyPlanModel.Id}") 
+               ?? Enumerable.Empty<IncomeModel>();
     }
-
+    
     public async Task UpdateIncome(IncomeModel incomeModel)
     {
         await _httpClient.PostAsJsonAsync("http://localhost:5179/api/Income/UpdateIncome", incomeModel);

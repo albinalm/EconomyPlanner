@@ -6,7 +6,7 @@ namespace EconomyPlanner.Web.Services.Interfaces;
 
 public interface IExpenseService
 {
-    IEnumerable<ExpenseModel> GetExpenses(EconomyPlanModel economyPlanModel);
+    Task<IEnumerable<ExpenseModel>> GetExpenses(EconomyPlanModel economyPlanModel);
     Task UpdateExpense(ExpenseModel expenseModel);
     Task<IEnumerable<string>> GetExpenseTypes();
     Task DeleteExpense(ExpenseModel expenseModel, bool deleteRecurring);

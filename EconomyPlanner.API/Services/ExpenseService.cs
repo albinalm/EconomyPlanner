@@ -1,22 +1,17 @@
-﻿using AutoMapper;
-using EconomyPlanner.Abstractions.Interfaces;
-using EconomyPlanner.Abstractions.Models;
-using EconomyPlanner.Repository.Configuration;
+﻿using EconomyPlanner.Repository.Configuration;
 using EconomyPlanner.Repository.Entities;
 using EconomyPlanner.Repository.TransactionTypes;
 using Microsoft.EntityFrameworkCore;
 
-namespace EconomyPlanner.Abstractions.Services;
+namespace EconomyPlanner.API.Services;
 
 public class ExpenseService : IExpenseService
 {
     private readonly DatabaseContext _dbContext;
-    private readonly IMapper _mapper;
 
-    public ExpenseService(DatabaseContext dbContext, IMapper mapper)
+    public ExpenseService(DatabaseContext dbContext)
     {
         _dbContext = dbContext;
-        _mapper = mapper;
     }
 
     public void CreateExpense(int economyPlanId,
@@ -69,37 +64,21 @@ public class ExpenseService : IExpenseService
         _dbContext.SaveChanges();
     }
 
-    public void UpdateExpenseFromModel(ExpenseModel expenseModel)
+    public void UpdateExpense(Expense expense)
     {
-        var expense = _dbContext.GetExpenseFromId(expenseModel.Id);
-
-        if (expense is null)
-            return;
-
-        _mapper.Map(expenseModel, expense);
-
         _dbContext.Update(expense);
         _dbContext.SaveChanges();
     }
 
-    public void UpdateRecurringExpenseFromModel(ExpenseModel expenseModel)
+    public void UpdateRecurringExpense(RecurringExpense recurringExpense)
     {
-        var recurringExpense = _dbContext.GetRecurringExpenseFromId(expenseModel.Id);
-
-        if (recurringExpense is null)
-            return;
-
-        _mapper.Map(expenseModel, recurringExpense);
-
         _dbContext.Update(recurringExpense);
         _dbContext.SaveChanges();
     }
 
-    public ExpenseModel? GetExpenseModel(int expenseId)
+    public Expense? GetExpense(int expenseId)
     {
-        var expense = _dbContext.Expenses.Find(expenseId);
-
-        return expense is not null ? _mapper.Map<ExpenseModel>(expense) : null;
+        return _dbContext.Expenses.Find(expenseId);
     }
 
     public IEnumerable<string> GetExpenseTypes()
@@ -187,14 +166,34 @@ public class ExpenseService : IExpenseService
         _dbContext.SaveChanges();
     }
 
-    public IEnumerable<ExpenseModel> GetAllExpenseModelsLinkedToRecurringExpense(int recurringExpenseId)
+    public IEnumerable<Expense> GetAllExpensesLinkedToRecurringExpense(int recurringExpenseId)
     {
         var recurringExpense = _dbContext.RecurringExpenses.Find(recurringExpenseId);
-        return _mapper.Map<IEnumerable<ExpenseModel>>(_dbContext.Expenses.Where(e => e.RecurringExpense == recurringExpense).ToList());
+        return _dbContext.Expenses.Where(e => e.RecurringExpense == recurringExpense).ToList();
     }
 
-    public ExpenseModel GetRecurringExpenseFromExpense(int expenseId)
+    public RecurringExpense? GetRecurringExpenseFromExpense(int expenseId)
     {
-        return _mapper.Map<ExpenseModel>(_dbContext.Expenses.Where(e => e.Id == expenseId).Include(e => e.RecurringExpense).FirstOrDefault()?.RecurringExpense);
+        return _dbContext.Expenses.Where(e => e.Id == expenseId).Include(e => e.RecurringExpense).FirstOrDefault()?.RecurringExpense;
+    }
+    
+    public IEnumerable<RecurringExpense> GetRecurringExpensesFromHouseholdGuid(string guid)
+    {
+        var household = _dbContext.GetHouseholdFromGuid(guid);
+
+        if (household is null)
+            throw new InvalidOperationException("ExpenseService > GetRecurringExpensesFromHouseholdGuid Household not found");
+
+        return household.RecurringExpenses;
+    }
+    
+    public IEnumerable<Expense> GetExpensesFromEconomyPlan(int id)
+    {
+        var economyPlan = _dbContext.GetEconomyPlanFromId(id);
+
+        if (economyPlan is null)
+            throw new InvalidOperationException("ExpenseService > GetExpensesFromEconomyPlan EconomyPlan not found");
+
+        return economyPlan.Expenses;
     }
 }

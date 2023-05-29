@@ -1,8 +1,7 @@
-﻿using EconomyPlanner.Abstractions.Interfaces;
-using EconomyPlanner.Repository.Configuration;
+﻿using EconomyPlanner.Repository.Configuration;
 using Microsoft.EntityFrameworkCore;
 
-namespace EconomyPlanner.Abstractions.Services;
+namespace EconomyPlanner.API.Services;
 
 public class TimeService : ITimeService
 {

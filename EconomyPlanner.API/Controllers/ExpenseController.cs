@@ -1,6 +1,6 @@
-﻿using EconomyPlanner.Abstractions.Interfaces;
-using EconomyPlanner.Abstractions.Models;
-using EconomyPlanner.API.Bodies;
+﻿using EconomyPlanner.API.Bodies;
+using EconomyPlanner.API.Services;
+using EconomyPlanner.Repository.Entities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EconomyPlanner.API.Controllers;
@@ -38,12 +38,12 @@ public class ExpenseController : ControllerBase
     }
     
     [HttpPost(Name = "UpdateExpense")]
-    public IActionResult UpdateExpense(ExpenseModel expenseModel)
+    public IActionResult UpdateExpense(Expense expense)
     {
         try
         {
-            _expenseService.UpdateExpenseFromModel(expenseModel);
-            return Ok(expenseModel);
+            _expenseService.UpdateExpense(expense);
+            return Ok();
         }
         catch (Exception ex)
         {
@@ -56,12 +56,12 @@ public class ExpenseController : ControllerBase
     {
         try
         {
-            var expenseModel = _expenseService.GetExpenseModel(expenseId);
+            var expense = _expenseService.GetExpense(expenseId);
             
-            if (expenseModel is null)
+            if (expense is null)
                 return NotFound();
             
-            return Ok(expenseModel);
+            return Ok(expense);
         }
         catch (Exception ex)
         {
@@ -96,12 +96,12 @@ public class ExpenseController : ControllerBase
     }
     
     [HttpPost(Name = "UpdateRecurringExpense")]
-    public IActionResult UpdateRecurringExpense(ExpenseModel expenseModel)
+    public IActionResult UpdateRecurringExpense(RecurringExpense recurringExpense)
     {
         try
         {
-            _expenseService.UpdateRecurringExpenseFromModel(expenseModel);
-            return Ok(expenseModel);
+            _expenseService.UpdateRecurringExpense(recurringExpense);
+            return Ok();
         }
         catch (Exception ex)
         {
@@ -126,12 +126,38 @@ public class ExpenseController : ControllerBase
     [HttpGet(Name = "GetAllExpensesLinkedToRecurringExpense")]
     public IActionResult GetAllExpensesLinkedToRecurringExpense(int recurringExpenseId)
     {
-        return Ok(_expenseService.GetAllExpenseModelsLinkedToRecurringExpense(recurringExpenseId));
+        return Ok(_expenseService.GetAllExpensesLinkedToRecurringExpense(recurringExpenseId));
     }
     
     [HttpGet(Name = "GetRecurringExpenseFromExpense")]
     public IActionResult GetRecurringExpenseFromExpense(int expenseId)
     {
         return Ok(_expenseService.GetRecurringExpenseFromExpense(expenseId));
+    }
+    
+    [HttpGet(Name = "GetRecurringExpensesFromHouseholdGuid")]
+    public IActionResult GetRecurringExpensesFromHouseholdGuid(string guid)
+    {
+        try
+        {
+            return Ok( _expenseService.GetRecurringExpensesFromHouseholdGuid(guid));
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ex.Message);
+        }
+    }
+    
+    [HttpGet(Name = "GetExpensesFromEconomyPlan")]
+    public IActionResult GetExpensesFromEconomyPlan(int id)
+    {
+        try
+        {
+            return Ok( _expenseService.GetExpensesFromEconomyPlan(id));
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ex.Message);
+        }
     }
 }
