@@ -33,14 +33,14 @@ public class HouseholdController : ControllerBase
         }
     }
     
-    [HttpPost(Name = "CreateHousehold")]
+    [HttpGet(Name = "CreateHousehold")]
     public IActionResult CreateHousehold(string name)
     {
         try
         {
-            _householdService.CreateHousehold(name);
+            var household = _householdService.CreateHousehold(name);
             
-            return Ok();
+            return Ok(household);
         }
         catch (Exception ex)
         {

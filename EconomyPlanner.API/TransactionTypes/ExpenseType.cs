@@ -1,9 +1,12 @@
-﻿namespace EconomyPlanner.Repository.TransactionTypes;
+﻿namespace EconomyPlanner.API.TransactionTypes;
 
 public static class ExpenseType
 {
     public static string Shopping => "Shopping";
     public static string Household => "Hushåll";
+    public static string Electricity => "El";
+    public static string Insurance => "Försäkring";
+    public static string Rent => "Hyra";
     public static string Subscription => "Abonnemang";
     public static string Other => "Övrigt";
     

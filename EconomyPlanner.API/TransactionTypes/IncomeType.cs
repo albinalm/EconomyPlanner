@@ -1,4 +1,4 @@
-﻿namespace EconomyPlanner.Repository.TransactionTypes;
+﻿namespace EconomyPlanner.API.TransactionTypes;
 
 public static class IncomeType
 {

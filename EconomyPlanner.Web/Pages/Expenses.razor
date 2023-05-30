@@ -5,13 +5,14 @@
 @using EconomyPlanner.Web.Shared.Expense
 @inject NavigationManager NavManager
 
-<PageTitle>Expenses</PageTitle>
-
-<h1>Nuvarande utgifter</h1>
+<PageTitle>Utgifter för vald ekonomiplan</PageTitle>
 <br/>
-
-<div>
-    <b>Vald ekonomiplan:</b>
+<h1 class="text-success bi bi-credit-card-fill"> Utgifter för vald ekonomiplan</h1>
+<br/>
+<hr/>
+<br/>
+<div class="pb-2">
+    <b class="text-dark bi bi-calendar-range-fill"> Period:</b>
 </div>
 <Dropdown TItem="EconomyPlanModel" OnSelected="@OnSelected">
     <InitialTip>@InitialEconomyPlanName</InitialTip>
@@ -44,17 +45,17 @@
             <div class="row">
                 <div class="col-md text-left">
                     <div class="span2">
-                        <button class="btn btn-dark btn-block btn-sm text-left @GetDisabledButtonClass()" @onclick="@(_ => ShowEditTypePopup(expense))">@expense.ExpenseType</button>
+                        <button class="btn btn-info btn-block btn-sm text-left @GetDisabledButtonClass()" @onclick="@(_ => ShowEditTypePopup(expense))">@expense.ExpenseType</button>
                     </div>
                 </div>
                 <div class="col-md">
                     <div class="span2">
-                        <button class="btn btn-dark btn-block btn-sm text-left @GetDisabledButtonClass()" @onclick="@(_ => ShowEditNamePopup(expense))">@expense.Name</button>
+                        <button class="btn btn-info btn-block btn-sm text-left @GetDisabledButtonClass()" @onclick="@(_ => ShowEditNamePopup(expense))">@expense.Name</button>
                     </div>
                 </div>
                 <div class="col-md">
                     <div class="span2">
-                        <button class="btn btn-dark btn-block btn-sm text-left @GetDisabledButtonClass()" @onclick="@(_ => ShowEditAmountPopup(expense))">@expense.Amount</button>
+                        <button class="btn btn-info btn-block btn-sm text-left @GetDisabledButtonClass()" @onclick="@(_ => ShowEditAmountPopup(expense))">@expense.Amount</button>
                     </div>
                 </div>
                 <div class="col-md">
@@ -73,7 +74,7 @@
 
 </div>
 <br/><hr/><br/>
-<h4>Återkommande utgifter:</h4>
+<h4 class="bi bi-arrow-clockwise"> Återkommande utgifter:</h4>
 <div class="alert alert-secondary mt-4">
     <div>
         <div class="row">
@@ -95,17 +96,17 @@
             <div class="row">
                 <div class="col-md text-left">
                     <div class="span2">
-                        <button class="btn btn-dark btn-block btn-sm text-left @GetDisabledButtonClass()" @onclick="@(_ => ShowEditRecurringTypePopup(recurringExpense))">@recurringExpense.ExpenseType</button>
+                        <button class="btn btn-info btn-block btn-sm text-left @GetDisabledButtonClass()" @onclick="@(_ => ShowEditRecurringTypePopup(recurringExpense))">@recurringExpense.ExpenseType</button>
                     </div>
                 </div>
                 <div class="col-md">
                     <div class="span2">
-                        <button class="btn btn-dark btn-block btn-sm text-left @GetDisabledButtonClass()" @onclick="@(_ => ShowEditRecurringNamePopup(recurringExpense))">@recurringExpense.Name</button>
+                        <button class="btn btn-info btn-block btn-sm text-left @GetDisabledButtonClass()" @onclick="@(_ => ShowEditRecurringNamePopup(recurringExpense))">@recurringExpense.Name</button>
                     </div>
                 </div>
                 <div class="col-md">
                     <div class="span2">
-                        <button class="btn btn-dark btn-block btn-sm text-left @GetDisabledButtonClass()" @onclick="@(_ => ShowEditRecurringAmountPopup(recurringExpense))">@recurringExpense.Amount</button>
+                        <button class="btn btn-info btn-block btn-sm text-left @GetDisabledButtonClass()" @onclick="@(_ => ShowEditRecurringAmountPopup(recurringExpense))">@recurringExpense.Amount</button>
                     </div>
                 </div>
                 <div class="col-md">

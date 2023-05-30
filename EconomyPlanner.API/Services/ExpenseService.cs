@@ -1,6 +1,6 @@
-﻿using EconomyPlanner.Repository.Configuration;
+﻿using EconomyPlanner.API.TransactionTypes;
+using EconomyPlanner.Repository.Configuration;
 using EconomyPlanner.Repository.Entities;
-using EconomyPlanner.Repository.TransactionTypes;
 using Microsoft.EntityFrameworkCore;
 
 namespace EconomyPlanner.API.Services;

@@ -2,12 +2,11 @@
 @page "/"
 @using EconomyPlanner.Web.Services.Interfaces
 @using EconomyPlanner.Web.Models
-@using Syncfusion.Blazor
 @using Syncfusion.Blazor.Charts;
 @using Syncfusion.Blazor.Data
 @using EconomyPlanner.Web.Extensions
 
-<PageTitle>Index</PageTitle>
+<PageTitle>Ekonomisk översikt</PageTitle>
 
 <h1 class="bi bi-stack text-info"> Ekonomisk översikt</h1>
 <br/>
@@ -25,7 +24,7 @@
 <p class="text-dark">
     <b>Inkomster:</b>
 </p>
-<div class="alert alert-secondary mt-4">
+<div class="alert alert-info mt-4">
     @foreach (var incomeType in IncomeTypes)
     {
         <span class="@GetIconFromType(incomeType)" aria-hidden="true"></span>
@@ -44,7 +43,7 @@
 <p class="text-dark">
     <b>Utgifter:</b>
 </p>
-<div class="alert alert-secondary mt-4">
+<div class="alert alert-info mt-4">
     @foreach (var expenseType in ExpenseTypes)
     {
         <span class="@GetIconFromType(expenseType)" aria-hidden="true"></span>
@@ -146,13 +145,13 @@
     {
         if (!await HouseholdService.HasSavedLogin())
         {
-            NavManager.NavigateTo("/login");
+            NavManager.NavigateTo("/login", forceLoad: true);
         }
         else
         {
             if (!await HouseholdService.AttemptLogin(await HouseholdService.GetGuid()))
             {
-                NavManager.NavigateTo("/login");
+                NavManager.NavigateTo("/login", forceLoad: true);
             }
             else
             {
@@ -263,6 +262,9 @@
                {
                "shopping" => "bi-basket-fill",
                "hushåll" => "bi-house-heart-fill",
+               "el" => "bi-lightning-fill",
+               "försäkring" => "bi-shield-fill-check",
+               "hyra" => "bi-key-fill",
                "abonnemang" => "bi-arrow-clockwise",
                "lön" => "bi-cash-stack",
                "återbetalning" => "bi-bag-plus-fill",
@@ -274,7 +276,7 @@
     {
         return _expenseModels.Where(e => e.ExpenseType == expenseType).Select(e => e.Amount).Sum();
     }
-
+    
     private decimal GetSumPerIncomeType(string incomeType)
     {
         return _incomeModels.Where(e => e.IncomeType == incomeType).Select(e => e.Amount).Sum();
@@ -289,7 +291,7 @@
 
     private (string caption, string style) GetOverviewCaption(decimal result)
     {
-        return result > 0 ? ($"Du har {result}:- över!", "text-success") : ($"Du ligger {result}:- back!", "text-danger");
+        return result >= 0 ? ($"Beräknat belopp att få över: {result}:-", "text-success") : ($"Beräknad skuld: {result}:-", "text-danger");
     }
 
     public class ExpensePieChart

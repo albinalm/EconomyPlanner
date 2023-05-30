@@ -1,5 +1,4 @@
-﻿using EconomyPlanner.API.Helpers;
-using EconomyPlanner.API.Interfaces;
+﻿using EconomyPlanner.API.Interfaces;
 using EconomyPlanner.Repository.Configuration;
 using EconomyPlanner.Repository.Entities;
 
@@ -23,19 +22,15 @@ public class HouseholdService : IHouseholdService
         return _dbContext.GetHouseholdFromGuid(guid);
     }
 
-    public void CreateHousehold(string name)
+    public Household CreateHousehold(string name)
     {
-        var currentDate = _timeService.GetNow();
-        var futureMonthDate = currentDate.AddMonths(1);
-        
         var household = Household.Create(name);
         
         _dbContext.Add(household);
         _dbContext.SaveChanges();
 
         _economyPlanService.SetupActiveEconomyPlans(household.Guid);
-        //
-        // _economyPlanService.CreateEconomyPlan(EconomyPlanHelper.GetEconomyPlanName(currentDate), household.Guid, currentDate);
-        // _economyPlanService.CreateEconomyPlan(EconomyPlanHelper.GetEconomyPlanName(futureMonthDate), household.Guid, futureMonthDate);
+        
+        return household;
     }
 }

@@ -13,8 +13,13 @@
     <br/>
     <button class="btn btn-dark" @onclick="SetGuid">Logga in</button>
     <br/><br/>
-    <p style="color: indianred" class="bi bi-house-lock-fill" hidden="@HideLoginFailedLabel"><b> Inloggningen misslyckades. Vänligen försök igen</b></p> 
-    <br/>
+    <p style="color: indianred" class="bi bi-house-lock-fill" hidden="@HideLoginFailedLabel"><b> Inloggningen misslyckades. Vänligen försök igen</b></p>
+    <div class="alert alert-info mt-4">
+        <p class="font-weight-bold">Inget hushåll? Inga problem!</p>
+        <p hidden="@HideHouseholdCreatedLabels"><b>Här är ditt inloggnings-id: </b> <i>@HouseholdGuid</i></p>
+        <p hidden="@HideHouseholdCreatedLabels" class="small bi bi-exclamation-triangle-fill"><i> Spara detta ID. Det går inte återskapa</i></p>
+        <button class="btn" hidden="@HideCreateHouseholdButton" @onclick="CreateHousehold">Skapa ett nytt hushåll</button>
+    </div>
 </div>
 
 @code{
@@ -22,9 +27,12 @@
     [Inject]
     private IHouseholdService HouseholdService { get; set; } = default!;
 
-    public bool HideLoginFailedLabel = true;
+    private bool HideLoginFailedLabel = true;
     private string TxtGuidText { get; set; } = "";
-
+    private bool HideCreateHouseholdButton { get; set; }
+    private bool HideHouseholdCreatedLabels { get; set; } = true;
+    private string HouseholdGuid { get; set; } = "";
+    
     private async Task SetGuid()
     {
         if (await HouseholdService.AttemptLogin(TxtGuidText))
@@ -34,6 +42,13 @@
         }
         TxtGuidText = string.Empty;
         HideLoginFailedLabel = false;
+    }
+
+    private async Task CreateHousehold()
+    {
+        HouseholdGuid = (await HouseholdService.CreateHousehold()).Guid;
+        HideCreateHouseholdButton = true;
+        HideHouseholdCreatedLabels = false;
     }
 
     protected override async Task OnInitializedAsync()
@@ -49,7 +64,5 @@
                 }
             }
         }
-            
     }
-
 }

@@ -96,4 +96,14 @@ public class HouseholdService : IHouseholdService
     {
         return await HasSavedLogin() ? await _localStorageService.GetItemAsync<string>("EconomyPlanner.UserGuid") : null;
     }
+
+    public async Task<HouseholdModel> CreateHousehold()
+    {
+        var householdModel = await _httpClient.GetFromJsonAsync<HouseholdModel>($"http://192.168.1.103:6320/api/Household/CreateHousehold?name={Guid.NewGuid().ToString()}");
+        
+        if (householdModel is null)
+            throw new ApplicationException("CreateHousehold failed!");
+        
+        return householdModel;
+    }
 }
