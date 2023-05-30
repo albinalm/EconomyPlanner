@@ -160,4 +160,17 @@ public class ExpenseController : ControllerBase
             return StatusCode(500, ex.Message);
         }
     }
+    
+    [HttpGet(Name = "GetAllExpensesFromLastSixEconomyPlans")] 
+    public IActionResult GetAllExpensesFromLastSixEconomyPlans(string guid)
+    {
+        try
+        {
+            return Ok( _expenseService.GetAllExpensesFromLastSixEconomyPlans(guid));
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ex.Message);
+        }
+    }
 }

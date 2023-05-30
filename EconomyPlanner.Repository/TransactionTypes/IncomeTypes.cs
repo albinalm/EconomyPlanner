@@ -1,15 +1,11 @@
-﻿using System.Runtime.CompilerServices;
-using EconomyPlanner.Repository.Entities;
-using EconomyPlanner.Repository.Languages;
-
-namespace EconomyPlanner.Repository.TransactionTypes;
+﻿namespace EconomyPlanner.Repository.TransactionTypes;
 
 public static class IncomeType
 {
-    public static string Salary => CommonLoc.IncomeTypeSalary;
-    public static string Refund => CommonLoc.IncomeTypeRefund;
-    public static string Gift => CommonLoc.IncomeTypeGift;
-    public static string Other => CommonLoc.TransactionTypeOther;
+    public static string Salary => "Lön";
+    public static string Refund => "Återbetalning";
+    public static string Gift => "Gåva";
+    public static string Other => "Övrigt";
 
     public static IEnumerable<string> GetIncomeTypes()
     {

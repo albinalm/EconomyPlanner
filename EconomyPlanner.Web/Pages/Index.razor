@@ -2,10 +2,15 @@
 @page "/"
 @using EconomyPlanner.Web.Services.Interfaces
 @using EconomyPlanner.Web.Models
+@using Syncfusion.Blazor
+@using Syncfusion.Blazor.Charts;
+@using Syncfusion.Blazor.Data
+@using EconomyPlanner.Web.Extensions
 
 <PageTitle>Index</PageTitle>
 
-<h1>Ekonomisk översikt</h1>
+<h1 class="bi bi-stack text-info"> Ekonomisk översikt</h1>
+<br/>
 <Dropdown TItem="EconomyPlanModel" OnSelected="@OnSelected">
     <InitialTip>@InitialEconomyPlanName</InitialTip>
     <ChildContent>
@@ -16,10 +21,8 @@
     </ChildContent>
 </Dropdown>
 <hr/>
-<h2 class="@OverviewStyle">@OverviewCaption</h2>
 <br/>
-<br/>
-<p>
+<p class="text-dark">
     <b>Inkomster:</b>
 </p>
 <div class="alert alert-secondary mt-4">
@@ -38,7 +41,7 @@
 
 <br/>
 
-<p>
+<p class="text-dark">
     <b>Utgifter:</b>
 </p>
 <div class="alert alert-secondary mt-4">
@@ -54,9 +57,59 @@
     <p class="font-weight-bold float-left">Totalbelopp: @_expenseModels.Select(e => e.Amount).Sum():-</p>
     <br/>
 </div>
+<br/>
+<br/>
+<h4 class="@OverviewStyle">@OverviewCaption</h4>
+<br/>
+<hr/>
+<br/>
+<h2 class="bi bi-bar-chart-fill text-success font-weight-bold"> Genomsnittlig ekonomifördelning</h2>
+<br/>
+<br/>
+<div class="row">
+    <div class="col">
+        <SfAccumulationChart Title="Genomsnittliga utgifter">
+            <AccumulationChartSeriesCollection>
+                <AccumulationChartSeries DataSource="@_expensePieDetails" XName="Type" YName="Amount"
+                                         Name="Type">
+                </AccumulationChartSeries>
+            </AccumulationChartSeriesCollection>
+
+            <AccumulationChartLegendSettings Visible="true"></AccumulationChartLegendSettings>
+        </SfAccumulationChart>
+    </div>
+    <div class="col">
+        <SfChart Title="Utgifter kontra inkomst per månad">
+            <ChartPrimaryXAxis ValueType="Syncfusion.Blazor.Charts.ValueType.Category">
+            </ChartPrimaryXAxis>
+            <ChartSeriesCollection>
+                <ChartSeries DataSource="@_expenseBarDetails" XName="Month" YName="Amount" Type="ChartSeriesType.Bar" Name="Kostnad">
+                    <ChartMarker>
+                        <ChartDataLabel Visible="false" Position="LabelPosition.Top">
+                            <ChartDataLabelFont FontWeight="600" Color="#ffffff"></ChartDataLabelFont>
+                        </ChartDataLabel>
+                    </ChartMarker>
+                </ChartSeries>
+            </ChartSeriesCollection>
+            
+            <ChartSeriesCollection>
+                <ChartSeries DataSource="@_incomeBarDetails" XName="Month" YName="Amount" Type="ChartSeriesType.Bar" Name="Inkomst">
+                    <ChartMarker>
+                        <ChartDataLabel Visible="false" Position="LabelPosition.Top">
+                            <ChartDataLabelFont FontWeight="600" Color="#ffffff"></ChartDataLabelFont>
+                        </ChartDataLabel>
+                    </ChartMarker>
+                </ChartSeries>
+            </ChartSeriesCollection>
+        </SfChart>
+    </div>
+</div>
+
+
+<p class="font-italic form-control-sm">*Baserat på max de senaste 6 månaderna eller antal ekonomiplaner beroende på vilket som är högst</p>
 
 @code{
-    
+
     [Inject]
     private IEconomyPlanService EconomyPlanService { get; set; } = null!;
 
@@ -75,8 +128,14 @@
     private List<IncomeModel> _incomeModels = new();
     private List<EconomyPlanModel> _economyPlanModels = new();
 
+    private List<ExpensePieChart> _expensePieDetails = new();
+
+    private List<TransactionBarChart> _expenseBarDetails = new();
+
+    private List<TransactionBarChart> _incomeBarDetails = new();
+
     private List<EconomyPlanModel> _activeEconomyPlans = new();
-    
+
     private string InitialEconomyPlanName { get; set; } = "";
     private IEnumerable<string> IncomeTypes { get; set; } = Enumerable.Empty<string>();
     private IEnumerable<string> ExpenseTypes { get; set; } = Enumerable.Empty<string>();
@@ -97,21 +156,20 @@
             }
             else
             {
-                await InitializePage();   
+                await InitializePage();
             }
         }
-            
     }
 
     private async Task InitializePage()
     {
         if (!HasUpdatedEconomyPlans)
         {
-            await SetupActiveEconomyPlans(); 
+            await SetupActiveEconomyPlans();
         }
-        
+
         await GetEconomyPlanModels();
-        
+
         if (_activeEconomyPlans.Any())
         {
             SelectedEconomyPlan = _activeEconomyPlans.First();
@@ -120,7 +178,71 @@
             _incomeModels = (await IncomeService.GetIncomes(SelectedEconomyPlan)).ToList();
             IncomeTypes = await IncomeService.GetIncomeTypes();
             ExpenseTypes = await ExpenseService.GetExpenseTypes();
+            await PopulateExpensePie();
+            await PopulateTransactionBar();
         }
+    }
+
+    private async Task PopulateExpensePie()
+    {
+        var guid = await HouseholdService.GetGuid();
+
+        if (guid is null) return;
+
+        var totalExpenses = await ExpenseService.GetAllExpenseModelsFromLastSixEconomyPlans(guid);
+
+        var totalExpenseGroups = totalExpenses.GroupByMany(e => e.ExpenseType);
+
+        var expensePieData = new List<ExpensePieChart>();
+
+        foreach (var expenseGroup in totalExpenseGroups)
+        {
+            var type = expenseGroup.Key.ToString();
+
+            var totalSum = expenseGroup.Items.Cast<object>().Sum(expense => ((ExpenseModel)expense).Amount);
+            expensePieData.Add(new ExpensePieChart { Amount = totalSum, Type = type });
+        }
+
+        _expensePieDetails = expensePieData;
+    }
+
+    private async Task PopulateTransactionBar()
+    {
+        var guid = await HouseholdService.GetGuid();
+
+        if (guid is null) return;
+
+        var economyPlans = await EconomyPlanService.GetLastSixEconomyPlanModels(guid);
+
+        var expenseBarData = new List<TransactionBarChart>();
+        var incomeBarData = new List<TransactionBarChart>();
+
+        foreach (var economyPlan in economyPlans)
+        {
+            decimal totalExpenseSum = 0;
+            decimal totalIncomeSum = 0;
+
+            var month = DateTime.Parse(economyPlan.EndDate).ToString("MMMM").FirstCharToUpper();
+
+            var expenseModels = await ExpenseService.GetExpenses(economyPlan);
+            var incomeModels = await IncomeService.GetIncomes(economyPlan);
+
+            foreach (var expenseModel in expenseModels)
+            {
+                totalExpenseSum += expenseModel.Amount;
+            }
+
+            foreach (var incomeModel in incomeModels)
+            {
+                totalIncomeSum += incomeModel.Amount;
+            }
+
+            expenseBarData.Add(new TransactionBarChart { Amount = totalExpenseSum, Month = month });
+            incomeBarData.Add(new TransactionBarChart { Amount = totalIncomeSum, Month = month });
+        }
+
+        _incomeBarDetails = incomeBarData;
+        _expenseBarDetails = expenseBarData;
     }
 
     private async Task GetEconomyPlanModels()
@@ -163,12 +285,23 @@
         _expenseModels = (await ExpenseService.GetExpenses(selection)).ToList();
         _incomeModels = (await IncomeService.GetIncomes(selection)).ToList();
         SelectedEconomyPlan = selection;
-       
     }
 
     private (string caption, string style) GetOverviewCaption(decimal result)
     {
         return result > 0 ? ($"Du har {result}:- över!", "text-success") : ($"Du ligger {result}:- back!", "text-danger");
+    }
+
+    public class ExpensePieChart
+    {
+        public string? Type { get; set; }
+        public decimal Amount { get; set; }
+    }
+
+    public class TransactionBarChart
+    {
+        public string? Month { get; set; }
+        public decimal Amount { get; set; }
     }
 
 }

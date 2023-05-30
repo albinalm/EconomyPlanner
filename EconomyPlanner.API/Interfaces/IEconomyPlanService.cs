@@ -11,4 +11,5 @@ public interface IEconomyPlanService
     EconomyPlan? GetEconomyPlan(int economyPlanId);
     EconomyPlan? GetEconomyPlanByDate(DateTime startPeriod);
     void SetupActiveEconomyPlans(string guid);
+    IEnumerable<EconomyPlan> GetLastSixEconomyPlans(string guid);
 }

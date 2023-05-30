@@ -6,4 +6,5 @@ public interface IEconomyPlanService
 {
     Task<IEnumerable<EconomyPlanModel>> GetEconomyPlans();
     Task SetupActiveEconomyPlans();
+    Task<IEnumerable<EconomyPlanModel>> GetLastSixEconomyPlanModels(string guid);
 }

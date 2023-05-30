@@ -25,4 +25,5 @@ public interface IExpenseService
     RecurringExpense? GetRecurringExpenseFromExpense(int expenseId);
     IEnumerable<RecurringExpense> GetRecurringExpensesFromHouseholdGuid(string guid);
     IEnumerable<Expense> GetExpensesFromEconomyPlan(int id);
+    IEnumerable<Expense> GetAllExpensesFromLastSixEconomyPlans(string guid);
 }

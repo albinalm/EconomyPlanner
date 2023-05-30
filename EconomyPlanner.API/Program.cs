@@ -3,8 +3,6 @@ using EconomyPlanner.API.Interfaces;
 using EconomyPlanner.API.Services;
 using EconomyPlanner.Repository.Configuration;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-
 var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
@@ -18,11 +16,15 @@ builder.Services.AddCors(options =>
     options.AddPolicy(name: "AllowBlazorOrigin",
                       corsPolicyBuilder =>
                       {
-                          corsPolicyBuilder.WithOrigins("http://localhost:5179", "http://localhost:5114")
+                          corsPolicyBuilder.AllowAnyOrigin()
                                            .AllowAnyMethod()
                                            .AllowAnyHeader();
                       });
 });
+builder.WebHost.UseKestrel()
+       .UseContentRoot(Directory.GetCurrentDirectory())
+       .UseUrls("http://192.168.1.103:6320")
+       .UseIISIntegration();
 
 builder.Services.AddScoped<ITimeService, TimeService>();
 

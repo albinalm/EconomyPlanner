@@ -3,18 +3,26 @@
 @using EconomyPlanner.Web.Services.Interfaces
 
 <PageTitle>Logga in på ditt hushåll</PageTitle>
-
-<h1>Logga in på ditt hushåll</h1>
+<h1 class="bi bi-pie-chart-fill text-success"> Välkommen till din digitala budgetkalkyl</h1>
 <br/>
-<p>Vänligen mata in ditt hushålls-ID nedan:</p>
-<input type="text" id="txt_guid" name="txt_guid" @bind="TxtGuidText">
-<button @onclick="SetGuid">Logga in</button>
+<div class="alert alert-light mt-4" style="">
+    <h2 class="text-info text-decoration-underline">Logga in på ditt hushåll</h2>
+    <br/>
+    <p>Vänligen mata in ditt hushålls-ID nedan:</p>
+    <input class="form-control form-control-sm w-25" type="text" id="txt_guid" name="txt_guid" @bind="TxtGuidText">
+    <br/>
+    <button class="btn btn-dark" @onclick="SetGuid">Logga in</button>
+    <br/><br/>
+    <p style="color: indianred" class="bi bi-house-lock-fill" hidden="@HideLoginFailedLabel"><b> Inloggningen misslyckades. Vänligen försök igen</b></p> 
+    <br/>
+</div>
 
 @code{
 
     [Inject]
     private IHouseholdService HouseholdService { get; set; } = default!;
 
+    public bool HideLoginFailedLabel = true;
     private string TxtGuidText { get; set; } = "";
 
     private async Task SetGuid()
@@ -24,8 +32,8 @@
             
             NavManager.NavigateTo("/", forceLoad: true);
         }
-        
-        Console.WriteLine("Inloggning misslyckades :(");
+        TxtGuidText = string.Empty;
+        HideLoginFailedLabel = false;
     }
 
     protected override async Task OnInitializedAsync()

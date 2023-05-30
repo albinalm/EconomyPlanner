@@ -83,4 +83,17 @@ public class EconomyPlanController : ControllerBase
             return StatusCode(500, ex.Message);
         }
     }
+    
+    [HttpGet(Name = "GetLastSixEconomyPlans")] 
+    public IActionResult GetLastSixEconomyPlans(string guid)
+    {
+        try
+        {
+            return Ok( _economyPlanService.GetLastSixEconomyPlans(guid));
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ex.Message);
+        }
+    }
 }

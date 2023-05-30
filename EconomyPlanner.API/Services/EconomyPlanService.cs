@@ -170,4 +170,23 @@ public class EconomyPlanService : IEconomyPlanService
             CreateEconomyPlan(EconomyPlanHelper.GetEconomyPlanName(futureMonthDate), household.Guid, futureMonthDate);
         }
     }
+
+    public IEnumerable<EconomyPlan> GetLastSixEconomyPlans(string guid)
+    {
+        var household = _dbContext.GetHouseholdFromGuid(guid);
+        
+        if (household is null)
+            throw new InvalidOperationException("EconomyPlanService > GetLastSixEconomyPlans Household not found");
+        
+        var economyPlans = _dbContext.GetEconomyPlansFromHousehold(household)?.ToList();
+        
+        if (economyPlans is null || !economyPlans.Any())
+        {
+            return Enumerable.Empty<EconomyPlan>();
+        }
+
+        var latestEconomyPlans = economyPlans.OrderBy(ep => DateTime.Parse(ep.EndDate)).TakeLast(6).ToList();
+        
+        return latestEconomyPlans;
+    }
 }

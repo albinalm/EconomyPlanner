@@ -196,4 +196,30 @@ public class ExpenseService : IExpenseService
 
         return economyPlan.Expenses;
     }
+
+    public IEnumerable<Expense> GetAllExpensesFromLastSixEconomyPlans(string guid)
+    {
+        var household = _dbContext.GetHouseholdFromGuid(guid);
+        
+        if (household is null)
+            throw new InvalidOperationException("ExpenseService > GetRecurringExpensesFromHouseholdGuid Household not found");
+        
+        var economyPlans = _dbContext.GetEconomyPlansFromHousehold(household)?.ToList();
+        
+        if (economyPlans is null || !economyPlans.Any())
+        {
+            return Enumerable.Empty<Expense>();
+        }
+
+        var latestEconomyPlans = economyPlans.OrderBy(ep => DateTime.Parse(ep.EndDate)).TakeLast(6).ToList();
+        
+        var totalExpenses = new List<Expense>();
+        
+        latestEconomyPlans.ForEach(ep =>
+        {
+            totalExpenses.AddRange(ep.Expenses);
+        });
+        
+        return totalExpenses;
+    }
 }

@@ -19,19 +19,4 @@
       </PackageReference>
     </ItemGroup>
 
-    <ItemGroup>
-      <Compile Update="Languages\CommonLoc.Designer.cs">
-        <DesignTime>True</DesignTime>
-        <AutoGen>True</AutoGen>
-        <DependentUpon>CommonLoc.resx</DependentUpon>
-      </Compile>
-    </ItemGroup>
-
-    <ItemGroup>
-      <EmbeddedResource Update="Languages\CommonLoc.resx">
-        <Generator>ResXFileCodeGenerator</Generator>
-        <LastGenOutput>CommonLoc.Designer.cs</LastGenOutput>
-      </EmbeddedResource>
-    </ItemGroup>
-
 </Project>

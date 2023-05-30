@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using EconomyPlanner.Web;
 using EconomyPlanner.Web.Services;
 using EconomyPlanner.Web.Services.Interfaces;
+using Syncfusion.Blazor;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -18,6 +19,8 @@ builder.Services.AddScoped<IHouseholdService, HouseholdService>();
 builder.Services.AddScoped<IEconomyPlanService, EconomyPlanService>();
 builder.Services.AddScoped<IExpenseService, ExpenseService>();
 builder.Services.AddScoped<IIncomeService, IncomeService>();
-builder.Services.AddBlazoredModal();   
+builder.Services.AddSyncfusionBlazor();
+
+builder.Services.AddBlazoredModal();
 
 await builder.Build().RunAsync();

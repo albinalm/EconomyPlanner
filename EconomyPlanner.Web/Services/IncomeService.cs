@@ -16,62 +16,62 @@ public class IncomeService : IIncomeService
     }
     public async Task<IEnumerable<IncomeModel>> GetIncomes(EconomyPlanModel economyPlanModel)
     {
-        return await _httpClient.GetFromJsonAsync<IEnumerable<IncomeModel>>($"http://localhost:5179/api/Income/GetIncomesFromEconomyPlan?id={economyPlanModel.Id}") 
+        return await _httpClient.GetFromJsonAsync<IEnumerable<IncomeModel>>($"http://192.168.1.103:6320/api/Income/GetIncomesFromEconomyPlan?id={economyPlanModel.Id}") 
                ?? Enumerable.Empty<IncomeModel>();
     }
     
     public async Task UpdateIncome(IncomeModel incomeModel)
     {
-        await _httpClient.PostAsJsonAsync("http://localhost:5179/api/Income/UpdateIncome", incomeModel);
+        await _httpClient.PostAsJsonAsync("http://192.168.1.103:6320/api/Income/UpdateIncome", incomeModel);
     }
 
     public async Task<IEnumerable<string>> GetIncomeTypes()
     {
-        return await _httpClient.GetFromJsonAsync<IEnumerable<string>>("http://localhost:5179/api/Income/GetIncomeTypes") ?? Enumerable.Empty<string>();
+        return await _httpClient.GetFromJsonAsync<IEnumerable<string>>("http://192.168.1.103:6320/api/Income/GetIncomeTypes") ?? Enumerable.Empty<string>();
     }
 
     public async Task DeleteIncome(IncomeModel incomeModel, bool deleteRecurring)
     { 
-        await _httpClient.GetAsync($"http://localhost:5179/api/Income/DeleteIncome?incomeId={incomeModel.Id}&deleteRecurring={deleteRecurring}");
+        await _httpClient.GetAsync($"http://192.168.1.103:6320/api/Income/DeleteIncome?incomeId={incomeModel.Id}&deleteRecurring={deleteRecurring}");
     }
 
     public async Task<bool> CheckIfIncomeIsRecurring(IncomeModel incomeModel)
     {
-        return await _httpClient.GetFromJsonAsync<bool>($"http://localhost:5179/api/Income/CheckIfIncomeIsRecurring?incomeId={incomeModel.Id}");
+        return await _httpClient.GetFromJsonAsync<bool>($"http://192.168.1.103:6320/api/Income/CheckIfIncomeIsRecurring?incomeId={incomeModel.Id}");
     }
 
     public async Task AddIncome(CreateIncomeModel createIncomeModel)
     {
-        await _httpClient.PostAsJsonAsync("http://localhost:5179/api/Income/CreateIncome", createIncomeModel);
+        await _httpClient.PostAsJsonAsync("http://192.168.1.103:6320/api/Income/CreateIncome", createIncomeModel);
     }
 
     public async Task AddRecurringIncome(CreateIncomeModel createIncomeModel)
     {
-        await _httpClient.PostAsJsonAsync("http://localhost:5179/api/Income/CreateRecurringIncome", createIncomeModel);
+        await _httpClient.PostAsJsonAsync("http://192.168.1.103:6320/api/Income/CreateRecurringIncome", createIncomeModel);
     }
     
     public async Task UpdateRecurringIncome(IncomeModel incomeModel)
     {
-        await _httpClient.PostAsJsonAsync("http://localhost:5179/api/Income/UpdateRecurringIncome", incomeModel);
+        await _httpClient.PostAsJsonAsync("http://192.168.1.103:6320/api/Income/UpdateRecurringIncome", incomeModel);
     }
     
     public async Task DeleteRecurringIncome(IncomeModel incomeModel)
     { 
-        await _httpClient.GetAsync($"http://localhost:5179/api/Income/DeleteRecurringIncome?recurringIncomeId={incomeModel.Id}");
+        await _httpClient.GetAsync($"http://192.168.1.103:6320/api/Income/DeleteRecurringIncome?recurringIncomeId={incomeModel.Id}");
     }
     
     public async Task AddRecurringIncomeAsIncome(IncomeModel incomeModel, EconomyPlanModel economyPlanModel)
     {
-        await _httpClient.GetAsync($"http://localhost:5179/api/Income/AddRecurringIncomeAsIncome?recurringIncomeId={incomeModel.Id}&economyPlanId={economyPlanModel.Id}");
+        await _httpClient.GetAsync($"http://192.168.1.103:6320/api/Income/AddRecurringIncomeAsIncome?recurringIncomeId={incomeModel.Id}&economyPlanId={economyPlanModel.Id}");
     }
 
     public async Task<IEnumerable<IncomeModel>> GetAllIncomesLinkedToRecurringIncome(IncomeModel incomeModel)
     {
-        return await _httpClient.GetFromJsonAsync<IEnumerable<IncomeModel>>($"http://localhost:5179/api/Income/GetAllIncomesLinkedToRecurringIncome?recurringIncomeId={incomeModel.Id}") ?? Enumerable.Empty<IncomeModel>();
+        return await _httpClient.GetFromJsonAsync<IEnumerable<IncomeModel>>($"http://192.168.1.103:6320/api/Income/GetAllIncomesLinkedToRecurringIncome?recurringIncomeId={incomeModel.Id}") ?? Enumerable.Empty<IncomeModel>();
     }
     
     public async Task<IncomeModel?> GetRecurringIncomeFromIncome(IncomeModel incomeModel)
     {
-        return await _httpClient.GetFromJsonAsync<IncomeModel?>($"http://localhost:5179/api/Income/GetRecurringIncomeFromIncome?incomeId={incomeModel.Id}");
+        return await _httpClient.GetFromJsonAsync<IncomeModel?>($"http://192.168.1.103:6320/api/Income/GetRecurringIncomeFromIncome?incomeId={incomeModel.Id}");
     }
 }
