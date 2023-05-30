@@ -1,13 +1,13 @@
 ﻿@using EconomyPlanner.Web.Models
 @using EconomyPlanner.Web.Services.Interfaces
 
-<p>Name:</p>
+<p>Namn:</p>
 <input class="form-control" type="text" @bind="NewExpense.Name">
 <br/>
-<p>Amount:</p>
+<p>Belopp:</p>
 <input class="form-control" type="number" @bind="NewExpense.Amount">
 <br/>
-<p>Expense type:</p>
+<p>Typ:</p>
 <div class="form-group">
     <select class="form-control" id="transactionTypeSelector" onchange="@SelectorOnChange">
         @foreach (var expenseType in ExpenseTypes)
@@ -19,15 +19,15 @@
 <br/>
 <div class="form-check">
     <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault" @onchange="eventArgs => { RecurringCheckboxClicked(eventArgs.Value); }">
-    <label class="form-check-label" for="flexSwitchCheckDefault">Make recurring</label>
+    <label class="form-check-label" for="flexSwitchCheckDefault">Gör återkommande</label>
 </div>
 <br/>
 <div hidden="@HideRecurringForm">
-    <p>Recurring amount:</p>
+    <p>Återkommande belopp:</p>
     <input class="form-control" type="number" @bind="NewExpense.RecurringAmount">
 </div>
 <br/>
-<button class="btn btn-dark text-center" @onclick="AddExpense">Add</button>
+<button class="btn btn-dark text-center" @onclick="AddExpense">Lägg till</button>
 @code
 {
     [Inject]

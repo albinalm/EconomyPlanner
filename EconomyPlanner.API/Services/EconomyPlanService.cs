@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using EconomyPlanner.API.Helpers;
 using EconomyPlanner.API.Interfaces;
 using EconomyPlanner.Repository.Configuration;
 using EconomyPlanner.Repository.Entities;
@@ -9,11 +10,13 @@ public class EconomyPlanService : IEconomyPlanService
 {
     private readonly DatabaseContext _dbContext;
     private readonly IMapper _mapper;
+    private readonly ITimeService _timeService;
 
-    public EconomyPlanService(DatabaseContext dbContext, IMapper mapper)
+    public EconomyPlanService(DatabaseContext dbContext, IMapper mapper, ITimeService timeService)
     {
         _dbContext = dbContext;
         _mapper = mapper;
+        _timeService = timeService;
     }
 
     public void CreateEconomyPlan(string name, string householdGuid, DateTime period)
@@ -90,12 +93,9 @@ public class EconomyPlanService : IEconomyPlanService
         if (household is null)
             throw new InvalidOperationException("GetEconomyPlansFromHouseholdId > Household not found");
 
-        var economyPlans = _dbContext.GetEconomyPlansFromHousehold(household).ToList();
-
-        if (!economyPlans.Any())
-            throw new InvalidOperationException("GetEconomyPlansFromHouseholdId > No economyplans found");
-
-        return economyPlans;
+        var economyPlans = _dbContext.GetEconomyPlansFromHousehold(household)?.ToList();
+        
+        return economyPlans ?? Enumerable.Empty<EconomyPlan>();
     }
     
     public void RemoveIncome(int economyPlanId, int incomeId, bool removeRecurring)
@@ -129,5 +129,45 @@ public class EconomyPlanService : IEconomyPlanService
     public EconomyPlan? GetEconomyPlanByDate(DateTime startPeriod)
     {
         return _dbContext.EconomyPlans.FirstOrDefault(ep => ep.StartDate == startPeriod.ToString("yyyy-MM-dd"));
+    }
+
+    public void SetupActiveEconomyPlans(string guid)
+    {
+        var household = _dbContext.GetHouseholdFromGuid(guid);
+        
+        if (household is null)
+            throw new InvalidOperationException("SetupActiveEconomyPlans > Household not found");
+
+        var currentTime = _timeService.GetNow();
+        
+        var activeEconomyPlans = GetEconomyPlansFromHouseholdId(guid).Where(ep => DateTime.Parse(ep.EndDate) >= currentTime).ToList();
+
+        if (activeEconomyPlans.Count == 2)
+        {
+            return;
+        }
+
+        if (activeEconomyPlans.Count == 1)
+        {
+            var month = currentTime.Month;
+            var economyPlanMonth = DateTime.Parse(activeEconomyPlans.Single().EndDate).Month;
+
+            if (month != economyPlanMonth)
+            {
+                var period = currentTime.AddMonths(1);
+                CreateEconomyPlan(EconomyPlanHelper.GetEconomyPlanName(period), guid, period);
+            }
+            else
+            {
+                CreateEconomyPlan(EconomyPlanHelper.GetEconomyPlanName(currentTime), guid, currentTime);
+            }
+        }
+        
+        else if (!activeEconomyPlans.Any())
+        {
+            var futureMonthDate = currentTime.AddMonths(1);
+            CreateEconomyPlan(EconomyPlanHelper.GetEconomyPlanName(currentTime), household.Guid, currentTime);
+            CreateEconomyPlan(EconomyPlanHelper.GetEconomyPlanName(futureMonthDate), household.Guid, futureMonthDate);
+        }
     }
 }

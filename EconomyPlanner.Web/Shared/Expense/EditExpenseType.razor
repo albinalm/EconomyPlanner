@@ -1,9 +1,9 @@
 ﻿@using EconomyPlanner.Web.Models
 @using EconomyPlanner.Web.Services.Interfaces
-<p>Old value:</p>
+<p>Tidigare typ:</p>
 <input class="form-control" type="text" placeholder="@ExpenseModel.ExpenseType" readonly>
 <br/>
-<p>New value:</p>
+<p>Ny typ:</p>
   <div class="form-group">
       <select class="form-control" id="transactionTypeSelector" onchange="@SelectorOnChange">
           @foreach (var expenseType in ExpenseTypes)
@@ -13,7 +13,7 @@
       </select>
   </div>
 <br/>
-<button class="btn btn-dark text-center" @onclick="Save">Save</button>
+<button class="btn btn-dark text-center" @onclick="Save">Spara</button>
 @code
 {
     [CascadingParameter] BlazoredModalInstance BlazoredModal { get; set; } = default!;

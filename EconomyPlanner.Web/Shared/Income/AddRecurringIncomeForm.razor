@@ -1,13 +1,13 @@
 ﻿@using EconomyPlanner.Web.Models
 @using EconomyPlanner.Web.Services.Interfaces
 
-<p>Name:</p>
+<p>Namn:</p>
 <input class="form-control" type="text" @bind="NewRecurringIncome.Name">
 <br/>
-<p>Amount:</p>
+<p>Belopp:</p>
 <input class="form-control" type="number" @bind="NewRecurringIncome.Amount">
 <br/>
-<p>Income type:</p>
+<p>Typ:</p>
 <div class="form-group">
     <select class="form-control" id="transactionTypeSelector" onchange="@SelectorOnChange">
         @foreach (var incomeType in IncomeTypes)
@@ -17,7 +17,7 @@
     </select>
 </div>
 <br/>
-<button class="btn btn-dark text-center" @onclick="AddIncome">Add</button>
+<button class="btn btn-dark text-center" @onclick="AddIncome">Lägg till</button>
 @code
 {
     [Inject]

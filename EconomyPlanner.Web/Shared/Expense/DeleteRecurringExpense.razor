@@ -2,10 +2,10 @@
 @using EconomyPlanner.Web.Models
 
 <p>@PreText<b>@RecurringExpenseModel.Name</b>?</p>
-<p hidden="@HideSeveralExpensesMessage" class="font-italic text-danger">This recurring expense is linked to multiple expenses. Removing this will keep but unlink all connected expenses</p>
+<p hidden="@HideSeveralExpensesMessage" class="font-italic text-danger">Denna återkommande utgift är kopplad till flera utgifter. Genom att ta bort denna kommer du bevara de tidigare kopplade utgifterna.</p>
 <br/>
-<button class="btn btn-warning text-center" @onclick="Delete">Yes</button>
-<button class="btn btn-info text-center" @onclick="Close">No</button>
+<button class="btn btn-warning text-center" @onclick="Delete">Ta bort</button>
+<button class="btn btn-info text-center" @onclick="Close">Avbryt</button>
 
 @code
 {

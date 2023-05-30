@@ -2,10 +2,10 @@
 @using EconomyPlanner.Web.Models
 
 <p>@PreText<b>@RecurringIncomeModel.Name</b>?</p>
-<p hidden="@HideSeveralIncomesMessage" class="font-italic text-danger">This recurring income is linked to multiple incomes. Removing this will keep but unlink all connected incomes</p>
+<p hidden="@HideSeveralIncomesMessage" class="font-italic text-danger">Denna återkommande utgift är kopplad till flera inkomster. Genom att ta bort denna kommer du bevara de tidigare kopplade inkomsterna.</p>
 <br/>
-<button class="btn btn-warning text-center" @onclick="Delete">Yes</button>
-<button class="btn btn-info text-center" @onclick="Close">No</button>
+<button class="btn btn-warning text-center" @onclick="Delete">Ta bort</button>
+<button class="btn btn-info text-center" @onclick="Close">Avbryt</button>
 
 @code
 {

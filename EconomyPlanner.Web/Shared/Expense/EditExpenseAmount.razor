@@ -1,12 +1,12 @@
 ﻿@using EconomyPlanner.Web.Models
 @using EconomyPlanner.Web.Services.Interfaces
-<p>Old value:</p>
+<p>Tidigare belopp:</p>
 <input class="form-control" type="text" placeholder="@ExpenseModel.Amount" readonly>
 <br/>
-<p>New value:</p>
+<p>Nytt belopp:</p>
 <input class="form-control" type="number" @bind="NewExpenseAmount" placeholder="@ExpenseModel.Amount">
 <br/>
-<button class="btn btn-dark text-center" @onclick="Save">Save</button>
+<button class="btn btn-dark text-center" @onclick="Save">Spara</button>
 @code
 {
     [CascadingParameter] BlazoredModalInstance BlazoredModal { get; set; } = default!;

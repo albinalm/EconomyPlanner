@@ -35,10 +35,11 @@ public class DatabaseContext : DbContext
     public Income? GetIncomeFromId(int incomeId) => Incomes.Find(incomeId);
     public RecurringExpense? GetRecurringExpenseFromId(int recurringExpenseId) => RecurringExpenses.Find(recurringExpenseId);
     public RecurringIncome? GetRecurringIncomeFromId(int recurringIncomeId) => RecurringIncomes.Find(recurringIncomeId);
-
-    public IEnumerable<EconomyPlan> GetEconomyPlansFromHousehold(Household household)
+    public IEnumerable<EconomyPlan>? GetEconomyPlansFromHousehold(Household household)
     {
-        return EconomyPlans.Where(e => household.EconomyPlans.Contains(e)).Include(e => e.Expenses).Include(e => e.Incomes);
+        return EconomyPlans.Any() 
+                   ? EconomyPlans.Where(e => household.EconomyPlans.Contains(e)).Include(e => e.Expenses).Include(e => e.Incomes)
+                   : null;
     }
 
 }

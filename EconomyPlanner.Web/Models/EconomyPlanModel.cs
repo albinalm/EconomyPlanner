@@ -6,4 +6,5 @@ public class EconomyPlanModel
     public string Name { get; set; } 
     
     public string EndDate { get; set; }
+    public bool IsActive { get; set; }
 }

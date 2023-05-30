@@ -32,8 +32,10 @@ public class HouseholdService : IHouseholdService
         
         _dbContext.Add(household);
         _dbContext.SaveChanges();
-        
-        _economyPlanService.CreateEconomyPlan(EconomyPlanHelper.GetEconomyPlanName(currentDate), household.Guid, currentDate);
-        _economyPlanService.CreateEconomyPlan(EconomyPlanHelper.GetEconomyPlanName(futureMonthDate), household.Guid, futureMonthDate);
+
+        _economyPlanService.SetupActiveEconomyPlans(household.Guid);
+        //
+        // _economyPlanService.CreateEconomyPlan(EconomyPlanHelper.GetEconomyPlanName(currentDate), household.Guid, currentDate);
+        // _economyPlanService.CreateEconomyPlan(EconomyPlanHelper.GetEconomyPlanName(futureMonthDate), household.Guid, futureMonthDate);
     }
 }

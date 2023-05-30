@@ -4,12 +4,12 @@
 <p>@PreText<b>@ExpenseModel.Name</b>?</p>
 <div class="form-check" hidden="@IsNotRecurring">
   <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault" hidden="@IsNotRecurring" @onchange="eventArgs => { RecurringCheckboxClicked(eventArgs.Value); }">
-  <label class="form-check-label" for="flexSwitchCheckDefault" hidden="@IsNotRecurring">Also delete recurring transaction</label>
-  <p hidden="@HideSeveralExpensesMessage" class="font-italic text-danger">The recurring expense is linked to multiple expenses. Checking this will unlink the all the other expenses from the recurring counterpart</p>
+  <label class="form-check-label" for="flexSwitchCheckDefault" hidden="@IsNotRecurring">Ta även bort kopplad återkommande utgift</label>
+  <p hidden="@HideSeveralExpensesMessage" class="font-italic text-danger">Denna återkommande utgift är kopplad till flera utgifter. Genom att välja detta kommer du löskoppla alla tidigare utgifter länkade till denna.</p>
 </div>
 <br/>
-<button class="btn btn-warning text-center" @onclick="Delete">Yes</button>
-<button class="btn btn-info text-center" @onclick="Close">No</button>
+<button class="btn btn-warning text-center" @onclick="Delete">Ta bort</button>
+<button class="btn btn-info text-center" @onclick="Close">Avbryt</button>
 
 @code
 {

@@ -1,13 +1,13 @@
 ﻿@using EconomyPlanner.Web.Services.Interfaces
 @using EconomyPlanner.Web.Models
 
-<p>Old value:</p>
+<p>Tidigare namn:</p>
 <input class="form-control" type="text" placeholder="@RecurringExpenseModel.Name" readonly>
 <br/>
-<p>New value:</p>
+<p>Nytt namn:</p>
 <input class="form-control" type="text" @bind="NewRecurringExpenseName" placeholder="@RecurringExpenseModel.Name">
 <br/>
-<button class="btn btn-dark text-center" @onclick="Save">Save</button>
+<button class="btn btn-dark text-center" @onclick="Save">Spara</button>
 @code
 {
     [CascadingParameter] BlazoredModalInstance BlazoredModal { get; set; } = default!;

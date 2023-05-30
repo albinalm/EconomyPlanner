@@ -2,13 +2,13 @@
 @page "/login"
 @using EconomyPlanner.Web.Services.Interfaces
 
-<PageTitle>Counter</PageTitle>
+<PageTitle>Logga in på ditt hushåll</PageTitle>
 
-<h1>Login to EconomyPlanner</h1>
+<h1>Logga in på ditt hushåll</h1>
 <br/>
-<p>Please login by entering your guid below:</p>
+<p>Vänligen mata in ditt hushålls-ID nedan:</p>
 <input type="text" id="txt_guid" name="txt_guid" @bind="TxtGuidText">
-<button @onclick="SetGuid">Submit</button>
+<button @onclick="SetGuid">Logga in</button>
 
 @code{
 
@@ -25,7 +25,7 @@
             NavManager.NavigateTo("/", forceLoad: true);
         }
         
-        Console.WriteLine("Login failed :(");
+        Console.WriteLine("Inloggning misslyckades :(");
     }
 
     protected override async Task OnInitializedAsync()

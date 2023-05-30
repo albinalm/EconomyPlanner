@@ -69,4 +69,18 @@ public class EconomyPlanController : ControllerBase
             return StatusCode(500, ex.Message);
         }
     }
+
+    [HttpGet(Name = "SetupActiveEconomyPlans")]
+    public IActionResult SetupActiveEconomyPlans(string guid)
+    {
+        try
+        {
+            _economyPlanService.SetupActiveEconomyPlans(guid);
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ex.Message);
+        }
+    }
 }

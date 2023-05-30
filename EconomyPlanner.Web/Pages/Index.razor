@@ -5,7 +5,7 @@
 
 <PageTitle>Index</PageTitle>
 
-<h1>Economic overview</h1>
+<h1>Ekonomisk översikt</h1>
 <Dropdown TItem="EconomyPlanModel" OnSelected="@OnSelected">
     <InitialTip>@InitialEconomyPlanName</InitialTip>
     <ChildContent>
@@ -20,7 +20,7 @@
 <br/>
 <br/>
 <p>
-    <b>Incomes:</b>
+    <b>Inkomster:</b>
 </p>
 <div class="alert alert-secondary mt-4">
     @foreach (var incomeType in IncomeTypes)
@@ -32,14 +32,14 @@
         <br/>
     }
     <br/>
-    <p class="font-weight-bold float-left">Total: @_incomeModels.Select(i => i.Amount).Sum():-</p>
+    <p class="font-weight-bold float-left">Totalbelopp: @_incomeModels.Select(i => i.Amount).Sum():-</p>
     <br/>
 </div>
 
 <br/>
 
 <p>
-    <b>Expenses:</b>
+    <b>Utgifter:</b>
 </p>
 <div class="alert alert-secondary mt-4">
     @foreach (var expenseType in ExpenseTypes)
@@ -51,12 +51,12 @@
         <br/>
     }
     <br/>
-    <p class="font-weight-bold float-left">Total: @_expenseModels.Select(e => e.Amount).Sum():-</p>
+    <p class="font-weight-bold float-left">Totalbelopp: @_expenseModels.Select(e => e.Amount).Sum():-</p>
     <br/>
 </div>
 
 @code{
-
+    
     [Inject]
     private IEconomyPlanService EconomyPlanService { get; set; } = null!;
 
@@ -69,10 +69,14 @@
     [Inject]
     private IHouseholdService HouseholdService { get; set; } = default!;
 
+    private static bool HasUpdatedEconomyPlans { get; set; }
     private EconomyPlanModel? SelectedEconomyPlan { get; set; }
     private List<ExpenseModel> _expenseModels = new();
     private List<IncomeModel> _incomeModels = new();
     private List<EconomyPlanModel> _economyPlanModels = new();
+
+    private List<EconomyPlanModel> _activeEconomyPlans = new();
+    
     private string InitialEconomyPlanName { get; set; } = "";
     private IEnumerable<string> IncomeTypes { get; set; } = Enumerable.Empty<string>();
     private IEnumerable<string> ExpenseTypes { get; set; } = Enumerable.Empty<string>();
@@ -82,22 +86,37 @@
     protected override async Task OnInitializedAsync()
     {
         if (!await HouseholdService.HasSavedLogin())
+        {
             NavManager.NavigateTo("/login");
+        }
         else
-            await InitializePage();
+        {
+            if (!await HouseholdService.AttemptLogin(await HouseholdService.GetGuid()))
+            {
+                NavManager.NavigateTo("/login");
+            }
+            else
+            {
+                await InitializePage();   
+            }
+        }
+            
     }
 
     private async Task InitializePage()
     {
-        await GetEconomyPlanModels();
-        if (_economyPlanModels.Any())
+        if (!HasUpdatedEconomyPlans)
         {
-            SelectedEconomyPlan = _economyPlanModels.First();
+            await SetupActiveEconomyPlans(); 
+        }
+        
+        await GetEconomyPlanModels();
+        
+        if (_activeEconomyPlans.Any())
+        {
+            SelectedEconomyPlan = _activeEconomyPlans.First();
             InitialEconomyPlanName = SelectedEconomyPlan.Name;
-            Console.WriteLine("Get expenses");
             _expenseModels = (await ExpenseService.GetExpenses(SelectedEconomyPlan)).ToList();
-            Console.WriteLine(_expenseModels.First().Name);
-            Console.WriteLine("Get incomes");
             _incomeModels = (await IncomeService.GetIncomes(SelectedEconomyPlan)).ToList();
             IncomeTypes = await IncomeService.GetIncomeTypes();
             ExpenseTypes = await ExpenseService.GetExpenseTypes();
@@ -107,6 +126,13 @@
     private async Task GetEconomyPlanModels()
     {
         _economyPlanModels = (await EconomyPlanService.GetEconomyPlans()).ToList();
+        _activeEconomyPlans = _economyPlanModels.Where(ep => ep.IsActive).ToList();
+    }
+
+    private async Task SetupActiveEconomyPlans()
+    {
+        await EconomyPlanService.SetupActiveEconomyPlans();
+        HasUpdatedEconomyPlans = true;
     }
 
     private string GetIconFromType(string transactionType)
@@ -137,7 +163,7 @@
         _expenseModels = (await ExpenseService.GetExpenses(selection)).ToList();
         _incomeModels = (await IncomeService.GetIncomes(selection)).ToList();
         SelectedEconomyPlan = selection;
-        Console.WriteLine("Current economy plan!" + SelectedEconomyPlan.Name + " ID: " + SelectedEconomyPlan.Id);
+       
     }
 
     private (string caption, string style) GetOverviewCaption(decimal result)

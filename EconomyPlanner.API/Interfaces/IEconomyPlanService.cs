@@ -10,4 +10,5 @@ public interface IEconomyPlanService
     void RemoveIncome(int economyPlanId, int incomeId, bool removeRecurring);
     EconomyPlan? GetEconomyPlan(int economyPlanId);
     EconomyPlan? GetEconomyPlanByDate(DateTime startPeriod);
+    void SetupActiveEconomyPlans(string guid);
 }
