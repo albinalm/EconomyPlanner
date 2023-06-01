@@ -56,9 +56,9 @@ public class EconomyPlanService : IEconomyPlanService
         await _httpClient.GetAsync($"http://192.168.1.103:6320/api/EconomyPlan/SetupActiveEconomyPlans?guid={await _householdService.GetGuid()}");
     }
     
-    public async Task<IEnumerable<EconomyPlanModel>> GetLastSixEconomyPlanModels(string guid)
+    public async Task<IEnumerable<EconomyPlanModel>> TryGetOneYearEconomyPlanModels(string guid)
     {
-        return await _httpClient.GetFromJsonAsync<IEnumerable<EconomyPlanModel>>($"http://192.168.1.103:6320/api/EconomyPlan/GetLastSixEconomyPlans?guid={guid}") 
+        return await _httpClient.GetFromJsonAsync<IEnumerable<EconomyPlanModel>>($"http://192.168.1.103:6320/api/EconomyPlan/TryGetOneYearEconomyPlans?guid={guid}") 
                ?? Enumerable.Empty<EconomyPlanModel>();
     }
 }

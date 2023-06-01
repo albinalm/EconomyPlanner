@@ -84,12 +84,12 @@ public class EconomyPlanController : ControllerBase
         }
     }
     
-    [HttpGet(Name = "GetLastSixEconomyPlans")] 
-    public IActionResult GetLastSixEconomyPlans(string guid)
+    [HttpGet(Name = "TryGetOneYearEconomyPlans")] 
+    public IActionResult TryGetOneYearEconomyPlans(string guid)
     {
         try
         {
-            return Ok( _economyPlanService.GetLastSixEconomyPlans(guid));
+            return Ok( _economyPlanService.TryGetOneYearEconomyPlans(guid));
         }
         catch (Exception ex)
         {

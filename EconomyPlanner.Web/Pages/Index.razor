@@ -8,7 +8,7 @@
 
 <PageTitle>Ekonomisk översikt</PageTitle>
 
-<h1 class="bi bi-stack text-info"> Ekonomisk översikt</h1>
+<h1 class="bi bi-stack text-success"> Ekonomisk översikt</h1>
 <br/>
 <Dropdown TItem="EconomyPlanModel" OnSelected="@OnSelected">
     <InitialTip>@InitialEconomyPlanName</InitialTip>
@@ -82,7 +82,7 @@
         </SfAccumulationChart>
     </div>
     <div class="col">
-        <SfChart Title="Genomsnittliga utgifter kontra nuvarande utgifter per kategori">
+        <SfChart Title="Genomsnittliga utgifter kontra nuvarande utgifter per kategori" Palettes="@_averageCharPalettes">
             <ChartPrimaryXAxis ValueType="Syncfusion.Blazor.Charts.ValueType.Category"></ChartPrimaryXAxis>
             <ChartSeriesCollection>
                 <ChartSeries DataSource="@_expenseAverageBarDetails" Name="Nuvarande belopp" XName="Type" YName="CurrentAmount" Type="ChartSeriesType.StackingColumn">
@@ -94,11 +94,11 @@
         </SfChart>
     </div>
     <div class="col">
-        <SfChart Title="Utgifter kontra inkomst per månad">
+        <SfChart Title="Utgifter kontra inkomst per månad" Palettes="@_barChartPalettes">
             <ChartPrimaryXAxis ValueType="Syncfusion.Blazor.Charts.ValueType.Category">
             </ChartPrimaryXAxis>
             <ChartSeriesCollection>
-                <ChartSeries DataSource="@_expenseBarDetails" XName="Month" YName="Amount" Type="ChartSeriesType.Bar" Name="Kostnad">
+                <ChartSeries DataSource="@_expenseBarDetails" XName="Month" YName="Amount" Type="ChartSeriesType.Bar" Name="Kostnad" ColumnSpacing="0.1">
                     <ChartMarker>
                         <ChartDataLabel Visible="false" Position="LabelPosition.Top">
                             <ChartDataLabelFont FontWeight="600" Color="#ffffff"></ChartDataLabelFont>
@@ -108,7 +108,7 @@
             </ChartSeriesCollection>
 
             <ChartSeriesCollection>
-                <ChartSeries DataSource="@_incomeBarDetails" XName="Month" YName="Amount" Type="ChartSeriesType.Bar" Name="Inkomst">
+                <ChartSeries DataSource="@_incomeBarDetails" XName="Month" YName="Amount" Type="ChartSeriesType.Bar" Name="Inkomst" ColumnSpacing="0.1">
                     <ChartMarker>
                         <ChartDataLabel Visible="false" Position="LabelPosition.Top">
                             <ChartDataLabelFont FontWeight="600" Color="#ffffff"></ChartDataLabelFont>
@@ -121,7 +121,7 @@
 </div>
 
 
-<p class="font-italic form-control-sm">*Baserat på max de senaste 6 månaderna eller antal ekonomiplaner beroende på vilket som är högst</p>
+<p class="font-italic form-control-sm">*Baserat på max de senaste 12 månaderna eller antal ekonomiplaner beroende på vilket som är högst</p>
 
 @code{
 
@@ -159,6 +159,9 @@
     private string OverviewCaption => GetOverviewCaption(_incomeModels.Select(i => i.Amount).Sum() - _expenseModels.Select(e => e.Amount).Sum()).caption;
     private string OverviewStyle => GetOverviewCaption(_incomeModels.Select(i => i.Amount).Sum() - _expenseModels.Select(e => e.Amount).Sum()).style;
 
+    private readonly string[] _barChartPalettes = { "#30bcd1", "#b3db44" };
+    private readonly string[] _averageCharPalettes = { "#30a9d1", "#292929" };
+    
     protected override async Task OnInitializedAsync()
     {
         if (!await HouseholdService.HasSavedLogin())
@@ -240,7 +243,7 @@
                                    AmountLabel = GetAmountLabel(totalSum, totalExpenses.Sum(expense => expense.Amount))
                                });
         }
-
+        
         _expensePieDetails = expensePieData;
         _expenseAverageBarDetails = expenseAverageBarData;
     }
@@ -257,7 +260,7 @@
 
         if (guid is null) return;
 
-        var economyPlans = await EconomyPlanService.GetLastSixEconomyPlanModels(guid);
+        var economyPlans = await EconomyPlanService.TryGetOneYearEconomyPlanModels(guid);
 
         var expenseBarData = new List<TransactionBarChart>();
         var incomeBarData = new List<TransactionBarChart>();

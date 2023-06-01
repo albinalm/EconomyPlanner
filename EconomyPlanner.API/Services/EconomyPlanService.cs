@@ -188,12 +188,12 @@ public class EconomyPlanService : IEconomyPlanService
         }
     }
 
-    public IEnumerable<EconomyPlan> GetLastSixEconomyPlans(string guid)
+    public IEnumerable<EconomyPlan> TryGetOneYearEconomyPlans(string guid)
     {
         var household = _dbContext.GetHouseholdFromGuid(guid);
         
         if (household is null)
-            throw new InvalidOperationException("EconomyPlanService > GetLastSixEconomyPlans Household not found");
+            throw new InvalidOperationException("EconomyPlanService > TryGetOneYearEconomyPlans Household not found");
         
         var economyPlans = _dbContext.GetEconomyPlansFromHousehold(household)?.ToList();
         
@@ -202,7 +202,7 @@ public class EconomyPlanService : IEconomyPlanService
             return Enumerable.Empty<EconomyPlan>();
         }
 
-        var latestEconomyPlans = economyPlans.OrderBy(ep => DateTime.Parse(ep.EndDate)).TakeLast(6).ToList();
+        var latestEconomyPlans = economyPlans.OrderBy(ep => DateTime.Parse(ep.EndDate)).TakeLast(12).ToList();
         
         return latestEconomyPlans;
     }
