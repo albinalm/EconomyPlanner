@@ -8,7 +8,7 @@
 
 <PageTitle>Inkomster för vald ekonomiplan</PageTitle>
 <br/>
-<h1 class="text-success bi bi-cash-stack"> Inkomster för vald ekonomiplan</h1>
+<h1 class="text-success bi bi-wallet-fill"> Inkomster för vald ekonomiplan</h1>
 <br/>
 <hr/>
 <br/>
@@ -44,19 +44,19 @@
         @foreach (var income in _incomeModels)
         {
             <div class="row">
-                <div class="col-md text-left">
+                <div class="col-md-5 text-left">
                     <div class="span2">
-                        <button class="btn btn-light btn-block btn-sm text-left @GetDisabledButtonClass()" @onclick="@(_ => ShowEditTypePopup(income))">@income.IncomeType</button>
+                        <button class="btn btn-info btn-block btn-sm text-left @GetDisabledButtonClass()" @onclick="@(_ => ShowEditNamePopup(income))">@income.Name</button>
                     </div>
                 </div>
-                <div class="col-md">
+                <div class="col-md-2">
                     <div class="span2">
-                        <button class="btn btn-light btn-block btn-sm text-left @GetDisabledButtonClass()" @onclick="@(_ => ShowEditNamePopup(income))">@income.Name</button>
+                        <button class="btn btn-light btn-block btn-sm text-left @GetDisabledButtonClass()" @onclick="@(_ => ShowEditAmountPopup(income))"><b>@income.Amount.ToNumberFormatString():-</b></button>
                     </div>
                 </div>
-                <div class="col-md">
+                <div class="col-md-3">
                     <div class="span2">
-                        <button class="btn btn-light btn-block btn-sm text-left @GetDisabledButtonClass()" @onclick="@(_ => ShowEditAmountPopup(income))">@income.Amount.ToNumberFormatString():-</button>
+                        <button class="btn btn-block btn-sm text-left @GetDisabledButtonClass()" @onclick="@(_ => ShowEditTypePopup(income))">@income.IncomeType</button>
                     </div>
                 </div>
                 <div class="col-md">
@@ -79,43 +79,43 @@
 <div class="alert alert-info mt-4">
     <div>
         <div class="row">
-            <div class="col-md">
+            <div class="col-md-4">
                 <b>Typ: </b>
             </div>
-            <div class="col-md">
+            <div class="col-md-2">
                 <b>Namn: </b>
             </div>
-            <div class="col-md">
+            <div class="col-md-3">
                 <b>Belopp: </b>
             </div>
-            <div class="col-md">
+            <div class="col-md-3">
             </div>
         </div>
         <hr/>
         @foreach (var recurringIncome in _recurringIncomes)
         {
             <div class="row">
-                <div class="col-md text-left">
+                <div class="col-md-4 text-left">
                     <div class="span2">
-                        <button class="btn btn-light btn-block btn-sm text-left @GetDisabledButtonClass()" @onclick="@(_ => ShowEditRecurringTypePopup(recurringIncome))">@recurringIncome.IncomeType</button>
+                        <button class="btn btn-info btn-block btn-sm text-left @GetDisabledButtonClass()" @onclick="@(_ => ShowEditRecurringNamePopup(recurringIncome))">@recurringIncome.Name</button>
                     </div>
                 </div>
-                <div class="col-md">
+                <div class="col-md-2">
                     <div class="span2">
-                        <button class="btn btn-light btn-block btn-sm text-left @GetDisabledButtonClass()" @onclick="@(_ => ShowEditRecurringNamePopup(recurringIncome))">@recurringIncome.Name</button>
+                        <button class="btn btn-light btn-block btn-sm text-left @GetDisabledButtonClass()" @onclick="@(_ => ShowEditRecurringAmountPopup(recurringIncome))"><b>@recurringIncome.Amount.ToNumberFormatString():-</b></button>
                     </div>
                 </div>
-                <div class="col-md">
+                <div class="col-md-3">
                     <div class="span2">
-                        <button class="btn btn-light btn-block btn-sm text-left @GetDisabledButtonClass()" @onclick="@(_ => ShowEditRecurringAmountPopup(recurringIncome))">@recurringIncome.Amount.ToNumberFormatString():-</button>
+                        <button class="btn btn-block btn-sm text-left @GetDisabledButtonClass()" @onclick="@(_ => ShowEditRecurringTypePopup(recurringIncome))">@recurringIncome.IncomeType</button>
                     </div>
                 </div>
-                <div class="col-md">
+                <div class="col-md-3">
+                                        <button class="btn btn-success btn-sm text-left @GetDisabledButtonClass()" @onclick="@(_ => AddIncomeFromRecurringIncome(recurringIncome))">
+                                            Lägg till i nuvarande ekonomiplan
+                                        </button>
                     <button class="btn btn-danger btn-sm text-left @GetDisabledButtonClass()" @onclick="@(_ => ShowDeleteRecurringPopup("Are you sure you wish to delete recurring income: ", recurringIncome))">
                         Ta bort
-                    </button>
-                    <button class="btn btn-success btn-sm text-left @GetDisabledButtonClass()" @onclick="@(_ => AddIncomeFromRecurringIncome(recurringIncome))">
-                        Lägg till i nuvarande ekonomiplan
                     </button>
                 </div>
             </div>
@@ -150,10 +150,10 @@
     private string GetDisabledButtonClass()
     {
         if (SelectedEconomyPlan is null) return "disabled";
-        
+
         return SelectedEconomyPlan.IsActive ? string.Empty : "disabled";
     }
-    
+
     private decimal TotalIncomeCost
     {
         get { return _incomeModels.Select(e => e.Amount).Sum(); }
@@ -214,7 +214,7 @@
     {
         if (SelectedEconomyPlan is null || !SelectedEconomyPlan.IsActive)
             return;
-        
+
         var parameters = new ModalParameters()
             .Add(nameof(DeleteIncome.PreText), preText)
             .Add(nameof(DeleteIncome.IncomeModel), incomeModel);
@@ -232,7 +232,7 @@
     {
         if (SelectedEconomyPlan is null || !SelectedEconomyPlan.IsActive)
             return;
-        
+
         var parameters = new ModalParameters()
             .Add(nameof(EditIncomeAmount.IncomeModel), incomeModel);
 
@@ -248,7 +248,7 @@
     {
         if (SelectedEconomyPlan is null || !SelectedEconomyPlan.IsActive)
             return;
-        
+
         var parameters = new ModalParameters()
             .Add(nameof(EditIncomeName.IncomeModel), incomeModel);
 
@@ -264,7 +264,7 @@
     {
         if (SelectedEconomyPlan is null || !SelectedEconomyPlan.IsActive)
             return;
-        
+
         var parameters = new ModalParameters()
             .Add(nameof(EditIncomeType.IncomeModel), incomeModel)
             .Add(nameof(EditIncomeType.IncomeTypes), await IncomeService.GetIncomeTypes());
@@ -281,7 +281,7 @@
     {
         if (SelectedEconomyPlan is null || !SelectedEconomyPlan.IsActive)
             return;
-        
+
         var guid = await HouseholdService.GetGuid();
 
         if (string.IsNullOrEmpty(guid)) return;
@@ -304,7 +304,7 @@
     {
         if (SelectedEconomyPlan is null || !SelectedEconomyPlan.IsActive)
             return;
-        
+
         var guid = await HouseholdService.GetGuid();
 
         if (string.IsNullOrEmpty(guid)) return;
@@ -325,7 +325,7 @@
     {
         if (SelectedEconomyPlan is null || !SelectedEconomyPlan.IsActive)
             return;
-        
+
         var parameters = new ModalParameters()
             .Add(nameof(EditRecurringIncomeAmount.RecurringIncomeModel), incomeModel);
 
@@ -341,7 +341,7 @@
     {
         if (SelectedEconomyPlan is null || !SelectedEconomyPlan.IsActive)
             return;
-        
+
         var parameters = new ModalParameters()
             .Add(nameof(EditRecurringIncomeName.RecurringIncomeModel), incomeModel);
 
@@ -357,7 +357,7 @@
     {
         if (SelectedEconomyPlan is null || !SelectedEconomyPlan.IsActive)
             return;
-        
+
         var parameters = new ModalParameters()
             .Add(nameof(EditRecurringIncomeType.RecurringIncomeModel), incomeModel)
             .Add(nameof(EditRecurringIncomeType.IncomeTypes), await IncomeService.GetIncomeTypes());
@@ -374,7 +374,7 @@
     {
         if (SelectedEconomyPlan is null || !SelectedEconomyPlan.IsActive)
             return;
-        
+
         var parameters = new ModalParameters()
             .Add(nameof(DeleteRecurringIncome.PreText), preText)
             .Add(nameof(DeleteRecurringIncome.RecurringIncomeModel), incomeModel);

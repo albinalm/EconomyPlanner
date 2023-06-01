@@ -28,13 +28,13 @@
 <div class="alert alert-info mt-4">
     <div>
         <div class="row">
-            <div class="col-md">
+            <div class="col-md-5">
                 <b>Namn: </b>
             </div>
-            <div class="col-md">
+            <div class="col-md-2">
                 <b>Belopp: </b>
             </div>
-            <div class="col-md">
+            <div class="col-md-3">
                 <b>Typ: </b>
             </div>
             <div class="col-md">
@@ -44,17 +44,19 @@
         @foreach (var expense in _expenseModels)
         {
             <div class="row">
-                <div class="col-md-2 text-left">
+                <div class="col-md-5 text-left">
                     <div class="span2">
-                        <button class="btn btn-light btn-block btn-sm text-left @GetDisabledButtonClass()" @onclick="@(_ => ShowEditNamePopup(expense))">@expense.Name</button>
+                        <button class="btn btn-info btn-block btn-sm text-left @GetDisabledButtonClass()" @onclick="@(_ => ShowEditNamePopup(expense))">@expense.Name</button>
                     </div>
                 </div>
                 <div class="col-md-2">
                     <div class="span2">
-                        <button class="btn btn-light btn-block btn-sm text-left @GetDisabledButtonClass()" @onclick="@(_ => ShowEditAmountPopup(expense))">@expense.Amount.ToNumberFormatString():-</button>
+                        <button class="btn btn-light btn-block btn-sm text-left @GetDisabledButtonClass()" @onclick="@(_ => ShowEditAmountPopup(expense))">
+                            <b>@expense.Amount.ToNumberFormatString():-</b>
+                        </button>
                     </div>
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-3">
                     <div class="span2">
                         <button class="btn btn-block btn-sm text-left @GetDisabledButtonClass()" @onclick="@(_ => ShowEditTypePopup(expense))">@expense.ExpenseType</button>
                     </div>
@@ -79,43 +81,43 @@
 <div class="alert alert-info mt-4">
     <div>
         <div class="row">
-            <div class="col-md">
+            <div class="col-md-4">
                 <b>Typ: </b>
             </div>
-            <div class="col-md">
+            <div class="col-md-2">
                 <b>Namn: </b>
             </div>
-            <div class="col-md">
+            <div class="col-md-3">
                 <b>Belopp: </b>
             </div>
-            <div class="col-md">
+            <div class="col-md-3">
             </div>
         </div>
         <hr/>
         @foreach (var recurringExpense in _recurringExpenses)
         {
             <div class="row">
-                <div class="col-md text-left">
+                <div class="col-md-4 text-left">
                     <div class="span2">
-                        <button class="btn btn-light btn-block btn-sm text-left @GetDisabledButtonClass()" @onclick="@(_ => ShowEditRecurringTypePopup(recurringExpense))">@recurringExpense.ExpenseType</button>
+                        <button class="btn btn-info btn-block btn-sm text-left @GetDisabledButtonClass()" @onclick="@(_ => ShowEditRecurringNamePopup(recurringExpense))">@recurringExpense.Name</button>
                     </div>
                 </div>
-                <div class="col-md">
+                <div class="col-md-2">
                     <div class="span2">
-                        <button class="btn btn-light btn-block btn-sm text-left @GetDisabledButtonClass()" @onclick="@(_ => ShowEditRecurringNamePopup(recurringExpense))">@recurringExpense.Name</button>
+                        <button class="btn btn-light btn-block btn-sm text-left @GetDisabledButtonClass()" @onclick="@(_ => ShowEditRecurringAmountPopup(recurringExpense))"><b>@recurringExpense.Amount.ToNumberFormatString():-</b></button>
                     </div>
                 </div>
-                <div class="col-md">
+                <div class="col-md-3">
                     <div class="span2">
-                        <button class="btn btn-light btn-block btn-sm text-left @GetDisabledButtonClass()" @onclick="@(_ => ShowEditRecurringAmountPopup(recurringExpense))">@recurringExpense.Amount.ToNumberFormatString():-</button>
+                        <button class="btn btn-block btn-sm text-left @GetDisabledButtonClass()" @onclick="@(_ => ShowEditRecurringTypePopup(recurringExpense))">@recurringExpense.ExpenseType</button>
                     </div>
                 </div>
-                <div class="col-md">
-                    <button class="btn btn-danger btn-sm text-left @GetDisabledButtonClass()" @onclick="@(_ => ShowDeleteRecurringPopup("Är du säker på att du vill ta bort återkommande utgift ", recurringExpense))">
-                        Ta bort
-                    </button>
+                <div class="col-md-3">
                     <button class="btn btn-success btn-sm text-left @GetDisabledButtonClass()" @onclick="@(_ => AddExpenseFromRecurringExpense(recurringExpense, SelectedEconomyPlan))">
                         Lägg till i nuvarande ekonomiplan
+                    </button>
+                    <button class="btn btn-danger btn-sm text-left @GetDisabledButtonClass()" @onclick="@(_ => ShowDeleteRecurringPopup("Är du säker på att du vill ta bort återkommande utgift ", recurringExpense))">
+                        Ta bort
                     </button>
                 </div>
             </div>
