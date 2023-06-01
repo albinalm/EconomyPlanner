@@ -1,4 +1,6 @@
-﻿namespace EconomyPlanner.Web.Extensions;
+﻿using EconomyPlanner.Web.Helpers;
+
+namespace EconomyPlanner.Web.Extensions;
 
 public static class StringExtensions
 {
@@ -9,4 +11,10 @@ public static class StringExtensions
             "" => throw new ArgumentException($@"{nameof(input)} cannot be empty", nameof(input)),
             _ => string.Concat(input[0].ToString().ToUpper(), input.AsSpan(1))
         };
+
+    public static string ToNumberFormatString(this decimal input)
+    {
+        var numberCulture = NumberCultureHelper.GetNumberCulture();
+        return Math.Round(input, 2).ToString("#,0.00", numberCulture).Replace($"{numberCulture.CurrencyDecimalSeparator}00", "");
+    }
 }

@@ -29,12 +29,12 @@
     {
         <span class="@GetIconFromType(incomeType)" aria-hidden="true"></span>
         <span class="text-nowrap">
-            <b>@incomeType</b> @GetSumPerIncomeType(incomeType):-
+            <b>@incomeType</b> @GetSumPerIncomeType(incomeType).ToNumberFormatString():-
         </span>
         <br/>
     }
     <br/>
-    <p class="font-weight-bold float-left">Totalbelopp: @_incomeModels.Select(i => i.Amount).Sum():-</p>
+    <p class="font-weight-bold float-left">Totalbelopp: @_incomeModels.Select(i => i.Amount).Sum().ToNumberFormatString():-</p>
     <br/>
 </div>
 
@@ -48,12 +48,12 @@
     {
         <span class="@GetIconFromType(expenseType)" aria-hidden="true"></span>
         <span class="text-nowrap">
-            <b>@expenseType</b> @GetSumPerExpenseType(expenseType):-
+            <b>@expenseType</b> @GetSumPerExpenseType(expenseType).ToNumberFormatString():-
         </span>
         <br/>
     }
     <br/>
-    <p class="font-weight-bold float-left">Totalbelopp: @_expenseModels.Select(e => e.Amount).Sum():-</p>
+    <p class="font-weight-bold float-left">Totalbelopp: @_expenseModels.Select(e => e.Amount).Sum().ToNumberFormatString():-</p>
     <br/>
 </div>
 <br/>
@@ -68,14 +68,30 @@
 <div class="row">
     <div class="col">
         <SfAccumulationChart Title="Genomsnittliga utgifter">
+            <AccumulationChartTooltipSettings Enable="true"></AccumulationChartTooltipSettings>
             <AccumulationChartSeriesCollection>
                 <AccumulationChartSeries DataSource="@_expensePieDetails" XName="Type" YName="Amount"
                                          Name="Type" InnerRadius="40%">
+                    <AccumulationDataLabelSettings Name="AmountLabel" Visible="true" Position="AccumulationLabelPosition.Outside">
+                        <AccumulationChartDataLabelFont FontWeight="600"></AccumulationChartDataLabelFont>
+                        <AccumulationChartConnector Length="20px" Type="ConnectorType.Curve"></AccumulationChartConnector>
+                    </AccumulationDataLabelSettings>
                 </AccumulationChartSeries>
             </AccumulationChartSeriesCollection>
-
-            <AccumulationChartLegendSettings Visible="true"></AccumulationChartLegendSettings>
+            <AccumulationChartLegendSettings Visible="true" Alignment="Alignment.Far"></AccumulationChartLegendSettings>
         </SfAccumulationChart>
+    </div>
+    <div class="col">
+        <SfChart Title="Genomsnittliga utgifter kontra nuvarande utgifter per kategori">
+            <ChartPrimaryXAxis ValueType="Syncfusion.Blazor.Charts.ValueType.Category"></ChartPrimaryXAxis>
+            <ChartSeriesCollection>
+                <ChartSeries DataSource="@_expenseAverageBarDetails" Name="Nuvarande belopp" XName="Type" YName="CurrentAmount" Type="ChartSeriesType.StackingColumn">
+                </ChartSeries>
+                <ChartSeries DataSource="@_expenseAverageBarDetails" Name="Genomsnittligt belopp" XName="Type" YName="AverageAmount" Width="2" Opacity="0.6" Type="ChartSeriesType.Line">
+                    <ChartMarker Visible="true" Height="10" Width="10"></ChartMarker>
+                </ChartSeries>
+            </ChartSeriesCollection>
+        </SfChart>
     </div>
     <div class="col">
         <SfChart Title="Utgifter kontra inkomst per månad">
@@ -90,7 +106,7 @@
                     </ChartMarker>
                 </ChartSeries>
             </ChartSeriesCollection>
-            
+
             <ChartSeriesCollection>
                 <ChartSeries DataSource="@_incomeBarDetails" XName="Month" YName="Amount" Type="ChartSeriesType.Bar" Name="Inkomst">
                     <ChartMarker>
@@ -130,6 +146,8 @@
     private List<ExpensePieChart> _expensePieDetails = new();
 
     private List<TransactionBarChart> _expenseBarDetails = new();
+
+    private List<ExpenseAveragePerCategoryChart> _expenseAverageBarDetails = new();
 
     private List<TransactionBarChart> _incomeBarDetails = new();
 
@@ -177,32 +195,60 @@
             _incomeModels = (await IncomeService.GetIncomes(SelectedEconomyPlan)).ToList();
             IncomeTypes = await IncomeService.GetIncomeTypes();
             ExpenseTypes = await ExpenseService.GetExpenseTypes();
-            await PopulateExpensePie();
-            await PopulateTransactionBar();
+            await PopulateCharts();
         }
     }
 
-    private async Task PopulateExpensePie()
+    private async Task PopulateCharts()
+    {
+        await PopulateExpenseCharts();
+        await PopulateTransactionBar();
+    }
+    
+    private async Task PopulateExpenseCharts()
     {
         var guid = await HouseholdService.GetGuid();
 
         if (guid is null) return;
 
-        var totalExpenses = await ExpenseService.GetAllExpenseModelsFromLastSixEconomyPlans(guid);
+        var totalExpenses = (await ExpenseService.GetAllExpenseModelsFromLastSixEconomyPlans(guid)).ToList();
 
         var totalExpenseGroups = totalExpenses.GroupByMany(e => e.ExpenseType);
 
         var expensePieData = new List<ExpensePieChart>();
+        var expenseAverageBarData = new List<ExpenseAveragePerCategoryChart>();
 
         foreach (var expenseGroup in totalExpenseGroups)
         {
             var type = expenseGroup.Key.ToString();
 
             var totalSum = expenseGroup.Items.Cast<object>().Sum(expense => ((ExpenseModel)expense).Amount);
-            expensePieData.Add(new ExpensePieChart { Amount = totalSum, Type = type });
+            var average = expenseGroup.Items.Cast<object>().Average(expense => ((ExpenseModel)expense).Amount);
+            var current = GetSumPerExpenseType(type);
+            
+            expenseAverageBarData.Add(new ExpenseAveragePerCategoryChart
+                                      {
+                                          Type = type,
+                                          CurrentAmount = current,
+                                          AverageAmount = average
+                                      });
+            
+            expensePieData.Add(new ExpensePieChart
+                               {
+                                   Type = type,
+                                   Amount = average,
+                                   AmountLabel = GetAmountLabel(totalSum, totalExpenses.Sum(expense => expense.Amount))
+                               });
         }
 
         _expensePieDetails = expensePieData;
+        _expenseAverageBarDetails = expenseAverageBarData;
+    }
+
+    private static string GetAmountLabel(decimal amount, decimal totalAmount)
+    {
+        var percent = amount / totalAmount * 100;
+        return $"{Math.Round(percent, 0)}%";
     }
 
     private async Task PopulateTransactionBar()
@@ -272,11 +318,11 @@
                _ => "bi-patch-question-fill"};
     }
 
-    private decimal GetSumPerExpenseType(string expenseType)
+    private decimal GetSumPerExpenseType(string? expenseType)
     {
-        return _expenseModels.Where(e => e.ExpenseType == expenseType).Select(e => e.Amount).Sum();
+        return expenseType is null ? 0 : _expenseModels.Where(e => e.ExpenseType == expenseType).Select(e => e.Amount).Sum();
     }
-    
+
     private decimal GetSumPerIncomeType(string incomeType)
     {
         return _incomeModels.Where(e => e.IncomeType == incomeType).Select(e => e.Amount).Sum();
@@ -287,17 +333,27 @@
         _expenseModels = (await ExpenseService.GetExpenses(selection)).ToList();
         _incomeModels = (await IncomeService.GetIncomes(selection)).ToList();
         SelectedEconomyPlan = selection;
+        
+        await PopulateCharts();
     }
 
     private (string caption, string style) GetOverviewCaption(decimal result)
     {
-        return result >= 0 ? ($"Beräknat belopp att få över: {result}:-", "text-success") : ($"Beräknad skuld: {result}:-", "text-danger");
+        return result >= 0 ? ($"Beräknat belopp att få över: {result.ToNumberFormatString()}:-", "text-success") : ($"Beräknad skuld: {result.ToNumberFormatString()}:-", "text-danger");
     }
 
     public class ExpensePieChart
     {
         public string? Type { get; set; }
         public decimal Amount { get; set; }
+        public string? AmountLabel { get; set; }
+    }
+
+    public class ExpenseAveragePerCategoryChart
+    {
+        public string? Type { get; set; }
+        public decimal CurrentAmount { get; set; }
+        public decimal AverageAmount { get; set; }
     }
 
     public class TransactionBarChart
