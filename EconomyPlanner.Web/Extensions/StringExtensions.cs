@@ -12,9 +12,15 @@ public static class StringExtensions
             _ => string.Concat(input[0].ToString().ToUpper(), input.AsSpan(1))
         };
 
-    public static string ToNumberFormatString(this decimal input)
+    public static string ToRoundedNumberFormatString(this decimal input)
     {
         var numberCulture = NumberCultureHelper.GetNumberCulture();
         return Math.Round(input, 2).ToString("#,0.00", numberCulture).Replace($"{numberCulture.CurrencyDecimalSeparator}00", "");
+    }
+    
+    public static string ToNumberFormatString(this decimal input)
+    {
+        var numberCulture = NumberCultureHelper.GetNumberCulture();
+        return input.ToString("#,0.00", numberCulture).Replace($"{numberCulture.CurrencyDecimalSeparator}00", "");
     }
 }

@@ -29,12 +29,12 @@
     {
         <span class="@GetIconFromType(incomeType)" aria-hidden="true"></span>
         <span class="text-nowrap">
-            <b>@incomeType</b> @GetSumPerIncomeType(incomeType).ToNumberFormatString():-
+            <b>@incomeType</b> @GetSumPerIncomeType(incomeType).ToRoundedNumberFormatString():-
         </span>
         <br/>
     }
     <br/>
-    <p class="font-weight-bold float-left">Totalbelopp: @_incomeModels.Select(i => i.Amount).Sum().ToNumberFormatString():-</p>
+    <p class="font-weight-bold float-left">Totalbelopp: @_incomeModels.Select(i => i.Amount).Sum().ToRoundedNumberFormatString():-</p>
     <br/>
 </div>
 
@@ -48,12 +48,12 @@
     {
         <span class="@GetIconFromType(expenseType)" aria-hidden="true"></span>
         <span class="text-nowrap">
-            <b>@expenseType</b> @GetSumPerExpenseType(expenseType).ToNumberFormatString():-
+            <b>@expenseType</b> @GetSumPerExpenseType(expenseType).ToRoundedNumberFormatString():-
         </span>
         <br/>
     }
     <br/>
-    <p class="font-weight-bold float-left">Totalbelopp: @_expenseModels.Select(e => e.Amount).Sum().ToNumberFormatString():-</p>
+    <p class="font-weight-bold float-left">Totalbelopp: @_expenseModels.Select(e => e.Amount).Sum().ToRoundedNumberFormatString():-</p>
     <br/>
 </div>
 <br/>
@@ -342,7 +342,7 @@
 
     private (string caption, string style) GetOverviewCaption(decimal result)
     {
-        return result >= 0 ? ($"Beräknat belopp att få över: {result.ToNumberFormatString()}:-", "text-success") : ($"Beräknad skuld: {result.ToNumberFormatString()}:-", "text-danger");
+        return result >= 0 ? ($"Beräknat belopp att få över: {result.ToRoundedNumberFormatString()}:-", "text-success") : ($"Beräknad skuld: {result.ToRoundedNumberFormatString()}:-", "text-danger");
     }
 
     public class ExpensePieChart

@@ -3,6 +3,7 @@
 @using EconomyPlanModel = EconomyPlanner.Web.Models.EconomyPlanModel
 @using ExpenseModel = EconomyPlanner.Web.Models.ExpenseModel
 @using EconomyPlanner.Web.Shared.Expense
+@using EconomyPlanner.Web.Extensions
 @inject NavigationManager NavManager
 
 <PageTitle>Utgifter för vald ekonomiplan</PageTitle>
@@ -24,17 +25,17 @@
     </ChildContent>
 </Dropdown>
 
-<div class="alert alert-secondary mt-4">
+<div class="alert alert-info mt-4">
     <div>
         <div class="row">
-            <div class="col-md">
-                <b>Typ: </b>
-            </div>
             <div class="col-md">
                 <b>Namn: </b>
             </div>
             <div class="col-md">
                 <b>Belopp: </b>
+            </div>
+            <div class="col-md">
+                <b>Typ: </b>
             </div>
             <div class="col-md">
             </div>
@@ -43,19 +44,19 @@
         @foreach (var expense in _expenseModels)
         {
             <div class="row">
-                <div class="col-md text-left">
+                <div class="col-md-2 text-left">
                     <div class="span2">
-                        <button class="btn btn-info btn-block btn-sm text-left @GetDisabledButtonClass()" @onclick="@(_ => ShowEditTypePopup(expense))">@expense.ExpenseType</button>
+                        <button class="btn btn-light btn-block btn-sm text-left @GetDisabledButtonClass()" @onclick="@(_ => ShowEditNamePopup(expense))">@expense.Name</button>
                     </div>
                 </div>
-                <div class="col-md">
+                <div class="col-md-2">
                     <div class="span2">
-                        <button class="btn btn-info btn-block btn-sm text-left @GetDisabledButtonClass()" @onclick="@(_ => ShowEditNamePopup(expense))">@expense.Name</button>
+                        <button class="btn btn-light btn-block btn-sm text-left @GetDisabledButtonClass()" @onclick="@(_ => ShowEditAmountPopup(expense))">@expense.Amount.ToNumberFormatString():-</button>
                     </div>
                 </div>
-                <div class="col-md">
+                <div class="col-md-2">
                     <div class="span2">
-                        <button class="btn btn-info btn-block btn-sm text-left @GetDisabledButtonClass()" @onclick="@(_ => ShowEditAmountPopup(expense))">@expense.Amount</button>
+                        <button class="btn btn-block btn-sm text-left @GetDisabledButtonClass()" @onclick="@(_ => ShowEditTypePopup(expense))">@expense.ExpenseType</button>
                     </div>
                 </div>
                 <div class="col-md">
@@ -69,13 +70,13 @@
     </div>
     <div>
         <button class="btn btn-success text-left oi oi-plus @GetDisabledButtonClass()" onclick="@ShowAddExpensePopup"></button>
-        <p class="float-right font-weight-bold">Totalbelopp: @TotalExpenseCost:-</p>
+        <p class="float-right font-weight-bold">Totalbelopp: @TotalExpenseCost.ToNumberFormatString():-</p>
     </div>
 
 </div>
 <br/><hr/><br/>
 <h4 class="bi bi-arrow-clockwise"> Återkommande utgifter:</h4>
-<div class="alert alert-secondary mt-4">
+<div class="alert alert-info mt-4">
     <div>
         <div class="row">
             <div class="col-md">
@@ -96,17 +97,17 @@
             <div class="row">
                 <div class="col-md text-left">
                     <div class="span2">
-                        <button class="btn btn-info btn-block btn-sm text-left @GetDisabledButtonClass()" @onclick="@(_ => ShowEditRecurringTypePopup(recurringExpense))">@recurringExpense.ExpenseType</button>
+                        <button class="btn btn-light btn-block btn-sm text-left @GetDisabledButtonClass()" @onclick="@(_ => ShowEditRecurringTypePopup(recurringExpense))">@recurringExpense.ExpenseType</button>
                     </div>
                 </div>
                 <div class="col-md">
                     <div class="span2">
-                        <button class="btn btn-info btn-block btn-sm text-left @GetDisabledButtonClass()" @onclick="@(_ => ShowEditRecurringNamePopup(recurringExpense))">@recurringExpense.Name</button>
+                        <button class="btn btn-light btn-block btn-sm text-left @GetDisabledButtonClass()" @onclick="@(_ => ShowEditRecurringNamePopup(recurringExpense))">@recurringExpense.Name</button>
                     </div>
                 </div>
                 <div class="col-md">
                     <div class="span2">
-                        <button class="btn btn-info btn-block btn-sm text-left @GetDisabledButtonClass()" @onclick="@(_ => ShowEditRecurringAmountPopup(recurringExpense))">@recurringExpense.Amount</button>
+                        <button class="btn btn-light btn-block btn-sm text-left @GetDisabledButtonClass()" @onclick="@(_ => ShowEditRecurringAmountPopup(recurringExpense))">@recurringExpense.Amount.ToNumberFormatString():-</button>
                     </div>
                 </div>
                 <div class="col-md">
@@ -122,7 +123,7 @@
         }
     </div>
     <button class="btn btn-success text-left oi oi-plus @GetDisabledButtonClass()" onclick="@ShowAddRecurringExpensePopup"></button>
-    <p class="float-right font-weight-bold">Totalbelopp: @TotalRecurringExpenseCost:-</p>
+    <p class="float-right font-weight-bold">Totalbelopp: @TotalRecurringExpenseCost.ToNumberFormatString():-</p>
 </div>
 
 @code {
@@ -149,10 +150,10 @@
     private string GetDisabledButtonClass()
     {
         if (SelectedEconomyPlan is null) return "disabled";
-        
+
         return SelectedEconomyPlan.IsActive ? string.Empty : "disabled";
     }
-    
+
     private decimal TotalExpenseCost
     {
         get { return _expenseModels.Select(e => e.Amount).Sum(); }
@@ -213,7 +214,7 @@
     {
         if (SelectedEconomyPlan is null || !SelectedEconomyPlan.IsActive)
             return;
-        
+
         var parameters = new ModalParameters()
             .Add(nameof(DeleteExpense.PreText), preText)
             .Add(nameof(DeleteExpense.ExpenseModel), expenseModel);
@@ -231,7 +232,7 @@
     {
         if (SelectedEconomyPlan is null || !SelectedEconomyPlan.IsActive)
             return;
-        
+
         var parameters = new ModalParameters()
             .Add(nameof(EditExpenseAmount.ExpenseModel), expenseModel);
 
@@ -247,7 +248,7 @@
     {
         if (SelectedEconomyPlan is null || !SelectedEconomyPlan.IsActive)
             return;
-        
+
         var parameters = new ModalParameters()
             .Add(nameof(EditExpenseName.ExpenseModel), expenseModel);
 
@@ -263,7 +264,7 @@
     {
         if (SelectedEconomyPlan is null || !SelectedEconomyPlan.IsActive)
             return;
-        
+
         var parameters = new ModalParameters()
             .Add(nameof(EditExpenseType.ExpenseModel), expenseModel)
             .Add(nameof(EditExpenseType.ExpenseTypes), await ExpenseService.GetExpenseTypes());
@@ -280,11 +281,11 @@
     {
         if (SelectedEconomyPlan is null || !SelectedEconomyPlan.IsActive)
             return;
-        
+
         var guid = await HouseholdService.GetGuid();
 
         if (string.IsNullOrEmpty(guid)) return;
-        
+
         var parameters = new ModalParameters()
             .Add(nameof(AddExpenseForm.ExpenseTypes), await ExpenseService.GetExpenseTypes())
             .Add(nameof(AddExpenseForm.EconomyPlanModel), SelectedEconomyPlan)
@@ -303,7 +304,7 @@
     {
         if (SelectedEconomyPlan is null || !SelectedEconomyPlan.IsActive)
             return;
-        
+
         var guid = await HouseholdService.GetGuid();
 
         if (string.IsNullOrEmpty(guid)) return;
@@ -324,7 +325,7 @@
     {
         if (SelectedEconomyPlan is null || !SelectedEconomyPlan.IsActive)
             return;
-        
+
         var parameters = new ModalParameters()
             .Add(nameof(EditRecurringExpenseAmount.RecurringExpenseModel), expenseModel);
 
@@ -340,7 +341,7 @@
     {
         if (SelectedEconomyPlan is null || !SelectedEconomyPlan.IsActive)
             return;
-        
+
         var parameters = new ModalParameters()
             .Add(nameof(EditRecurringExpenseName.RecurringExpenseModel), expenseModel);
 
@@ -356,7 +357,7 @@
     {
         if (SelectedEconomyPlan is null || !SelectedEconomyPlan.IsActive)
             return;
-        
+
         var parameters = new ModalParameters()
             .Add(nameof(EditRecurringExpenseType.RecurringExpenseModel), expenseModel)
             .Add(nameof(EditRecurringExpenseType.ExpenseTypes), await ExpenseService.GetExpenseTypes());
@@ -373,7 +374,7 @@
     {
         if (SelectedEconomyPlan is null || !SelectedEconomyPlan.IsActive)
             return;
-        
+
         var parameters = new ModalParameters()
             .Add(nameof(DeleteRecurringExpense.PreText), preText)
             .Add(nameof(DeleteRecurringExpense.RecurringExpenseModel), expenseModel);
@@ -390,7 +391,7 @@
     {
         if (economyPlanModel is null || !economyPlanModel.IsActive)
             return;
-        
+
         await ExpenseService.AddRecurringExpenseAsExpense(expenseModel, economyPlanModel);
         await RefreshExpenses();
     }

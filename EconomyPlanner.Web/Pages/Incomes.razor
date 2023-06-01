@@ -3,6 +3,7 @@
 @using EconomyPlanModel = EconomyPlanner.Web.Models.EconomyPlanModel
 @using EconomyPlanner.Web.Models
 @using EconomyPlanner.Web.Shared.Income
+@using EconomyPlanner.Web.Extensions
 @inject NavigationManager NavManager
 
 <PageTitle>Inkomster för vald ekonomiplan</PageTitle>
@@ -24,7 +25,7 @@
     </ChildContent>
 </Dropdown>
 
-<div class="alert alert-secondary mt-4">
+<div class="alert alert-info mt-4">
     <div>
         <div class="row">
             <div class="col-md">
@@ -45,17 +46,17 @@
             <div class="row">
                 <div class="col-md text-left">
                     <div class="span2">
-                        <button class="btn btn-info btn-block btn-sm text-left @GetDisabledButtonClass()" @onclick="@(_ => ShowEditTypePopup(income))">@income.IncomeType</button>
+                        <button class="btn btn-light btn-block btn-sm text-left @GetDisabledButtonClass()" @onclick="@(_ => ShowEditTypePopup(income))">@income.IncomeType</button>
                     </div>
                 </div>
                 <div class="col-md">
                     <div class="span2">
-                        <button class="btn btn-info btn-block btn-sm text-left @GetDisabledButtonClass()" @onclick="@(_ => ShowEditNamePopup(income))">@income.Name</button>
+                        <button class="btn btn-light btn-block btn-sm text-left @GetDisabledButtonClass()" @onclick="@(_ => ShowEditNamePopup(income))">@income.Name</button>
                     </div>
                 </div>
                 <div class="col-md">
                     <div class="span2">
-                        <button class="btn btn-info btn-block btn-sm text-left @GetDisabledButtonClass()" @onclick="@(_ => ShowEditAmountPopup(income))">@income.Amount</button>
+                        <button class="btn btn-light btn-block btn-sm text-left @GetDisabledButtonClass()" @onclick="@(_ => ShowEditAmountPopup(income))">@income.Amount.ToNumberFormatString():-</button>
                     </div>
                 </div>
                 <div class="col-md">
@@ -69,13 +70,13 @@
     </div>
     <div>
         <button class="btn btn-success text-left oi oi-plus @GetDisabledButtonClass()" onclick="@ShowAddIncomePopup"></button>
-        <p class="float-right font-weight-bold">Totalbelopp: @TotalIncomeCost:-</p>
+        <p class="float-right font-weight-bold">Totalbelopp: @TotalIncomeCost.ToNumberFormatString():-</p>
     </div>
 
 </div>
 <br/><hr/><br/>
 <h4 class="bi bi-arrow-clockwise"> Återkommande inkomster:</h4>
-<div class="alert alert-secondary mt-4">
+<div class="alert alert-info mt-4">
     <div>
         <div class="row">
             <div class="col-md">
@@ -96,17 +97,17 @@
             <div class="row">
                 <div class="col-md text-left">
                     <div class="span2">
-                        <button class="btn btn-info btn-block btn-sm text-left @GetDisabledButtonClass()" @onclick="@(_ => ShowEditRecurringTypePopup(recurringIncome))">@recurringIncome.IncomeType</button>
+                        <button class="btn btn-light btn-block btn-sm text-left @GetDisabledButtonClass()" @onclick="@(_ => ShowEditRecurringTypePopup(recurringIncome))">@recurringIncome.IncomeType</button>
                     </div>
                 </div>
                 <div class="col-md">
                     <div class="span2">
-                        <button class="btn btn-info btn-block btn-sm text-left @GetDisabledButtonClass()" @onclick="@(_ => ShowEditRecurringNamePopup(recurringIncome))">@recurringIncome.Name</button>
+                        <button class="btn btn-light btn-block btn-sm text-left @GetDisabledButtonClass()" @onclick="@(_ => ShowEditRecurringNamePopup(recurringIncome))">@recurringIncome.Name</button>
                     </div>
                 </div>
                 <div class="col-md">
                     <div class="span2">
-                        <button class="btn btn-info btn-block btn-sm text-left @GetDisabledButtonClass()" @onclick="@(_ => ShowEditRecurringAmountPopup(recurringIncome))">@recurringIncome.Amount</button>
+                        <button class="btn btn-light btn-block btn-sm text-left @GetDisabledButtonClass()" @onclick="@(_ => ShowEditRecurringAmountPopup(recurringIncome))">@recurringIncome.Amount.ToNumberFormatString():-</button>
                     </div>
                 </div>
                 <div class="col-md">
@@ -122,7 +123,7 @@
         }
     </div>
     <button class="btn btn-success text-left oi oi-plus @GetDisabledButtonClass()" onclick="@ShowAddRecurringIncomePopup"></button>
-    <p class="float-right font-weight-bold">Totalbelopp: @TotalRecurringIncomeCost:-</p>
+    <p class="float-right font-weight-bold">Totalbelopp: @TotalRecurringIncomeCost.ToNumberFormatString():-</p>
 </div>
 
 @code {
