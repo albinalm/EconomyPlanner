@@ -3,6 +3,7 @@ using EconomyPlanner.API.Helpers;
 using EconomyPlanner.API.Interfaces;
 using EconomyPlanner.Repository.Configuration;
 using EconomyPlanner.Repository.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace EconomyPlanner.API.Services;
 
@@ -40,7 +41,15 @@ public class EconomyPlanService : IEconomyPlanService
 
     private void AddRecurringExpensesToEconomyPlan(EconomyPlan economyPlan)
     {
-        foreach (var recurringExpense in _dbContext.RecurringExpenses)
+        var recurringExpenses = _dbContext.Households
+                                          .Include(h => h.RecurringExpenses)
+                                          .Include(h => h.EconomyPlans)
+                                          .SingleOrDefault(x => x.EconomyPlans.Contains(economyPlan))?.RecurringExpenses;
+        
+        if (recurringExpenses is null)
+            return;
+        
+        foreach (var recurringExpense in recurringExpenses)
         {
             var expense = _mapper.Map<Expense>(recurringExpense);
             expense.RecurringExpense = recurringExpense;
@@ -51,7 +60,15 @@ public class EconomyPlanService : IEconomyPlanService
 
     private void AddRecurringIncomesToEconomyPlan(EconomyPlan economyPlan)
     {
-        foreach (var recurringIncome in _dbContext.RecurringIncomes)
+        var recurringIncomes = _dbContext.Households
+                                          .Include(h => h.RecurringIncomes)
+                                          .Include(h => h.EconomyPlans)
+                                          .SingleOrDefault(x => x.EconomyPlans.Contains(economyPlan))?.RecurringIncomes;
+        
+        if (recurringIncomes is null)
+            return;
+        
+        foreach (var recurringIncome in recurringIncomes)
         {
             var income = _mapper.Map<Income>(recurringIncome);
             income.RecurringIncome = recurringIncome;
@@ -140,7 +157,7 @@ public class EconomyPlanService : IEconomyPlanService
 
         var currentTime = _timeService.GetNow();
         
-        var activeEconomyPlans = GetEconomyPlansFromHouseholdId(guid).Where(ep => DateTime.Parse(ep.EndDate) >= currentTime).ToList();
+        var activeEconomyPlans = GetEconomyPlansFromHouseholdId(guid).Where(ep => currentTime.Month <= DateTime.Parse(ep.EndDate).Month).ToList();
 
         if (activeEconomyPlans.Count == 2)
         {
