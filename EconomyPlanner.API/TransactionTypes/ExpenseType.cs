@@ -8,8 +8,10 @@ public static class ExpenseType
     public static string Insurance => "Försäkring";
     public static string Rent => "Hyra";
     public static string Subscription => "Abonnemang";
+    public static string Loan => "Lån";
+    public static string Savings => "Sparande";
     public static string Other => "Övrigt";
-    
+
     public static IEnumerable<string> GetExpenseTypes()
     {
         var expenseTypes = typeof(ExpenseType).GetProperties();
