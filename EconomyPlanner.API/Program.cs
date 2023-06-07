@@ -21,10 +21,10 @@ builder.Services.AddCors(options =>
                                            .AllowAnyHeader();
                       });
 });
-// builder.WebHost.UseKestrel()
-//        .UseContentRoot(Directory.GetCurrentDirectory())
-//        .UseUrls("http://192.168.1.105:6320")
-//        .UseIISIntegration();
+builder.WebHost.UseKestrel()
+       .UseContentRoot(Directory.GetCurrentDirectory())
+       .UseUrls("http://192.168.1.105:6320")
+       .UseIISIntegration();
 
 builder.Services.AddScoped<ITimeService, TimeService>();
 
