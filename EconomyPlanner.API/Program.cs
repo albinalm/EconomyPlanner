@@ -3,6 +3,7 @@ using EconomyPlanner.API.Interfaces;
 using EconomyPlanner.API.Services;
 using EconomyPlanner.Repository.Configuration;
 using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
@@ -21,15 +22,11 @@ builder.Services.AddCors(options =>
                                            .AllowAnyHeader();
                       });
 });
-var connectionString = builder.Configuration.GetConnectionString("API");
-
-if (connectionString is null)
-    throw new ApplicationException("Connection string is null!");
 
 builder.WebHost.UseKestrel()
-           .UseContentRoot(Directory.GetCurrentDirectory())
-           .UseUrls("http://*:6320", "http://*:5179")
-           .UseIISIntegration();
+       .UseContentRoot(Directory.GetCurrentDirectory())
+       .UseUrls("http://*:6320", "http://*:5179")
+       .UseIISIntegration();
 
 builder.Services.AddScoped<ITimeService, TimeService>();
 
@@ -64,10 +61,10 @@ app.Run();
 static void RegisterRepository(IServiceCollection services, IConfiguration config)
 {
     var connectionString = config.GetConnectionString("Domain");
-            
+
     if (string.IsNullOrWhiteSpace(connectionString))
         throw new InvalidOperationException("A connection string needs to be provided");
-        
-    services.AddDbContext<DatabaseContext>(options => options.UseSqlServer(connectionString, b => b.MigrationsAssembly("EconomyPlannerMigrationDummy")));
-    
+
+    services.AddDbContext<DatabaseContext>(options => options.UseSqlServer(connectionString,
+                                                                           b => b.MigrationsAssembly("EconomyPlannerMigrationDummy")));
 }
