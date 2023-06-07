@@ -197,7 +197,7 @@ public class ExpenseService : IExpenseService
         return economyPlan.Expenses;
     }
 
-    public IEnumerable<Expense> GetAllExpensesFromLastSixEconomyPlans(string guid)
+    public IEnumerable<Expense> GetAllExpensesFromLastYearEconomyPlans(string guid)
     {
         var household = _dbContext.GetHouseholdFromGuid(guid);
         
@@ -211,7 +211,7 @@ public class ExpenseService : IExpenseService
             return Enumerable.Empty<Expense>();
         }
 
-        var latestEconomyPlans = economyPlans.OrderBy(ep => DateTime.Parse(ep.EndDate)).TakeLast(6).ToList();
+        var latestEconomyPlans = economyPlans.OrderBy(ep => DateTime.Parse(ep.EndDate)).TakeLast(12).ToList();
         
         var totalExpenses = new List<Expense>();
         

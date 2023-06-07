@@ -161,12 +161,12 @@ public class ExpenseController : ControllerBase
         }
     }
     
-    [HttpGet(Name = "GetAllExpensesFromLastSixEconomyPlans")] 
-    public IActionResult GetAllExpensesFromLastSixEconomyPlans(string guid)
+    [HttpGet(Name = "GetAllExpensesFromLastYearEconomyPlans")] 
+    public IActionResult GetAllExpensesFromLastYearEconomyPlans(string guid)
     {
         try
         {
-            return Ok( _expenseService.GetAllExpensesFromLastSixEconomyPlans(guid));
+            return Ok( _expenseService.GetAllExpensesFromLastYearEconomyPlans(guid));
         }
         catch (Exception ex)
         {

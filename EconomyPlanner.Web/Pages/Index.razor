@@ -214,7 +214,7 @@
 
         if (guid is null) return;
 
-        var totalExpenses = (await ExpenseService.GetAllExpenseModelsFromLastSixEconomyPlans(guid)).ToList();
+        var totalExpenses = (await ExpenseService.GetAllExpenseModelsFromLastYearEconomyPlans(guid)).ToList();
 
         var totalExpenseGroups = totalExpenses.GroupByMany(e => e.ExpenseType);
 
@@ -226,7 +226,8 @@
             var type = expenseGroup.Key.ToString();
 
             var totalSum = expenseGroup.Items.Cast<object>().Sum(expense => ((ExpenseModel)expense).Amount);
-            var average = expenseGroup.Items.Cast<object>().Average(expense => ((ExpenseModel)expense).Amount);
+            var average = totalSum / _economyPlanModels.Take(12).Count();
+            
             var current = GetSumPerExpenseType(type);
             
             expenseAverageBarData.Add(new ExpenseAveragePerCategoryChart
