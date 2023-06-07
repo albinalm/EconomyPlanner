@@ -181,7 +181,7 @@
         {
             SelectedEconomyPlan = _activeEconomyPlanModels.FirstOrDefault() ?? _economyPlanModels.First();
             InitialEconomyPlanName = SelectedEconomyPlan.Name;
-            _expenseModels = (await ExpenseService.GetExpenses(SelectedEconomyPlan)).ToList();
+            _expenseModels = (await ExpenseService.ExpenseModels(SelectedEconomyPlan)).ToList();
             await GetRecurringExpenses();
         }
     }
@@ -191,7 +191,7 @@
         await GetEconomyPlanModels();
         if (_economyPlanModels.Any())
         {
-            _expenseModels = (await ExpenseService.GetExpenses(_economyPlanModels.First(e => e.Id == SelectedEconomyPlan!.Id))).ToList();
+            _expenseModels = (await ExpenseService.ExpenseModels(_economyPlanModels.First(e => e.Id == SelectedEconomyPlan!.Id))).ToList();
         }
     }
 
@@ -202,13 +202,13 @@
 
     private async Task GetEconomyPlanModels()
     {
-        _economyPlanModels = (await EconomyPlanService.GetEconomyPlans()).ToList();
+        _economyPlanModels = (await EconomyPlanService.EconomyPlanModels()).ToList();
         _activeEconomyPlanModels = _economyPlanModels.Where(ep => ep.IsActive).ToList();
     }
 
     private async Task OnSelected(EconomyPlanModel selection)
     {
-        _expenseModels = (await ExpenseService.GetExpenses(selection)).ToList();
+        _expenseModels = (await ExpenseService.ExpenseModels(selection)).ToList();
         SelectedEconomyPlan = selection;
     }
 
@@ -269,7 +269,7 @@
 
         var parameters = new ModalParameters()
             .Add(nameof(EditExpenseType.ExpenseModel), expenseModel)
-            .Add(nameof(EditExpenseType.ExpenseTypes), await ExpenseService.GetExpenseTypes());
+            .Add(nameof(EditExpenseType.ExpenseTypes), await ExpenseService.ExpenseTypes());
 
         var result = await Modal.Show<EditExpenseType>("Redigera", parameters).Result;
 
@@ -289,7 +289,7 @@
         if (string.IsNullOrEmpty(guid)) return;
 
         var parameters = new ModalParameters()
-            .Add(nameof(AddExpenseForm.ExpenseTypes), await ExpenseService.GetExpenseTypes())
+            .Add(nameof(AddExpenseForm.ExpenseTypes), await ExpenseService.ExpenseTypes())
             .Add(nameof(AddExpenseForm.EconomyPlanModel), SelectedEconomyPlan)
             .Add(nameof(AddExpenseForm.HouseholdGuid), guid);
 
@@ -312,7 +312,7 @@
         if (string.IsNullOrEmpty(guid)) return;
 
         var parameters = new ModalParameters()
-            .Add(nameof(AddExpenseForm.ExpenseTypes), await ExpenseService.GetExpenseTypes())
+            .Add(nameof(AddExpenseForm.ExpenseTypes), await ExpenseService.ExpenseTypes())
             .Add(nameof(AddExpenseForm.HouseholdGuid), guid);
 
         var result = await Modal.Show<AddRecurringExpenseForm>("Lägg till en ny återkommande utgift", parameters).Result;
@@ -362,7 +362,7 @@
 
         var parameters = new ModalParameters()
             .Add(nameof(EditRecurringExpenseType.RecurringExpenseModel), expenseModel)
-            .Add(nameof(EditRecurringExpenseType.ExpenseTypes), await ExpenseService.GetExpenseTypes());
+            .Add(nameof(EditRecurringExpenseType.ExpenseTypes), await ExpenseService.ExpenseTypes());
 
         var result = await Modal.Show<EditRecurringExpenseType>("Redigera", parameters).Result;
 

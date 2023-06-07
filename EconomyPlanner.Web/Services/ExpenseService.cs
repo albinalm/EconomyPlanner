@@ -11,6 +11,32 @@ public class ExpenseService : IExpenseService
     private readonly HttpClient _httpClient;
     private readonly string? _domain;
     private readonly string? _port;
+    private IEnumerable<string>? _cachedExpenseTypes;
+    private IEnumerable<ExpenseModel>? _cachedExpenseModels;
+    private IEnumerable<ExpenseModel>? _cachedOneYearExpenseModels;
+    private EconomyPlanModel? _selectedEconomyPlan;
+    public async Task<IEnumerable<string>> ExpenseTypes() => _cachedExpenseTypes ?? await GetExpenseTypes();
+    public async Task<IEnumerable<ExpenseModel>> ExpenseModels(EconomyPlanModel? economyPlanModel)
+    {
+        if (economyPlanModel is null)
+            return Enumerable.Empty<ExpenseModel>();
+        
+        if (_selectedEconomyPlan is null)
+            return await GetExpensesFromEconomyPlan(economyPlanModel);
+        
+        if (economyPlanModel == _selectedEconomyPlan && _cachedExpenseModels is not null)
+            return _cachedExpenseModels;
+
+        var expenses = await GetExpensesFromEconomyPlan(economyPlanModel);
+        
+        _cachedExpenseModels = expenses;
+        _selectedEconomyPlan = economyPlanModel;
+        
+        return await GetExpensesFromEconomyPlan(economyPlanModel);
+    }
+
+    public async Task<IEnumerable<ExpenseModel>> OneYearExpenseModels(string guid) 
+        => _cachedOneYearExpenseModels ?? await GetAllExpenseModelsFromLastYearEconomyPlans(guid);
     public ExpenseService(HttpClient httpClient, Options options)
     {
         _httpClient = httpClient;
@@ -18,20 +44,24 @@ public class ExpenseService : IExpenseService
         _port = options.ApiPort;
     }
 
-    public async Task<IEnumerable<ExpenseModel>> GetExpenses(EconomyPlanModel economyPlanModel)
+    public async Task<IEnumerable<ExpenseModel>> GetExpensesFromEconomyPlan(EconomyPlanModel economyPlanModel)
     {
         return await _httpClient.GetFromJsonAsync<IEnumerable<ExpenseModel>>($"http://{_domain}:{_port}/api/Expense/GetExpensesFromEconomyPlan?id={economyPlanModel.Id}")
                ?? Enumerable.Empty<ExpenseModel>();
     }
-    
+
     public async Task UpdateExpense(ExpenseModel expenseModel)
     {
         await _httpClient.PostAsJsonAsync($"http://{_domain}:{_port}/api/Expense/UpdateExpense", expenseModel);
     }
 
-    public async Task<IEnumerable<string>> GetExpenseTypes()
+    private async Task<IEnumerable<string>> GetExpenseTypes()
     {
-        return await _httpClient.GetFromJsonAsync<IEnumerable<string>>($"http://{_domain}:{_port}/api/Expense/GetExpenseTypes") ?? Enumerable.Empty<string>();
+        var expenseTypes = await _httpClient.GetFromJsonAsync<IEnumerable<string>>($"http://{_domain}:{_port}/api/Expense/GetExpenseTypes") ?? Enumerable.Empty<string>();
+        
+        _cachedExpenseTypes = expenseTypes;
+        
+        return _cachedExpenseTypes;
     }
 
     public async Task DeleteExpense(ExpenseModel expenseModel, bool deleteRecurring)
@@ -80,9 +110,12 @@ public class ExpenseService : IExpenseService
         return await _httpClient.GetFromJsonAsync<ExpenseModel?>($"http://{_domain}:{_port}/api/Expense/GetRecurringExpenseFromExpense?expenseId={expenseModel.Id}");
     }
 
-    public async Task<IEnumerable<ExpenseModel>> GetAllExpenseModelsFromLastYearEconomyPlans(string guid)
+    private async Task<IEnumerable<ExpenseModel>> GetAllExpenseModelsFromLastYearEconomyPlans(string guid)
     {
-        return await _httpClient.GetFromJsonAsync<IEnumerable<ExpenseModel>>($"http://{_domain}:{_port}/api/Expense/GetAllExpensesFromLastYearEconomyPlans?guid={guid}") 
-               ?? Enumerable.Empty<ExpenseModel>();
+        var expenseModels = await _httpClient.GetFromJsonAsync<IEnumerable<ExpenseModel>>($"http://{_domain}:{_port}/api/Expense/GetAllExpensesFromLastYearEconomyPlans?guid={guid}") 
+                            ?? Enumerable.Empty<ExpenseModel>();
+
+        _cachedOneYearExpenseModels = expenseModels;
+        return _cachedOneYearExpenseModels;
     }
 }

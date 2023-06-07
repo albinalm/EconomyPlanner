@@ -200,7 +200,7 @@
 
     private async Task GetEconomyPlanModes()
     {
-        _economyPlanModels = (await EconomyPlanService.GetEconomyPlans()).ToList();
+        _economyPlanModels = (await EconomyPlanService.EconomyPlanModels()).ToList();
         _activeEconomyPlanModels = _economyPlanModels.Where(ep => ep.IsActive).ToList();
     }
 

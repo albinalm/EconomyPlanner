@@ -10,9 +10,11 @@ public class EconomyPlanService : IEconomyPlanService
     private readonly HttpClient _httpClient;
     private readonly IHouseholdService _householdService;
     private DateTime? _cachedDateTime;
+    private IEnumerable<EconomyPlanModel>? _cachedEconomyPlanModels;
     private readonly string? _domain;
     private readonly string? _port;
     private async Task<DateTime> ServerTime() => _cachedDateTime ?? await GetServerTime();
+    public async Task<IEnumerable<EconomyPlanModel>> EconomyPlanModels() => _cachedEconomyPlanModels ?? await GetEconomyPlans();
     public EconomyPlanService(HttpClient httpClient, IHouseholdService householdService, Options options)
     {
         _httpClient = httpClient;
@@ -27,7 +29,7 @@ public class EconomyPlanService : IEconomyPlanService
         return _cachedDateTime ?? DateTime.Now;
     }
     
-    public async Task<IEnumerable<EconomyPlanModel>> GetEconomyPlans()
+    private async Task<IEnumerable<EconomyPlanModel>> GetEconomyPlans()
     {
         var hasLogin = await _householdService.HasSavedLogin();
         
@@ -47,6 +49,7 @@ public class EconomyPlanService : IEconomyPlanService
             ep.IsActive = currentDate <= DateTime.Parse(ep.EndDate);
         });
         
+        _cachedEconomyPlanModels = economyPlanModels;
         return economyPlanModels;
     }
 
