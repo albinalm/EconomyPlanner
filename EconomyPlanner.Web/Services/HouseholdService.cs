@@ -10,11 +10,15 @@ public class HouseholdService : IHouseholdService
 {
     private readonly HttpClient _httpClient;
     private readonly ILocalStorageService _localStorageService;
-
-    public HouseholdService(HttpClient httpClient, ILocalStorageService localStorageService)
+    
+    private readonly string? _domain;
+    private readonly string? _port;
+    public HouseholdService(HttpClient httpClient, ILocalStorageService localStorageService, Options options)
     {
         _httpClient = httpClient;
         _localStorageService = localStorageService;
+        _domain = options.ApiDomain;
+        _port = options.ApiPort;
     }
     private string? SessionGuidCache { get; set; }
     
@@ -31,7 +35,7 @@ public class HouseholdService : IHouseholdService
         
         try
         {
-            loginSuccessful = await _httpClient.GetFromJsonAsync<HouseholdModel>($"http://192.168.1.105:6320/api/Household/GetHouseholdFromGuid?guid={guid}") != null;   
+            loginSuccessful = await _httpClient.GetFromJsonAsync<HouseholdModel>($"http://{_domain}:{_port}/api/Household/GetHouseholdFromGuid?guid={guid}") != null;   
         }
         catch{}
         
@@ -58,7 +62,7 @@ public class HouseholdService : IHouseholdService
         if (!await HasSavedLogin())
             throw new InvalidOperationException("No valid login");
 
-        var householdModel = await _httpClient.GetFromJsonAsync<HouseholdModel>($"http://192.168.1.105:6320/api/Household/GetHouseholdFromGuid?guid={await GetGuid()}");
+        var householdModel = await _httpClient.GetFromJsonAsync<HouseholdModel>($"http://{_domain}:{_port}/api/Household/GetHouseholdFromGuid?guid={await GetGuid()}");
         
         if (householdModel is null)
             throw new InvalidOperationException("Could not find household via login");
@@ -71,7 +75,7 @@ public class HouseholdService : IHouseholdService
         if (!await HasSavedLogin())
             throw new InvalidOperationException("No valid login");
         
-        var expenseModels = await _httpClient.GetFromJsonAsync<IEnumerable<ExpenseModel>>($"http://192.168.1.105:6320/api/Expense/GetRecurringExpensesFromHouseholdGuid?guid={await GetGuid()}");
+        var expenseModels = await _httpClient.GetFromJsonAsync<IEnumerable<ExpenseModel>>($"http://{_domain}:{_port}/api/Expense/GetRecurringExpensesFromHouseholdGuid?guid={await GetGuid()}");
         
         if (expenseModels is null)
             throw new InvalidOperationException("Could not find household via login");
@@ -84,7 +88,7 @@ public class HouseholdService : IHouseholdService
         if (!await HasSavedLogin())
             throw new InvalidOperationException("No valid login");
         
-        var incomeModels = await _httpClient.GetFromJsonAsync<IEnumerable<IncomeModel>>($"http://192.168.1.105:6320/api/Income/GetRecurringIncomesFromHouseholdGuid?guid={await GetGuid()}");
+        var incomeModels = await _httpClient.GetFromJsonAsync<IEnumerable<IncomeModel>>($"http://{_domain}:{_port}/api/Income/GetRecurringIncomesFromHouseholdGuid?guid={await GetGuid()}");
         
         if (incomeModels is null)
             throw new InvalidOperationException("Could not find household via login");
@@ -99,7 +103,7 @@ public class HouseholdService : IHouseholdService
 
     public async Task<HouseholdModel> CreateHousehold()
     {
-        var householdModel = await _httpClient.GetFromJsonAsync<HouseholdModel>($"http://192.168.1.105:6320/api/Household/CreateHousehold?name={Guid.NewGuid().ToString()}");
+        var householdModel = await _httpClient.GetFromJsonAsync<HouseholdModel>($"http://{_domain}:{_port}/api/Household/CreateHousehold?name={Guid.NewGuid().ToString()}");
         
         if (householdModel is null)
             throw new ApplicationException("CreateHousehold failed!");

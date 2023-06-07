@@ -342,3 +342,6 @@ healthchecksdb
 
 # Migrations folder
 Tools/EconomyPlannerMigrationDummy/Migrations/
+
+# Web appsettings
+EconomyPlanner.Web/wwwroot/appsettings.json

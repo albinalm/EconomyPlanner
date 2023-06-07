@@ -4,6 +4,7 @@
 @using EconomyPlanner.Web.Models
 @using Syncfusion.Blazor.Charts;
 @using EconomyPlanner.Web.Extensions
+@using EconomyPlanner.Web.Helpers
 
 <PageTitle>Ekonomisk översikt</PageTitle>
 
@@ -153,6 +154,9 @@
     [Inject]
     private IHouseholdService HouseholdService { get; set; } = default!;
 
+    [Inject]
+    private Options Options { get; set; } = default!;
+    
     private static bool HasUpdatedEconomyPlans { get; set; }
     private EconomyPlanModel? SelectedEconomyPlan { get; set; }
     private List<ExpenseModel> _expenseModels = new();
@@ -199,6 +203,7 @@
 
     private async Task InitializePage()
     {
+        Console.WriteLine("APIDomain: " + Options.ApiDomain);  
         if (!HasUpdatedEconomyPlans)
         {
             await SetupActiveEconomyPlans();

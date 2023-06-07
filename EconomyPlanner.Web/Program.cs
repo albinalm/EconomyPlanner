@@ -11,7 +11,12 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
-builder.Services.AddScoped(_ => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+var httpService = new HttpClient
+                  {
+                      BaseAddress = new Uri(builder.HostEnvironment.BaseAddress)
+                  };
+
+builder.Services.AddScoped(_ => httpService);
 
 builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddBlazoredLocalStorage(config => config.JsonSerializerOptions.WriteIndented = true);
@@ -19,6 +24,12 @@ builder.Services.AddScoped<IHouseholdService, HouseholdService>();
 builder.Services.AddScoped<IEconomyPlanService, EconomyPlanService>();
 builder.Services.AddScoped<IExpenseService, ExpenseService>();
 builder.Services.AddScoped<IIncomeService, IncomeService>();
+
+var options = builder.Configuration.Get<Options>();
+if (options is null)
+    throw new ApplicationException("Options is null");
+
+builder.Services.AddSingleton(options);
 builder.Services.AddSyncfusionBlazor();
 
 builder.Services.AddBlazoredModal();
