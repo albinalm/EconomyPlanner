@@ -9,44 +9,50 @@
     </div>
 </div>
 
-<div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
-    <nav class="flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="true"></span> Ekonomisk översikt
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="expenses">
-                <span class="oi bi-cash-coin" aria-hidden="true"></span> Utgifter
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="incomes">
-                <span class="oi bi-cash-stack" aria-hidden="true"></span> Inkomster
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            @if (!IsLoggedIn)
-            {
-                <NavLink class="nav-link" href="login">
-                    <span class="oi oi-account-login" aria-hidden="true"></span> Logga in
+    <div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
+        <nav class="flex-column">
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/overview" Match="NavLinkMatch.All">
+                    <span class="oi oi-home" aria-hidden="true"></span> Ekonomisk översikt
                 </NavLink>
-            }
-            else
-            {
-                <NavLink class="nav-link" @onclick="Logout">
-                    <span class="oi oi-account-logout" aria-hidden="true"></span> Logga ut
+            </div>
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="expenses">
+                    <span class="oi bi-cash-coin" aria-hidden="true"></span> Utgifter
                 </NavLink>
-            }
-        </div>
-    </nav>
-</div>
+            </div>
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="incomes">
+                    <span class="oi bi-cash-stack" aria-hidden="true"></span> Inkomster
+                </NavLink>
+            </div>
+            <div class="nav-item px-3">
+                @if (!IsLoggedIn)
+                {
+                    <NavLink class="nav-link" href="">
+                        <span class="oi oi-account-login" aria-hidden="true"></span> Logga in
+                    </NavLink>
+                }
+                else
+                {
+                    <NavLink class="nav-link" @onclick="Logout">
+                        <span class="oi oi-account-logout" aria-hidden="true"></span> Logga ut
+                    </NavLink>
+                }
+            </div>
+        </nav>
+    </div>
 
 @code {
 
     [Inject]
-    private IHouseholdService HouseholdService { get; set; }
+    private IHouseholdService HouseholdService { get; set; } = default!;
+
+    [Inject]
+    private IEconomyPlanService EconomyPlanService { get; set; } = default!;
+    
+    [Inject]
+    private IExpenseService ExpenseService { get; set; } = default!;
 
     private bool IsLoggedIn { get; set; }
     private bool collapseNavMenu = true;
@@ -72,9 +78,13 @@
 
     private async Task Logout()
     {
+        EconomyPlanService.ClearCache();
+        ExpenseService.ClearCache();
+        
         await HouseholdService.Logout();
+        MainLayout.ShowNavBar = false;
         IsLoggedIn = false;
-        NavManager.NavigateTo("/login");
+        NavManager.NavigateTo("/");
     }
 
     protected override async Task OnInitializedAsync()

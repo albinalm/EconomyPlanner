@@ -66,5 +66,5 @@ static void RegisterRepository(IServiceCollection services, IConfiguration confi
         throw new InvalidOperationException("A connection string needs to be provided");
 
     services.AddDbContext<DatabaseContext>(options => options.UseSqlServer(connectionString,
-                                                                           b => b.MigrationsAssembly("EconomyPlannerMigrationDummy")));
+                                                                           b => b.MigrationsAssembly("EconomyPlanner.API")));
 }

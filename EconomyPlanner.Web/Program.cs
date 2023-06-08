@@ -1,3 +1,4 @@
+using System.Net.Http.Headers;
 using Blazored.LocalStorage;
 using Blazored.Modal;
 using Microsoft.AspNetCore.Components.Web;
@@ -13,11 +14,12 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 
 var httpService = new HttpClient
                   {
-                      BaseAddress = new Uri(builder.HostEnvironment.BaseAddress)
+                      BaseAddress = new Uri(builder.HostEnvironment.BaseAddress),
                   };
 
-builder.Services.AddScoped(_ => httpService);
+httpService.DefaultRequestHeaders.Add("Access-Control-Allow-Private-Network", "true");
 
+builder.Services.AddScoped(_ => httpService);
 builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddBlazoredLocalStorage(config => config.JsonSerializerOptions.WriteIndented = true);
 builder.Services.AddScoped<IHouseholdService, HouseholdService>();

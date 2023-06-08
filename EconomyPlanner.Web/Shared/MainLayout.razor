@@ -1,14 +1,21 @@
 ﻿@inherits LayoutComponentBase
 
-<div class="page">
-    <div style="background-image:linear-gradient(180deg, rgba(6,154,92,1) 2%, rgba(23,210,133,1) 45%, rgba(43,242,158,1) 70%);" class="sidebar">
-        <NavMenu/>
-    </div>
 
+<div class="page">
+    @if (ShowNavBar)
+    {
+        <div style="background-image:linear-gradient(180deg, rgba(6,154,92,1) 2%, rgba(23,210,133,1) 45%, rgba(43,242,158,1) 70%);" class="sidebar">
+            <NavMenu/>
+        </div>
+    }
     <main style="background-color: white">
-        
+
         <article class="content px-4">
             @Body
         </article>
     </main>
 </div>
+@code
+{
+    public static bool ShowNavBar = false;
+}

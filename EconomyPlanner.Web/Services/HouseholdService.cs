@@ -10,7 +10,7 @@ public class HouseholdService : IHouseholdService
 {
     private readonly HttpClient _httpClient;
     private readonly ILocalStorageService _localStorageService;
-    
+
     private readonly string? _domain;
     private readonly string? _port;
     public HouseholdService(HttpClient httpClient, ILocalStorageService localStorageService, Options options)
@@ -43,12 +43,13 @@ public class HouseholdService : IHouseholdService
         
         await _localStorageService.SetItemAsync("EconomyPlanner.UserGuid", guid);
         SessionGuidCache = guid;
-
+        Console.WriteLine("Login to: " + guid + " was successful");
         return loginSuccessful;
     }
 
     public async Task Logout()
     {
+        SessionGuidCache = null;
         await _localStorageService.RemoveItemAsync("EconomyPlanner.UserGuid");
     }
 

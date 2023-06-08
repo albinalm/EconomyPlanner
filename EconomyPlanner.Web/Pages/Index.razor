@@ -1,441 +1,441 @@
-﻿@inject NavigationManager NavManager
-@page "/"
-@using EconomyPlanner.Web.Services.Interfaces
-@using EconomyPlanner.Web.Models
-@using Syncfusion.Blazor.Charts;
-@using EconomyPlanner.Web.Extensions
-@using EconomyPlanner.Web.Helpers
-@using EconomyPlanner.Web.Models.Graphs
-
-<PageTitle>Ekonomisk översikt</PageTitle>
-
-<h1 class="bi bi-stack text-success"> Ekonomisk översikt</h1>
-<br/>
-<Dropdown TItem="EconomyPlanModel" OnSelected="@OnSelected">
-    <InitialTip>@EconomyPlanModels.FirstOrDefault()?.Name</InitialTip>
-    <ChildContent>
-        @foreach (var plan in EconomyPlanModels)
-        {
-            <DropdownListItem Item="@plan">@plan.Name</DropdownListItem>
-        }
-    </ChildContent>
-</Dropdown>
-<hr/>
-<br/>
-<p class="text-dark">
-    <b>Inkomster:</b>
-</p>
-<div class="alert alert-info mt-4">
-    @foreach (var incomeType in IncomeTypes)
-    {
-        <span class="@GetIconFromType(incomeType)" aria-hidden="true"></span>
-        <span class="text-nowrap">
-            <b>@incomeType</b> @IncomeHelper.GetSumPerIncomeType(incomeType, IncomeModels).ToNumberFormatString():-
-        </span>
-        <br/>
-    }
-    <br/>
-    <p class="font-weight-bold float-left">Totalbelopp: @IncomeModels.Select(i => i.Amount).Sum().ToNumberFormatString():-</p>
-    <br/>
-</div>
-
-<br/>
-
-<p class="text-dark">
-    <b>Utgifter:</b>
-</p>
-<div class="alert alert-info mt-4">
-    @foreach (var expenseType in ExpenseTypes)
-    {
-        <span class="@GetIconFromType(expenseType)" aria-hidden="true"></span>
-        <span class="text-nowrap">
-            <b>@expenseType</b> @ExpenseHelper.GetSumPerExpenseType(expenseType, ExpenseModels).ToNumberFormatString():-
-        </span>
-        <br/>
-    }
-    <br/>
-    <p class="font-weight-bold float-left">Totalbelopp: @ExpenseModels.Select(e => e.Amount).Sum().ToNumberFormatString():-</p>
-    <br/>
-</div>
-<br/><br/>
-<h4 class="@OverviewStyle">@OverviewCaption</h4>
-<br/><hr/><br/>
-<h2 class="bi bi-bar-chart-fill text-success font-weight-bold"> Genomsnittlig ekonomifördelning</h2>
-<br/><br/>
-<div Charts>
-    <div class="row">
-        <div class="col">
-            <img src="Images/chartLoad.gif" hidden="@HideExpensePieChartLoadingCircle"/>
-            <div ExpensePieChart hidden="@HideExpensePieChart">
-                <SfAccumulationChart Title="Genomsnittliga utgifter">
-                    <AccumulationChartTooltipSettings Enable="true"></AccumulationChartTooltipSettings>
-                    <AccumulationChartSeriesCollection>
-                        <AccumulationChartSeries DataSource="@_expensePieChartDetails" XName="Type" YName="Amount"
-                                                 Name="Type" InnerRadius="40%">
-                            <AccumulationDataLabelSettings Name="AmountLabel" Visible="true" Position="AccumulationLabelPosition.Outside">
-                                <AccumulationChartDataLabelFont FontWeight="600"></AccumulationChartDataLabelFont>
-                                <AccumulationChartConnector Length="20px" Type="ConnectorType.Curve"></AccumulationChartConnector>
-                            </AccumulationDataLabelSettings>
-                        </AccumulationChartSeries>
-                    </AccumulationChartSeriesCollection>
-                    <AccumulationChartLegendSettings Visible="true" Alignment="Alignment.Far"></AccumulationChartLegendSettings>
-                </SfAccumulationChart>
-            </div>
-        </div>
-        <div class="col">
-            <img src="Images/chartLoad.gif" hidden="@HideExpenseAverageBarChartLoadingCircle"/>
-            <div ExpenseAverageBarChart hidden="@HideExpenseAverageBarChart">
-                <SfChart Title="Genomsnittliga utgifter kontra nuvarande utgifter per kategori" Palettes="@_averageCharPalettes">
-                    <ChartPrimaryXAxis ValueType="Syncfusion.Blazor.Charts.ValueType.Category"></ChartPrimaryXAxis>
-                    <ChartSeriesCollection>
-                        <ChartSeries DataSource="@_expenseAverageChartDetails" Name="Nuvarande belopp" XName="Type" YName="CurrentAmount" Type="ChartSeriesType.StackingColumn">
-                            <ChartMarker>
-                                <ChartDataLabel Visible="true" Position="LabelPosition.Bottom" Name="CurrentAmountReadable">
-                                    <ChartDataLabelFont FontWeight="600"></ChartDataLabelFont>
-                                </ChartDataLabel>
-                            </ChartMarker>
-                        </ChartSeries>
-                        <ChartSeries DataSource="@_expenseAverageChartDetails" Name="Genomsnittligt belopp" XName="Type" YName="AverageAmount" Width="2" Opacity="0.6" Type="ChartSeriesType.Line">
-                            <ChartMarker Visible="true" Height="10" Width="10">
-                                <ChartDataLabel Visible="true" Fill="#ffffff" Name="AverageAmountReadable">
-                                    <ChartDataLabelBorder Width="1" Color="black"></ChartDataLabelBorder>
-                                    <ChartDataLabelFont Color="#121212"></ChartDataLabelFont>
-                                </ChartDataLabel>
-                            </ChartMarker>
-                        </ChartSeries>
-                    </ChartSeriesCollection>
-                </SfChart>
-            </div>
-        </div>
-        <div class="col">
-            <img src="Images/chartLoad.gif" hidden="@HideTransactionRatioBarChartLoadingCircle"/>
-            <div TransactionRatioBarChart hidden="@HideTransactionRatioBarChart">
-                <SfChart Title="Utgifter kontra inkomst per månad" Palettes="@_barChartPalettes">
-                    <ChartPrimaryXAxis ValueType="Syncfusion.Blazor.Charts.ValueType.Category">
-                    </ChartPrimaryXAxis>
-                    <ChartSeriesCollection>
-                        <ChartSeries DataSource="@_expenseBarChartDetails" XName="Month" YName="Amount" Type="ChartSeriesType.StackingBar" Name="Kostnad" ColumnSpacing="0.1">
-                            <ChartMarker>
-                                <ChartDataLabel Visible="true" Position="LabelPosition.Top" Name="AmountReadable">
-                                    <ChartDataLabelFont FontWeight="600" Color="#ffffff"></ChartDataLabelFont>
-                                </ChartDataLabel>
-                            </ChartMarker>
-                        </ChartSeries>
-                        <ChartSeries DataSource="@_expenseBarChartDetails" XName="Month" YName="Savings" Type="ChartSeriesType.StackingBar" Name="Sparande" ColumnSpacing="0.1">
-                            <ChartMarker>
-                                <ChartDataLabel Visible="true" Position="LabelPosition.Top" Name="SavingsReadable">
-                                    <ChartDataLabelFont FontWeight="600" Color="#ffffff"></ChartDataLabelFont>
-                                </ChartDataLabel>
-                            </ChartMarker>
-                        </ChartSeries>
-                    </ChartSeriesCollection>
-
-                    <ChartSeriesCollection>
-                        <ChartSeries DataSource="@_incomeBarChartDetails" XName="Month" YName="Amount" Type="ChartSeriesType.Bar" Name="Inkomst" ColumnSpacing="0.1">
-                            <ChartMarker>
-                                <ChartDataLabel Visible="true" Position="LabelPosition.Top" Name="AmountReadable">
-                                    <ChartDataLabelFont FontWeight="600" Color="#ffffff"></ChartDataLabelFont>
-                                </ChartDataLabel>
-                            </ChartMarker>
-                        </ChartSeries>
-                    </ChartSeriesCollection>
-                </SfChart>
-            </div>
-        </div>
-    </div>
-
-</div>
-
-<p class="font-italic form-control-sm" hidden="@HideTransactionRatioBarChart">*Baserat på max de senaste 12 månaderna eller antal ekonomiplaner beroende på vilket som är högst</p>
-
-@code
-{
-    #region Services
-
-    [Inject]
-    private IEconomyPlanService EconomyPlanService { get; set; } = null!;
-
-    [Inject]
-    private IExpenseService ExpenseService { get; set; } = null!;
-
-    [Inject]
-    private IIncomeService IncomeService { get; set; } = null!;
-
-    [Inject]
-    private IHouseholdService HouseholdService { get; set; } = default!;
-
-    [Inject]
-    private Options Options { get; set; } = default!;
-
-    #endregion
-
-    #region Chart Settings
-
-    private bool HideExpensePieChartLoadingCircle { get; set; }
-    private bool HideExpensePieChart { get; set; } = true;
-    
-    private bool HideTransactionRatioBarChartLoadingCircle { get; set; }
-    private bool HideTransactionRatioBarChart { get; set; } = true;
-    
-    private bool HideExpenseAverageBarChartLoadingCircle { get; set; }
-    private bool HideExpenseAverageBarChart { get; set; } = true;
-
-    private List<ExpensePieChartDetailsModel> _expensePieChartDetails = new();
-
-    private List<TransactionRatioBarChartDetailsModel> _expenseBarChartDetails = new();
-
-    private List<ExpenseAverageChartDetailsModel> _expenseAverageChartDetails = new();
-
-    private List<TransactionRatioBarChartDetailsModel> _incomeBarChartDetails = new();
-
-    #endregion
-
-    #region Palettes
-
-    private readonly string[] _barChartPalettes = { "#edbf28", "#949494", "#30a9d1" };
-
-    private readonly string[] _averageCharPalettes = { "#edbf28", "#303030" };
-
-    #endregion
-
-    #region Models
-    
-    private List<EconomyPlanModel> EconomyPlanModels { get; set; } = new();
-
-    private List<EconomyPlanModel> ActiveEconomyPlans { get; set; } = new();
-
-    private EconomyPlanModel? SelectedEconomyPlan { get; set; }
-
-    private List<ExpenseModel> ExpenseModels { get; set; } = new();
-
-    private List<IncomeModel> IncomeModels { get; set; } = new();
-
-    #endregion
-    
-    private static bool HasUpdatedEconomyPlans { get; set; }
-    
-    private List<string> IncomeTypes { get; set; } = Enumerable.Empty<string>().ToList();
-
-    private List<string> ExpenseTypes { get; set; } = Enumerable.Empty<string>().ToList();
-
-    private string OverviewCaption => GetOverviewCaption(IncomeModels.Select(i => i.Amount).Sum() - ExpenseModels.Select(e => e.Amount).Sum()).caption;
-
-    private string OverviewStyle => GetOverviewCaption(IncomeModels.Select(i => i.Amount).Sum() - ExpenseModels.Select(e => e.Amount).Sum()).style;
-
-    protected override async Task OnInitializedAsync()
-    {
-        if (!await HouseholdService.HasSavedLogin())
-        {
-            NavManager.NavigateTo("/login", forceLoad: true);
-        }
-        else
-        {
-            if (!await HouseholdService.AttemptLogin(await HouseholdService.GetGuid()))
-            {
-                NavManager.NavigateTo("/login", forceLoad: true);
-            }
-            else
-            {
-                await InitializePage();
-            }
-        }
-    }
-
-    private async Task OnSelected(EconomyPlanModel selection)
-    {
-        SelectedEconomyPlan = selection;
-
-        await LoadTransactionModels(selection);
-
-        HideExpenseAverageBarChart = true;
-        HideTransactionRatioBarChart = true;
-        HideExpensePieChart = true;
-
-        HideExpenseAverageBarChartLoadingCircle = false;
-        HideTransactionRatioBarChartLoadingCircle = false;
-        HideExpensePieChartLoadingCircle = false;
-        
-        await LoadCharts();
-    }
-    
-    private async Task InitializePage()
-    {
-        if (!HasUpdatedEconomyPlans)
-        {
-            await SetupActiveEconomyPlans();
-        }
-
-        await GetEconomyPlanModels();
-
-        if (ActiveEconomyPlans.Any())
-        {
-            SelectedEconomyPlan = ActiveEconomyPlans.First();
-
-            await LoadTransactionModels(SelectedEconomyPlan);
-
-            await LoadTransactionTypes();
-
-            await LoadCharts();
-        }
-    }
-    
-    private async Task GetEconomyPlanModels()
-    {
-        EconomyPlanModels = (await EconomyPlanService.EconomyPlanModels()).ToList();
-        ActiveEconomyPlans = EconomyPlanModels.Where(ep => ep.IsActive).ToList();
-    }
-
-    private async Task SetupActiveEconomyPlans()
-    {
-        await EconomyPlanService.SetupActiveEconomyPlans();
-        HasUpdatedEconomyPlans = true;
-    }
-
-    private async Task LoadTransactionModels(EconomyPlanModel economyPlanModel)
-    {
-        ExpenseModels = (await ExpenseService.ExpenseModels(economyPlanModel)).ToList();
-        IncomeModels = (await IncomeService.GetIncomes(economyPlanModel)).ToList();
-    }
-
-    private async Task LoadTransactionTypes()
-    {
-        IncomeTypes = (await IncomeService.GetIncomeTypes()).ToList();
-        ExpenseTypes = (await ExpenseService.ExpenseTypes()).ToList();
-    }
-
-    private async Task LoadCharts()
-    {
-        await LoadPieChart();
-        await LoadAverageBarChart();
-        await LoadTransactionRatioChart();
-    }
-
-    private async Task LoadPieChart()
-    {
-        var guid = await HouseholdService.GetGuid();
-
-        if (guid is null) return;
-
-        var totalExpenses = (await ExpenseService.OneYearExpenseModels(guid)).ToList();
-
-        var expensePieData = (from expenseType in ExpenseTypes
-                              let total = totalExpenses.Where(expense => expense.ExpenseType == expenseType).Select(expense => expense.Amount).Sum()
-                              let average = total / EconomyPlanModels.Take(12).Count()
-                              select new ExpensePieChartDetailsModel()
-                                     {
-                                         Type = expenseType, Amount = average, AmountLabel = GetAmountLabel(total, totalExpenses.Sum(expense => expense.Amount))
-                                     }).ToList();
-
-        _expensePieChartDetails = expensePieData;
-
-        HideExpensePieChartLoadingCircle = true;
-        HideExpensePieChart = false;
-    }
-
-    private async Task LoadAverageBarChart()
-    {
-        var guid = await HouseholdService.GetGuid();
-
-        if (guid is null) return;
-
-        var totalExpenses = (await ExpenseService.OneYearExpenseModels(guid)).ToList();
-
-        var expenseAverageBarData = (from expenseType in ExpenseTypes
-                                     let current = ExpenseHelper.GetSumPerExpenseType(expenseType, ExpenseModels)
-                                     let total = totalExpenses.Where(expense => expense.ExpenseType == expenseType).Select(expense => expense.Amount).Sum()
-                                     let average = total / EconomyPlanModels.Take(12).Count()
-                                     select new ExpenseAverageChartDetailsModel
-                                            {
-                                                Type = expenseType,
-                                                CurrentAmount = current,
-                                                AverageAmount = average,
-                                                CurrentAmountReadable = $"{current.ToRoundedNumberFormatString()}:-",
-                                                AverageAmountReadable = $"{average.ToRoundedNumberFormatString()}:-"
-                                            }).ToList();
-
-        _expenseAverageChartDetails = expenseAverageBarData;
-
-        HideExpenseAverageBarChartLoadingCircle = true;
-        HideExpenseAverageBarChart = false;
-    }
-
-    private async Task LoadTransactionRatioChart()
-    {
-        var guid = await HouseholdService.GetGuid();
-
-        if (guid is null) return;
-
-        var economyPlans = EconomyPlanModels.OrderBy(e => e.EndDate).TakeLast(12);
-
-        var expenseBarData = new List<TransactionRatioBarChartDetailsModel>();
-        var incomeBarData = new List<TransactionRatioBarChartDetailsModel>();
-
-        foreach (var economyPlan in economyPlans)
-        {
-            var month = DateTime.Parse(economyPlan.EndDate).ToString("MMMM").FirstCharToUpper();
-
-            var expenseModels = (await ExpenseService.GetExpensesFromEconomyPlan(economyPlan)).ToList();
-            var incomeModels = await IncomeService.GetIncomes(economyPlan);
-
-            var totalIncomeAmount = incomeModels.Sum(incomeModel => incomeModel.Amount);
-
-            var totalSavingAmount = expenseModels.Where(e => e.ExpenseType.ToLowerInvariant() == "sparande").Sum(e => e.Amount);
-
-            var totalExpenseAmount = expenseModels.Sum(expenseModel => expenseModel.Amount) - totalSavingAmount;
-
-            expenseBarData.Add(new TransactionRatioBarChartDetailsModel
-                               {
-                                   Amount = totalExpenseAmount,
-                                   Month = month,
-                                   Savings = totalSavingAmount,
-                                   AmountReadable = $"{totalExpenseAmount.ToRoundedNumberFormatString()}:-",
-                                   SavingsReadable = $"{totalSavingAmount.ToRoundedNumberFormatString()}:-"
-                               });
-
-            incomeBarData.Add(new TransactionRatioBarChartDetailsModel
-                              {
-                                  Amount = totalIncomeAmount,
-                                  Month = month,
-                                  AmountReadable = $"{totalIncomeAmount.ToRoundedNumberFormatString()}:-"
-                              });
-        }
-
-        _incomeBarChartDetails = incomeBarData;
-        _expenseBarChartDetails = expenseBarData;
-
-        HideTransactionRatioBarChartLoadingCircle = true;
-        HideTransactionRatioBarChart = false;
-    }
-
-
-
-    private static string GetAmountLabel(decimal amount, decimal totalAmount)
-    {
-        var percent = amount / totalAmount * 100;
-        return $"{Math.Round(percent, 0)}%";
-    }
-
-    private static string GetIconFromType(string transactionType)
-    {
-        return transactionType.ToLowerInvariant() switch
-               {
-               "shopping" => "bi-basket-fill",
-               "hushåll" => "bi-house-heart-fill",
-               "el" => "bi-lightning-fill",
-               "försäkring" => "bi-shield-fill-check",
-               "hyra" => "bi-key-fill",
-               "abonnemang" => "bi-arrow-clockwise",
-               "lön" => "bi-cash-stack",
-               "återbetalning" => "bi-bag-plus-fill",
-               "gåva" => "bi-box2-heart-fill",
-               "lån" => "bi-bank2",
-               "sparande" => "bi-graph-up",
-               _ => "bi-patch-question-fill"};
-    }
-
-    private static (string caption, string style) GetOverviewCaption(decimal result)
-    {
-        return result >= 0 ? ($"Beräknat belopp att få över: {result.ToRoundedNumberFormatString()}:-", "text-success") : ($"Beräknad skuld: {result.ToRoundedNumberFormatString()}:-", "text-danger");
-    }
-
-}
+﻿@* @inject NavigationManager NavManager *@
+@* @page "/" *@
+@* @using EconomyPlanner.Web.Services.Interfaces *@
+@* @using EconomyPlanner.Web.Models *@
+@* @using Syncfusion.Blazor.Charts; *@
+@* @using EconomyPlanner.Web.Extensions *@
+@* @using EconomyPlanner.Web.Helpers *@
+@* @using EconomyPlanner.Web.Models.Graphs *@
+@* *@
+@* <PageTitle>Ekonomisk översikt</PageTitle> *@
+@* *@
+@* <h1 class="bi bi-stack text-success"> Ekonomisk översikt</h1> *@
+@* <br/> *@
+@* <Dropdown TItem="EconomyPlanModel" OnSelected="@OnSelected"> *@
+@*     <InitialTip>@EconomyPlanModels.FirstOrDefault()?.Name</InitialTip> *@
+@*     <ChildContent> *@
+@*         @foreach (var plan in EconomyPlanModels) *@
+@*         { *@
+@*             <DropdownListItem Item="@plan">@plan.Name</DropdownListItem> *@
+@*         } *@
+@*     </ChildContent> *@
+@* </Dropdown> *@
+@* <hr/> *@
+@* <br/> *@
+@* <p class="text-dark"> *@
+@*     <b>Inkomster:</b> *@
+@* </p> *@
+@* <div class="alert alert-info mt-4"> *@
+@*     @foreach (var incomeType in IncomeTypes) *@
+@*     { *@
+@*         <span class="@GetIconFromType(incomeType)" aria-hidden="true"></span> *@
+@*         <span class="text-nowrap"> *@
+@*             <b>@incomeType</b> @IncomeHelper.GetSumPerIncomeType(incomeType, IncomeModels).ToNumberFormatString():- *@
+@*         </span> *@
+@*         <br/> *@
+@*     } *@
+@*     <br/> *@
+@*     <p class="font-weight-bold float-left">Totalbelopp: @IncomeModels.Select(i => i.Amount).Sum().ToNumberFormatString():-</p> *@
+@*     <br/> *@
+@* </div> *@
+@* *@
+@* <br/> *@
+@* *@
+@* <p class="text-dark"> *@
+@*     <b>Utgifter:</b> *@
+@* </p> *@
+@* <div class="alert alert-info mt-4"> *@
+@*     @foreach (var expenseType in ExpenseTypes) *@
+@*     { *@
+@*         <span class="@GetIconFromType(expenseType)" aria-hidden="true"></span> *@
+@*         <span class="text-nowrap"> *@
+@*             <b>@expenseType</b> @ExpenseHelper.GetSumPerExpenseType(expenseType, ExpenseModels).ToNumberFormatString():- *@
+@*         </span> *@
+@*         <br/> *@
+@*     } *@
+@*     <br/> *@
+@*     <p class="font-weight-bold float-left">Totalbelopp: @ExpenseModels.Select(e => e.Amount).Sum().ToNumberFormatString():-</p> *@
+@*     <br/> *@
+@* </div> *@
+@* <br/><br/> *@
+@* <h4 class="@OverviewStyle">@OverviewCaption</h4> *@
+@* <br/><hr/><br/> *@
+@* <h2 class="bi bi-bar-chart-fill text-success font-weight-bold"> Genomsnittlig ekonomifördelning</h2> *@
+@* <br/><br/> *@
+@* <div Charts> *@
+@*     <div class="row"> *@
+@*         <div class="col"> *@
+@*             <img src="Images/chartLoad.gif" hidden="@HideExpensePieChartLoadingCircle"/> *@
+@*             <div ExpensePieChart hidden="@HideExpensePieChart"> *@
+@*                 <SfAccumulationChart Title="Genomsnittliga utgifter"> *@
+@*                     <AccumulationChartTooltipSettings Enable="true"></AccumulationChartTooltipSettings> *@
+@*                     <AccumulationChartSeriesCollection> *@
+@*                         <AccumulationChartSeries DataSource="@_expensePieChartDetails" XName="Type" YName="Amount" *@
+@*                                                  Name="Type" InnerRadius="40%"> *@
+@*                             <AccumulationDataLabelSettings Name="AmountLabel" Visible="true" Position="AccumulationLabelPosition.Outside"> *@
+@*                                 <AccumulationChartDataLabelFont FontWeight="600"></AccumulationChartDataLabelFont> *@
+@*                                 <AccumulationChartConnector Length="20px" Type="ConnectorType.Curve"></AccumulationChartConnector> *@
+@*                             </AccumulationDataLabelSettings> *@
+@*                         </AccumulationChartSeries> *@
+@*                     </AccumulationChartSeriesCollection> *@
+@*                     <AccumulationChartLegendSettings Visible="true" Alignment="Alignment.Far"></AccumulationChartLegendSettings> *@
+@*                 </SfAccumulationChart> *@
+@*             </div> *@
+@*         </div> *@
+@*         <div class="col"> *@
+@*             <img src="Images/chartLoad.gif" hidden="@HideExpenseAverageBarChartLoadingCircle"/> *@
+@*             <div ExpenseAverageBarChart hidden="@HideExpenseAverageBarChart"> *@
+@*                 <SfChart Title="Genomsnittliga utgifter kontra nuvarande utgifter per kategori" Palettes="@_averageCharPalettes"> *@
+@*                     <ChartPrimaryXAxis ValueType="Syncfusion.Blazor.Charts.ValueType.Category"></ChartPrimaryXAxis> *@
+@*                     <ChartSeriesCollection> *@
+@*                         <ChartSeries DataSource="@_expenseAverageChartDetails" Name="Nuvarande belopp" XName="Type" YName="CurrentAmount" Type="ChartSeriesType.StackingColumn"> *@
+@*                             <ChartMarker> *@
+@*                                 <ChartDataLabel Visible="true" Position="LabelPosition.Bottom" Name="CurrentAmountReadable"> *@
+@*                                     <ChartDataLabelFont FontWeight="600"></ChartDataLabelFont> *@
+@*                                 </ChartDataLabel> *@
+@*                             </ChartMarker> *@
+@*                         </ChartSeries> *@
+@*                         <ChartSeries DataSource="@_expenseAverageChartDetails" Name="Genomsnittligt belopp" XName="Type" YName="AverageAmount" Width="2" Opacity="0.6" Type="ChartSeriesType.Line"> *@
+@*                             <ChartMarker Visible="true" Height="10" Width="10"> *@
+@*                                 <ChartDataLabel Visible="true" Fill="#ffffff" Name="AverageAmountReadable"> *@
+@*                                     <ChartDataLabelBorder Width="1" Color="black"></ChartDataLabelBorder> *@
+@*                                     <ChartDataLabelFont Color="#121212"></ChartDataLabelFont> *@
+@*                                 </ChartDataLabel> *@
+@*                             </ChartMarker> *@
+@*                         </ChartSeries> *@
+@*                     </ChartSeriesCollection> *@
+@*                 </SfChart> *@
+@*             </div> *@
+@*         </div> *@
+@*         <div class="col"> *@
+@*             <img src="Images/chartLoad.gif" hidden="@HideTransactionRatioBarChartLoadingCircle"/> *@
+@*             <div TransactionRatioBarChart hidden="@HideTransactionRatioBarChart"> *@
+@*                 <SfChart Title="Utgifter kontra inkomst per månad" Palettes="@_barChartPalettes"> *@
+@*                     <ChartPrimaryXAxis ValueType="Syncfusion.Blazor.Charts.ValueType.Category"> *@
+@*                     </ChartPrimaryXAxis> *@
+@*                     <ChartSeriesCollection> *@
+@*                         <ChartSeries DataSource="@_expenseBarChartDetails" XName="Month" YName="Amount" Type="ChartSeriesType.StackingBar" Name="Kostnad" ColumnSpacing="0.1"> *@
+@*                             <ChartMarker> *@
+@*                                 <ChartDataLabel Visible="true" Position="LabelPosition.Top" Name="AmountReadable"> *@
+@*                                     <ChartDataLabelFont FontWeight="600" Color="#ffffff"></ChartDataLabelFont> *@
+@*                                 </ChartDataLabel> *@
+@*                             </ChartMarker> *@
+@*                         </ChartSeries> *@
+@*                         <ChartSeries DataSource="@_expenseBarChartDetails" XName="Month" YName="Savings" Type="ChartSeriesType.StackingBar" Name="Sparande" ColumnSpacing="0.1"> *@
+@*                             <ChartMarker> *@
+@*                                 <ChartDataLabel Visible="true" Position="LabelPosition.Top" Name="SavingsReadable"> *@
+@*                                     <ChartDataLabelFont FontWeight="600" Color="#ffffff"></ChartDataLabelFont> *@
+@*                                 </ChartDataLabel> *@
+@*                             </ChartMarker> *@
+@*                         </ChartSeries> *@
+@*                     </ChartSeriesCollection> *@
+@* *@
+@*                     <ChartSeriesCollection> *@
+@*                         <ChartSeries DataSource="@_incomeBarChartDetails" XName="Month" YName="Amount" Type="ChartSeriesType.Bar" Name="Inkomst" ColumnSpacing="0.1"> *@
+@*                             <ChartMarker> *@
+@*                                 <ChartDataLabel Visible="true" Position="LabelPosition.Top" Name="AmountReadable"> *@
+@*                                     <ChartDataLabelFont FontWeight="600" Color="#ffffff"></ChartDataLabelFont> *@
+@*                                 </ChartDataLabel> *@
+@*                             </ChartMarker> *@
+@*                         </ChartSeries> *@
+@*                     </ChartSeriesCollection> *@
+@*                 </SfChart> *@
+@*             </div> *@
+@*         </div> *@
+@*     </div> *@
+@* </div> *@
+@* *@
+@* <p class="font-italic form-control-sm" hidden="@HideTransactionRatioBarChart">*Baserat på max de senaste 12 månaderna eller antal ekonomiplaner beroende på vilket som är högst</p> *@
+@* *@
+@* @code *@
+@* { *@
+@*     #region Services *@
+@* *@
+@*     [Inject] *@
+@*     private IEconomyPlanService EconomyPlanService { get; set; } = null!; *@
+@* *@
+@*     [Inject] *@
+@*     private IExpenseService ExpenseService { get; set; } = null!; *@
+@* *@
+@*     [Inject] *@
+@*     private IIncomeService IncomeService { get; set; } = null!; *@
+@* *@
+@*     [Inject] *@
+@*     private IHouseholdService HouseholdService { get; set; } = default!; *@
+@* *@
+@*     [Inject] *@
+@*     private Options Options { get; set; } = default!; *@
+@* *@
+@*     #endregion *@
+@* *@
+@*     #region Chart Settings *@
+@* *@
+@*     private bool HideExpensePieChartLoadingCircle { get; set; } *@
+@*     private bool HideExpensePieChart { get; set; } = true; *@
+@* *@
+@*     private bool HideTransactionRatioBarChartLoadingCircle { get; set; } *@
+@*     private bool HideTransactionRatioBarChart { get; set; } = true; *@
+@* *@
+@*     private bool HideExpenseAverageBarChartLoadingCircle { get; set; } *@
+@*     private bool HideExpenseAverageBarChart { get; set; } = true; *@
+@* *@
+@*     private List<ExpensePieChartDetailsModel> _expensePieChartDetails = new(); *@
+@* *@
+@*     private List<TransactionRatioBarChartDetailsModel> _expenseBarChartDetails = new(); *@
+@* *@
+@*     private List<ExpenseAverageChartDetailsModel> _expenseAverageChartDetails = new(); *@
+@* *@
+@*     private List<TransactionRatioBarChartDetailsModel> _incomeBarChartDetails = new(); *@
+@* *@
+@*     #endregion *@
+@* *@
+@*     #region Palettes *@
+@* *@
+@*     private readonly string[] _barChartPalettes = { "#edbf28", "#949494", "#30a9d1" }; *@
+@* *@
+@*     private readonly string[] _averageCharPalettes = { "#edbf28", "#303030" }; *@
+@* *@
+@*     #endregion *@
+@* *@
+@*     #region Models *@
+@* *@
+@*     private List<EconomyPlanModel> EconomyPlanModels { get; set; } = new(); *@
+@* *@
+@*     private List<EconomyPlanModel> ActiveEconomyPlans { get; set; } = new(); *@
+@* *@
+@*     private EconomyPlanModel? SelectedEconomyPlan { get; set; } *@
+@* *@
+@*     private List<ExpenseModel> ExpenseModels { get; set; } = new(); *@
+@* *@
+@*     private List<IncomeModel> IncomeModels { get; set; } = new(); *@
+@* *@
+@*     #endregion *@
+@* *@
+@*     public static bool HasLoggedIn { get; set; } *@
+@*     private static bool HasUpdatedEconomyPlans { get; set; } *@
+@* *@
+@*     private List<string> IncomeTypes { get; set; } = Enumerable.Empty<string>().ToList(); *@
+@* *@
+@*     private List<string> ExpenseTypes { get; set; } = Enumerable.Empty<string>().ToList(); *@
+@* *@
+@*     private string OverviewCaption => GetOverviewCaption(IncomeModels.Select(i => i.Amount).Sum() - ExpenseModels.Select(e => e.Amount).Sum()).caption; *@
+@* *@
+@*     private string OverviewStyle => GetOverviewCaption(IncomeModels.Select(i => i.Amount).Sum() - ExpenseModels.Select(e => e.Amount).Sum()).style; *@
+@* *@
+@*     protected override async Task OnInitializedAsync() *@
+@*     { *@
+@*         if (!await HouseholdService.HasSavedLogin()) *@
+@*         { *@
+@*             NavManager.NavigateTo("/login"); *@
+@*         } *@
+@*         else *@
+@*         { *@
+@*             if (!await HouseholdService.AttemptLogin(await HouseholdService.GetGuid())) *@
+@*             { *@
+@*                 NavManager.NavigateTo("/login"); *@
+@*             } *@
+@*             else *@
+@*             { *@
+@*                 HasLoggedIn = true; *@
+@*                 await InitializePage(); *@
+@*             } *@
+@*         } *@
+@*     } *@
+@* *@
+@*     private async Task OnSelected(EconomyPlanModel selection) *@
+@*     { *@
+@*         SelectedEconomyPlan = selection; *@
+@* *@
+@*         await LoadTransactionModels(selection); *@
+@* *@
+@*         HideExpenseAverageBarChart = true; *@
+@*         HideTransactionRatioBarChart = true; *@
+@*         HideExpensePieChart = true; *@
+@* *@
+@*         HideExpenseAverageBarChartLoadingCircle = false; *@
+@*         HideTransactionRatioBarChartLoadingCircle = false; *@
+@*         HideExpensePieChartLoadingCircle = false; *@
+@* *@
+@*         await LoadCharts(); *@
+@*     } *@
+@* *@
+@*     private async Task InitializePage() *@
+@*     { *@
+@*         if (!HasUpdatedEconomyPlans) *@
+@*         { *@
+@*             await SetupActiveEconomyPlans(); *@
+@*         } *@
+@* *@
+@*         await GetEconomyPlanModels(); *@
+@* *@
+@*         if (ActiveEconomyPlans.Any()) *@
+@*         { *@
+@*             SelectedEconomyPlan = ActiveEconomyPlans.First(); *@
+@* *@
+@*             await LoadTransactionModels(SelectedEconomyPlan); *@
+@* *@
+@*             await LoadTransactionTypes(); *@
+@* *@
+@*             await LoadCharts(); *@
+@*         } *@
+@*     } *@
+@* *@
+@*     private async Task GetEconomyPlanModels() *@
+@*     { *@
+@*         EconomyPlanModels = (await EconomyPlanService.EconomyPlanModels()).ToList(); *@
+@*         ActiveEconomyPlans = EconomyPlanModels.Where(ep => ep.IsActive).ToList(); *@
+@*     } *@
+@* *@
+@*     private async Task SetupActiveEconomyPlans() *@
+@*     { *@
+@*         await EconomyPlanService.SetupActiveEconomyPlans(); *@
+@*         HasUpdatedEconomyPlans = true; *@
+@*     } *@
+@* *@
+@*     private async Task LoadTransactionModels(EconomyPlanModel economyPlanModel) *@
+@*     { *@
+@*         ExpenseModels = (await ExpenseService.ExpenseModels(economyPlanModel)).ToList(); *@
+@*         IncomeModels = (await IncomeService.GetIncomes(economyPlanModel)).ToList(); *@
+@*     } *@
+@* *@
+@*     private async Task LoadTransactionTypes() *@
+@*     { *@
+@*         IncomeTypes = (await IncomeService.GetIncomeTypes()).ToList(); *@
+@*         ExpenseTypes = (await ExpenseService.ExpenseTypes()).ToList(); *@
+@*     } *@
+@* *@
+@*     private async Task LoadCharts() *@
+@*     { *@
+@*         await LoadPieChart(); *@
+@*         await LoadAverageBarChart(); *@
+@*         await LoadTransactionRatioChart(); *@
+@*     } *@
+@* *@
+@*     private async Task LoadPieChart() *@
+@*     { *@
+@*         var guid = await HouseholdService.GetGuid(); *@
+@* *@
+@*         if (guid is null) return; *@
+@* *@
+@*         var totalExpenses = (await ExpenseService.OneYearExpenseModels(guid)).ToList(); *@
+@* *@
+@*         var expensePieData = (from expenseType in ExpenseTypes *@
+@*                               let total = totalExpenses.Where(expense => expense.ExpenseType == expenseType).Select(expense => expense.Amount).Sum() *@
+@*                               let average = total / EconomyPlanModels.Take(12).Count() *@
+@*                               select new ExpensePieChartDetailsModel() *@
+@*                                      { *@
+@*                                          Type = expenseType, Amount = average, AmountLabel = GetAmountLabel(total, totalExpenses.Sum(expense => expense.Amount)) *@
+@*                                      }).ToList(); *@
+@* *@
+@*         _expensePieChartDetails = expensePieData; *@
+@* *@
+@*         HideExpensePieChartLoadingCircle = true; *@
+@*         HideExpensePieChart = false; *@
+@*     } *@
+@* *@
+@*     private async Task LoadAverageBarChart() *@
+@*     { *@
+@*         var guid = await HouseholdService.GetGuid(); *@
+@* *@
+@*         if (guid is null) return; *@
+@* *@
+@*         var totalExpenses = (await ExpenseService.OneYearExpenseModels(guid)).ToList(); *@
+@* *@
+@*         var expenseAverageBarData = (from expenseType in ExpenseTypes *@
+@*                                      let current = ExpenseHelper.GetSumPerExpenseType(expenseType, ExpenseModels) *@
+@*                                      let total = totalExpenses.Where(expense => expense.ExpenseType == expenseType).Select(expense => expense.Amount).Sum() *@
+@*                                      let average = total / EconomyPlanModels.Take(12).Count() *@
+@*                                      select new ExpenseAverageChartDetailsModel *@
+@*                                             { *@
+@*                                                 Type = expenseType, *@
+@*                                                 CurrentAmount = current, *@
+@*                                                 AverageAmount = average, *@
+@*                                                 CurrentAmountReadable = $"{current.ToRoundedNumberFormatString()}:-", *@
+@*                                                 AverageAmountReadable = $"{average.ToRoundedNumberFormatString()}:-" *@
+@*                                             }).ToList(); *@
+@* *@
+@*         _expenseAverageChartDetails = expenseAverageBarData; *@
+@* *@
+@*         HideExpenseAverageBarChartLoadingCircle = true; *@
+@*         HideExpenseAverageBarChart = false; *@
+@*     } *@
+@* *@
+@*     private async Task LoadTransactionRatioChart() *@
+@*     { *@
+@*         var guid = await HouseholdService.GetGuid(); *@
+@* *@
+@*         if (guid is null) return; *@
+@* *@
+@*         var economyPlans = EconomyPlanModels.OrderBy(e => e.EndDate).TakeLast(12); *@
+@* *@
+@*         var expenseBarData = new List<TransactionRatioBarChartDetailsModel>(); *@
+@*         var incomeBarData = new List<TransactionRatioBarChartDetailsModel>(); *@
+@* *@
+@*         foreach (var economyPlan in economyPlans) *@
+@*         { *@
+@*             var month = DateTime.Parse(economyPlan.EndDate).ToString("MMMM").FirstCharToUpper(); *@
+@* *@
+@*             var expenseModels = (await ExpenseService.GetExpensesFromEconomyPlan(economyPlan)).ToList(); *@
+@*             var incomeModels = await IncomeService.GetIncomes(economyPlan); *@
+@* *@
+@*             var totalIncomeAmount = incomeModels.Sum(incomeModel => incomeModel.Amount); *@
+@* *@
+@*             var totalSavingAmount = expenseModels.Where(e => e.ExpenseType.ToLowerInvariant() == "sparande").Sum(e => e.Amount); *@
+@* *@
+@*             var totalExpenseAmount = expenseModels.Sum(expenseModel => expenseModel.Amount) - totalSavingAmount; *@
+@* *@
+@*             expenseBarData.Add(new TransactionRatioBarChartDetailsModel *@
+@*                                { *@
+@*                                    Amount = totalExpenseAmount, *@
+@*                                    Month = month, *@
+@*                                    Savings = totalSavingAmount, *@
+@*                                    AmountReadable = $"{totalExpenseAmount.ToRoundedNumberFormatString()}:-", *@
+@*                                    SavingsReadable = $"{totalSavingAmount.ToRoundedNumberFormatString()}:-" *@
+@*                                }); *@
+@* *@
+@*             incomeBarData.Add(new TransactionRatioBarChartDetailsModel *@
+@*                               { *@
+@*                                   Amount = totalIncomeAmount, *@
+@*                                   Month = month, *@
+@*                                   AmountReadable = $"{totalIncomeAmount.ToRoundedNumberFormatString()}:-" *@
+@*                               }); *@
+@*         } *@
+@* *@
+@*         _incomeBarChartDetails = incomeBarData; *@
+@*         _expenseBarChartDetails = expenseBarData; *@
+@* *@
+@*         HideTransactionRatioBarChartLoadingCircle = true; *@
+@*         HideTransactionRatioBarChart = false; *@
+@*     } *@
+@* *@
+@* *@
+@*     private static string GetAmountLabel(decimal amount, decimal totalAmount) *@
+@*     { *@
+@*         var percent = amount / totalAmount * 100; *@
+@*         return $"{Math.Round(percent, 0)}%"; *@
+@*     } *@
+@* *@
+@*     private static string GetIconFromType(string transactionType) *@
+@*     { *@
+@*         return transactionType.ToLowerInvariant() switch *@
+@*                { *@
+@*                "shopping" => "bi-basket-fill", *@
+@*                "hushåll" => "bi-house-heart-fill", *@
+@*                "el" => "bi-lightning-fill", *@
+@*                "försäkring" => "bi-shield-fill-check", *@
+@*                "hyra" => "bi-key-fill", *@
+@*                "abonnemang" => "bi-arrow-clockwise", *@
+@*                "lön" => "bi-cash-stack", *@
+@*                "återbetalning" => "bi-bag-plus-fill", *@
+@*                "gåva" => "bi-box2-heart-fill", *@
+@*                "lån" => "bi-bank2", *@
+@*                "sparande" => "bi-graph-up", *@
+@*                _ => "bi-patch-question-fill"}; *@
+@*     } *@
+@* *@
+@*     private static (string caption, string style) GetOverviewCaption(decimal result) *@
+@*     { *@
+@*         return result >= 0 ? ($"Beräknat belopp att få över: {result.ToRoundedNumberFormatString()}:-", "text-success") : ($"Beräknad skuld: {result.ToRoundedNumberFormatString()}:-", "text-danger"); *@
+@*     } *@
+@* *@
+@* } *@

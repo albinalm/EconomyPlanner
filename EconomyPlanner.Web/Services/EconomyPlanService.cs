@@ -68,4 +68,9 @@ public class EconomyPlanService : IEconomyPlanService
         return await _httpClient.GetFromJsonAsync<IEnumerable<EconomyPlanModel>>($"http://{_domain}:{_port}/api/EconomyPlan/TryGetOneYearEconomyPlans?guid={guid}") 
                ?? Enumerable.Empty<EconomyPlanModel>();
     }
+
+    public void ClearCache()
+    {
+        _cachedEconomyPlanModels = null;
+    }
 }

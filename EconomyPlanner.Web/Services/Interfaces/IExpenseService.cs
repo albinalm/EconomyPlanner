@@ -20,4 +20,5 @@ public interface IExpenseService
     Task<ExpenseModel?> GetRecurringExpenseFromExpense(ExpenseModel expenseModel);
     Task<IEnumerable<ExpenseModel>> OneYearExpenseModels(string guid);
     Task<IEnumerable<ExpenseModel>> GetExpensesFromEconomyPlan(EconomyPlanModel economyPlanModel);
+    void ClearCache();
 }

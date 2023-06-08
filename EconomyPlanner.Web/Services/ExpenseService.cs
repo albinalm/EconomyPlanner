@@ -18,6 +18,8 @@ public class ExpenseService : IExpenseService
     public async Task<IEnumerable<string>> ExpenseTypes() => _cachedExpenseTypes ?? await GetExpenseTypes();
     public async Task<IEnumerable<ExpenseModel>> ExpenseModels(EconomyPlanModel? economyPlanModel)
     {
+        Console.WriteLine($"economyPlanModel is: {economyPlanModel?.Name} {economyPlanModel?.Id} Selected is: {_selectedEconomyPlan?.Name} and cached expense model count is: {_cachedExpenseModels?.Count()}");
+        
         if (economyPlanModel is null)
             return Enumerable.Empty<ExpenseModel>();
         
@@ -28,7 +30,7 @@ public class ExpenseService : IExpenseService
             return _cachedExpenseModels;
 
         var expenses = await GetExpensesFromEconomyPlan(economyPlanModel);
-        
+     
         _cachedExpenseModels = expenses;
         _selectedEconomyPlan = economyPlanModel;
         
@@ -117,5 +119,11 @@ public class ExpenseService : IExpenseService
 
         _cachedOneYearExpenseModels = expenseModels;
         return _cachedOneYearExpenseModels;
+    }
+
+    public void ClearCache()
+    {
+        _cachedExpenseModels = null;
+        _cachedOneYearExpenseModels = null;
     }
 }

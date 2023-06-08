@@ -1,26 +1,32 @@
 @inject NavigationManager NavManager
-@page "/login"
+@page "/"
 @using EconomyPlanner.Web.Services.Interfaces
 
 <PageTitle>Logga in på ditt hushåll</PageTitle>
-<h1 class="bi bi-pie-chart-fill text-success"> Välkommen till din digitala budgetkalkyl</h1>
-<br/>
-<div class="alert alert-light mt-4" style="">
-    <h2 class="text-info text-decoration-underline">Logga in på ditt hushåll</h2>
+
+<div LoginBox class="d-flex justify-content-center" style="height: 250px;">
     <br/>
-    <p>Vänligen mata in ditt hushålls-ID nedan:</p>
-    <input class="form-control form-control-sm w-25" type="text" id="txt_guid" name="txt_guid" @bind="TxtGuidText">
-    <br/>
-    <button class="btn btn-dark" @onclick="SetGuid">Logga in</button>
-    <br/><br/>
-    <p style="color: indianred" class="bi bi-house-lock-fill" hidden="@HideLoginFailedLabel"><b> Inloggningen misslyckades. Vänligen försök igen</b></p>
-    <div class="alert alert-info mt-4">
-        <p class="font-weight-bold">Inget hushåll? Inga problem!</p>
-        <p hidden="@HideHouseholdCreatedLabels"><b>Här är ditt inloggnings-id: </b> <i>@HouseholdGuid</i></p>
-        <p hidden="@HideHouseholdCreatedLabels" class="small bi bi-exclamation-triangle-fill"><i> Spara detta ID. Det går inte återskapa</i></p>
-        <button class="btn" hidden="@HideCreateHouseholdButton" @onclick="CreateHousehold">Skapa ett nytt hushåll</button>
+    <div class="alert alert-light mt-4 " style="">
+        <img class="rounded ml-4" src="Images/logoGreen_small.png"/>
+        <br/>
+        <hr/>
+        <h2 class="text-info text-decoration-underline">Logga in på ditt hushåll</h2>
+        <br/>
+        <p>Vänligen mata in ditt hushålls-ID nedan:</p>
+        <input class="form-control form-control-sm" type="text" id="txt_guid" name="txt_guid" @bind="TxtGuidText">
+        <br/>
+        <button class="btn btn-info" @onclick="SetGuid">Logga in</button>
+        <br/><br/>
+        <p style="color: indianred" class="bi bi-house-lock-fill" hidden="@HideLoginFailedLabel"><b> Inloggningen misslyckades. Vänligen försök igen</b></p>
+        <div class="alert alert-info mt-4">
+            <p class="font-weight-bold">Inget hushåll? Inga problem!</p>
+            <p hidden="@HideHouseholdCreatedLabels"><b>Här är ditt inloggnings-id: </b> <i>@HouseholdGuid</i></p>
+            <p hidden="@HideHouseholdCreatedLabels" class="small bi bi-exclamation-triangle-fill"><i> Spara detta ID. Det går inte återskapa</i></p>
+            <button class="btn" hidden="@HideCreateHouseholdButton" @onclick="CreateHousehold">Skapa ett nytt hushåll</button>
+        </div>
     </div>
 </div>
+
 
 @code{
 
@@ -37,11 +43,14 @@
     {
         if (await HouseholdService.AttemptLogin(TxtGuidText))
         {
-            
-            NavManager.NavigateTo("/", forceLoad: true);
+            MainLayout.ShowNavBar = true;
+            NavManager.NavigateTo("/overview");
         }
-        TxtGuidText = string.Empty;
-        HideLoginFailedLabel = false;
+        else
+        {
+            TxtGuidText = string.Empty;
+            HideLoginFailedLabel = false;
+        }
     }
 
     private async Task CreateHousehold()
@@ -60,7 +69,8 @@
             {
                 if (await HouseholdService.AttemptLogin(login))
                 {
-                    NavManager.NavigateTo("/", forceLoad: true);
+                    MainLayout.ShowNavBar = true;
+                    NavManager.NavigateTo("/overview");
                 }
             }
         }
