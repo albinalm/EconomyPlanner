@@ -1,0 +1,87 @@
+﻿@page "/expenses"
+@using EconomyPlanner.Web.Services.Interfaces
+@using EconomyPlanModel = EconomyPlanner.Web.Models.EconomyPlanModel
+@using System.Globalization
+@inject NavigationManager NavManager
+
+<PageTitle>Utgifter för vald ekonomiplan</PageTitle>
+<br/>
+<h1 class="text-success bi bi-credit-card-fill"> Utgifter för vald ekonomiplan</h1>
+<br/>
+<hr/>
+<br/>
+<div class="pb-2">
+    <b class="text-dark bi bi-calendar-range-fill"> Period:</b>
+</div>
+<Dropdown TItem="EconomyPlanModel" OnSelected="@OnSelected">
+    <InitialTip>@InitialEconomyPlanName</InitialTip>
+    <ChildContent>
+        @foreach (var plan in _economyPlanModels)
+        {
+            <DropdownListItem Item="@plan">@plan.Name</DropdownListItem>
+        }
+    </ChildContent>
+</Dropdown>
+<br/>
+
+<HxGrid MultiSelectionEnabled="true" Responsive="true" @bind-SelectedDataItems="selectedCultureInfos" TItem="CultureInfo" DataProvider="ClientSideProcessingDataProvider" PageSize="10">
+    <Columns>
+        <HxGridColumn HeaderText="LCID" ItemTextSelector="@(item => item.LCID.ToString())" SortKeySelector="@(item => item.LCID)" IsDefaultSortColumn="true" />
+        <HxGridColumn HeaderText="DisplayName" ItemTextSelector="@(item => item.DisplayName)" SortKeySelector="@(item => item.DisplayName)" />
+        <HxGridColumn HeaderText="Name" ItemTextSelector="@(item => item.Name)" SortKeySelector="@(item => item.Name)" />
+        <HxGridColumn HeaderText="EnglishName" ItemTextSelector="@(item => item.EnglishName)" SortKeySelector="@(item => item.EnglishName)" />
+    </Columns>
+</HxGrid>
+
+@code {
+    private HashSet<CultureInfo> selectedCultureInfos = new();
+    private List<CultureInfo> localCultureInfos = CultureInfo.GetCultures(CultureTypes.AllCultures).ToList();
+
+    private Task<GridDataProviderResult<CultureInfo>> ClientSideProcessingDataProvider(GridDataProviderRequest<CultureInfo> request)
+    {
+        return Task.FromResult(request.ApplyTo(localCultureInfos));
+    }
+
+    #region BaseCode
+    [Inject]
+    private IEconomyPlanService EconomyPlanService { get; set; } = null!;
+    
+    [Inject]
+    private IHouseholdService HouseholdService { get; set; } = null!;
+
+    private EconomyPlanModel? SelectedEconomyPlan { get; set; }
+    private List<EconomyPlanModel> _economyPlanModels = new();
+    private List<EconomyPlanModel> _activeEconomyPlanModels = new();
+    private string InitialEconomyPlanName { get; set; } = "";
+    
+    protected override async Task OnInitializedAsync()
+    {
+        if (!await HouseholdService.HasSavedLogin())
+            NavManager.NavigateTo("/login");
+        else
+            await InitializePage();
+    }
+
+    private async Task InitializePage()
+    {
+        await GetEconomyPlanModels();
+        if (_economyPlanModels.Any())
+        {
+            SelectedEconomyPlan = _activeEconomyPlanModels.FirstOrDefault() ?? _economyPlanModels.First();
+            InitialEconomyPlanName = SelectedEconomyPlan.Name;
+        }
+    }
+    
+    private async Task GetEconomyPlanModels()
+    {
+        _economyPlanModels = (await EconomyPlanService.EconomyPlanModels()).ToList();
+        _activeEconomyPlanModels = _economyPlanModels.Where(ep => ep.IsActive).ToList();
+    }
+
+    private Task OnSelected(EconomyPlanModel selection)
+    {
+        SelectedEconomyPlan = selection;
+        return Task.CompletedTask;
+    }
+    #endregion
+}

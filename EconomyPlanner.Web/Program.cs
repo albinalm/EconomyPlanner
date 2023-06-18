@@ -1,4 +1,4 @@
-using System.Net.Http.Headers;
+
 using Blazored.LocalStorage;
 using Blazored.Modal;
 using Microsoft.AspNetCore.Components.Web;
@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using EconomyPlanner.Web;
 using EconomyPlanner.Web.Services;
 using EconomyPlanner.Web.Services.Interfaces;
+using Havit.Blazor.Components.Web;            // <------ ADD THIS LINE
+using Havit.Blazor.Components.Web.Bootstrap;  // <------ ADD THIS LINE
 using Syncfusion.Blazor;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
@@ -35,5 +37,6 @@ builder.Services.AddSingleton(options);
 builder.Services.AddSyncfusionBlazor();
 
 builder.Services.AddBlazoredModal();
+builder.Services.AddHxServices(); 
 
 await builder.Build().RunAsync();
