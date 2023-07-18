@@ -30,11 +30,11 @@ public class EconomyPlanService : IEconomyPlanService
         var economyPlan = EconomyPlan.Create(name, period);
 
         _dbContext.Add(economyPlan);
-
+        
+        household.EconomyPlans.Add(economyPlan);
+        
         AddRecurringExpensesToEconomyPlan(economyPlan);
         AddRecurringIncomesToEconomyPlan(economyPlan);
-
-        household.EconomyPlans.Add(economyPlan);
 
         _dbContext.SaveChanges();
     }
@@ -169,15 +169,10 @@ public class EconomyPlanService : IEconomyPlanService
             var month = currentTime.Month;
             var economyPlanMonth = DateTime.Parse(activeEconomyPlans.Single().EndDate).Month;
 
-            if (month != economyPlanMonth)
-            {
-                var period = currentTime.AddMonths(1);
-                CreateEconomyPlan(EconomyPlanHelper.GetEconomyPlanName(period), guid, period);
-            }
-            else
-            {
-                CreateEconomyPlan(EconomyPlanHelper.GetEconomyPlanName(currentTime), guid, currentTime);
-            }
+            if (month == economyPlanMonth) return;
+            
+            var period = currentTime.AddMonths(1);
+            CreateEconomyPlan(EconomyPlanHelper.GetEconomyPlanName(period), guid, period);
         }
         
         else if (!activeEconomyPlans.Any())

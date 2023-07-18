@@ -265,8 +265,7 @@
         {
             await SetupActiveEconomyPlans();
         }
-        Console.WriteLine("Im now in: " + await HouseholdService.GetGuid());
-        
+
         await GetEconomyPlanModels();
 
         if (ActiveEconomyPlans.Any())
