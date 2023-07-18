@@ -1,5 +1,6 @@
 ﻿@page "/"
 @using System.Globalization
+
 <HxGrid TItem="CultureInfo" MultiSelectionEnabled="true" Responsive="true" @bind-SelectedDataItems="selectedCultureInfos" DataProvider="ClientSideProcessingDataProvider" PageSize="10" @ref="grid" InProgress="@inProgress">
     <Columns>
         <HxGridColumn HeaderText="LCID" ItemTextSelector="@(item => item.LCID.ToString())" SortKeySelector="@(item => item.LCID)" IsDefaultSortColumn="true" />
@@ -14,7 +15,9 @@
     </Columns>
 </HxGrid>
 <HxButton Text="Refresh data" OnClick="HandleButtonClick" Color="ThemeColor.Primary" />
+
 @code {
+    private bool ShowAddNameButton;
     private HashSet<CultureInfo> selectedCultureInfos = new();
     private List<CultureInfo> localCultureInfos = CultureInfo.GetCultures(CultureTypes.AllCultures).ToList();
     private HxGrid<CultureInfo> grid;
